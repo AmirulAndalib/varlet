@@ -14,14 +14,14 @@
 | `readonly` | 是否只读 | _boolean_ | `false` |
 | `indeterminate` | 是否为不确定状态（样式优先级最高） | _boolean_ | `false` |
 | `ripple` | 是否开启水波纹 | _boolean_ | `true` |
-| `rules` | 验证规则，返回 `true` 表示验证通过，其余的值则转换为文本作为用户提示 | _Array<(value: any) => any>_ | `-` |
+| `rules` | 验证规则，返回 `true` 表示验证通过，其它类型的值将转换为文本作为用户提示。自 `3.5.0` 开始支持 [Zod 验证](#/zh-CN/zodValidation)  | _((v: any) => any) \| ZodType \| Array<((v: any) => any) \| ZodType>_ | `-` |
 
 ### 事件
 
 | 事件名 | 说明 | 参数 |
 | --- | --- | --- |
 | `click` | 点击时触发 | `e: Event` |
-| `change` | 状态变更时触发 | `value: any` |
+| `change` | 状态变更时触发 | `value: any, indeterminate: boolean` |
 
 ### 插槽
 
@@ -30,4 +30,4 @@
 | `checked-icon` | 选中图标 | `-` |
 | `unchecked-icon` | 未选中图标 | `-` |
 | `indeterminate-icon` | 不确定状态图标 | `-` |
-| `default` | 显示的文本 | `-` |
+| `default` | 显示的文本 | `checked: boolean` 是否选中 |

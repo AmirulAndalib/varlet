@@ -1,6 +1,6 @@
-import markdownIt from 'markdown-it'
-import hljs from 'highlight.js'
 import { kebabCase } from '@varlet/shared'
+import hljs from 'highlight.js'
+import markdownIt from 'markdown-it'
 import { pinyin } from 'pinyin-pro'
 import type { Plugin } from 'vite'
 
@@ -14,7 +14,7 @@ function htmlWrapper(html: string) {
   const matches = html.matchAll(/<h3>(.*?)<\/h3>/g)
   const hGroup = html
     .replace(/<h3>/g, () => {
-      const hash = transformHash(matches.next().value[1])
+      const hash = transformHash(matches.next().value![1])
 
       return `:::<h3 id="${hash}"><router-link to="#${hash}">#</router-link>`
     })
@@ -141,6 +141,15 @@ export function markdown(options: MarkdownOptions): Plugin {
       } catch (e: any) {
         this.error(e)
       }
+    },
+
+    handleHotUpdate(ctx) {
+      if (!/\.md$/.test(ctx.file)) {
+        return
+      }
+
+      const { read } = ctx
+      ctx.read = async () => markdownToVue(await read(), options)
     },
   }
 }

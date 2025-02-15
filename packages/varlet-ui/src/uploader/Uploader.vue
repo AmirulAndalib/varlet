@@ -2,17 +2,34 @@
   <div :class="classes(n(), n('$--box'))">
     <div :class="n('file-list')">
       <div
-        :class="classes(n('file'), formatElevation(elevation, 2), [f.state === 'loading', n('--loading')])"
-        :key="f.id"
         v-for="f in files"
+        :key="f.id"
         v-ripple="{ disabled: disabled || formDisabled || readonly || formReadonly || !ripple }"
+        :class="classes(n('file'), formatElevation(elevation, 2), [f.state === 'loading', n('--loading')])"
         @click="preview(f)"
       >
         <div :class="n('file-name')">{{ f.name || f.url }}</div>
-        <div :class="n('file-close')" v-if="removable" @click.stop="handleRemove(f)">
-          <var-icon :class="n('file-close-icon')" var-uploader-cover name="delete" />
-        </div>
-        <img :class="n('file-cover')" :style="{ objectFit: f.fit }" :src="f.cover" :alt="f.name" v-if="f.cover" />
+        <slot
+          v-if="removable"
+          name="remove-button"
+          :remove="
+            () => {
+              handleRemove(f)
+            }
+          "
+        >
+          <div :class="n('file-close')" @click.stop="handleRemove(f)">
+            <var-icon :class="n('file-close-icon')" var-uploader-cover name="delete" />
+          </div>
+        </slot>
+        <img
+          v-if="f.cover"
+          role="img"
+          :class="n('file-cover')"
+          :style="{ objectFit: f.fit }"
+          :src="f.cover"
+          :alt="f.name"
+        />
         <div :class="n('file-indicator')">
           <div
             :class="
@@ -24,18 +41,23 @@
       </div>
 
       <div
-        :class="
-          classes(
-            [!$slots.default, `${n('action')} ${formatElevation(elevation, 2)}`],
-            [disabled || formDisabled, n('--disabled')]
-          )
-        "
         v-if="!maxlength || modelValue.length < toNumber(maxlength)"
+        ref="actionRef"
         v-ripple="{
           disabled: disabled || formDisabled || readonly || formReadonly || !ripple || Boolean($slots.default),
         }"
         v-hover:desktop="handleHovering"
+        :class="
+          classes(
+            n('--outline-none'),
+            [!$slots.default, `${n('action')} ${formatElevation(elevation, 2)}`],
+            [disabled || formDisabled, n('--disabled')],
+          )
+        "
+        :tabindex="disabled || formDisabled ? undefined : '0'"
         @click="handleActionClick"
+        @focus="isFocusing = true"
+        @blur="isFocusing = false"
       >
         <input
           ref="input"
@@ -51,7 +73,10 @@
 
         <slot>
           <var-icon :class="n('action-icon')" var-uploader-cover name="plus" />
-          <var-hover-overlay :hovering="hovering && !disabled && !formDisabled" />
+          <var-hover-overlay
+            :hovering="hovering && !disabled && !formDisabled && !readonly && !formReadonly"
+            :focusing="isFocusing && !disabled && !formDisabled && !readonly && !formReadonly"
+          />
         </slot>
       </div>
     </div>
@@ -63,13 +88,14 @@
     </var-form-details>
 
     <var-popup
+      v-model:show="showPreview"
       :class="n('preview')"
       var-uploader-cover
       position="center"
-      v-model:show="showPreview"
       @closed="currentPreview = null"
     >
       <video
+        v-if="currentPreview && isHTMLSupportVideo(currentPreview?.url)"
         :class="n('preview-video')"
         playsinline="true"
         webkit-playsinline="true"
@@ -78,27 +104,27 @@
         x5-video-player-fullscreen="false"
         controls
         :src="currentPreview?.url"
-        v-if="currentPreview && isHTMLSupportVideo(currentPreview?.url)"
       ></video>
     </var-popup>
   </div>
 </template>
 
 <script lang="ts">
-import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
+import { computed, defineComponent, nextTick, reactive, ref, watch } from 'vue'
+import { call, isNumber, normalizeToArray, toDataURL, toNumber } from '@varlet/shared'
+import { useEventListener } from '@varlet/use'
 import VarFormDetails from '../form-details'
-import VarIcon from '../icon'
-import VarPopup from '../popup'
-import ImagePreview from '../image-preview'
-import Ripple from '../ripple'
-import Hover from '../hover'
-import { defineComponent, nextTick, reactive, computed, watch, ref } from 'vue'
-import { props, type VarFile, type UploaderValidateTrigger } from './props'
-import { isNumber, toNumber, normalizeToArray, toDataURL, call } from '@varlet/shared'
-import { isHTMLSupportImage, isHTMLSupportVideo } from '../utils/shared'
-import { useValidation, createNamespace, formatElevation } from '../utils/components'
 import { useForm } from '../form/provide'
+import Hover from '../hover'
+import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
+import VarIcon from '../icon'
+import ImagePreview from '../image-preview'
+import VarPopup from '../popup'
+import Ripple from '../ripple'
+import { createNamespace, formatElevation, useValidation } from '../utils/components'
 import { toSizeUnit } from '../utils/elements'
+import { isHTMLSupportImage, isHTMLSupportVideo } from '../utils/shared'
+import { props, type UploaderValidateTrigger, type VarFile } from './props'
 import { type UploaderProvider } from './provide'
 
 const { name, n, classes } = createNamespace('uploader')
@@ -129,6 +155,8 @@ export default defineComponent({
   },
   props,
   setup(props) {
+    const isFocusing = ref(false)
+    const actionRef = ref<null | HTMLElement>(null)
     const input = ref<null | HTMLElement>(null)
     const showPreview = ref(false)
     const currentPreview = ref<null | VarFile>(null)
@@ -172,14 +200,40 @@ export default defineComponent({
 
     call(bindForm, uploaderProvider)
 
+    useEventListener(() => window, 'keydown', handleKeydown)
+    useEventListener(() => window, 'keyup', handleKeyup)
+
     watch(
       () => props.modelValue,
       () => {
         !callReset && validateWithTrigger('onChange')
         callReset = false
       },
-      { deep: true }
+      { deep: true },
     )
+
+    function handleKeydown(event: KeyboardEvent) {
+      if (!isFocusing.value) {
+        return
+      }
+
+      if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault()
+      }
+
+      if (event.key === 'Enter') {
+        actionRef.value!.click()
+      }
+    }
+
+    function handleKeyup(event: KeyboardEvent) {
+      if (!isFocusing.value || event.key !== ' ') {
+        return
+      }
+
+      event.preventDefault()
+      actionRef.value!.click()
+    }
 
     function preview(varFile: VarFile) {
       const { disabled, previewed, preventDefaultPreview, onPreview } = props
@@ -262,7 +316,7 @@ export default defineComponent({
                 varFile,
               })
             })
-          })
+          }),
       )
     }
 
@@ -295,7 +349,6 @@ export default defineComponent({
 
         const events = normalizeToArray(onBeforeFilter)
 
-        // eslint-disable-next-line no-restricted-syntax
         for (const event of events) {
           varFiles = await event(varFiles)
         }
@@ -402,12 +455,14 @@ export default defineComponent({
 
     return {
       input,
+      actionRef,
       files,
       showPreview,
       currentPreview,
       errorMessage,
       maxlengthText,
       hovering,
+      isFocusing,
       formDisabled: form?.disabled,
       formReadonly: form?.readonly,
       n,
@@ -438,12 +493,13 @@ export default defineComponent({
 <style lang="less">
 @import '../styles/common';
 @import '../styles/elevation';
+@import '../hover-overlay/hoverOverlay';
+@import '../ripple/ripple';
 @import '../form-details/formDetails';
 @import '../icon/icon';
 @import '../popup/popup';
 @import '../swipe/swipe';
 @import '../swipe-item/swipeItem';
 @import '../image-preview/imagePreview';
-@import '../hover-overlay/hoverOverlay';
 @import './uploader';
 </style>

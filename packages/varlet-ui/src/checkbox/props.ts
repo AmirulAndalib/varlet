@@ -1,7 +1,7 @@
 import type { PropType } from 'vue'
 import { defineListenerProp } from '../utils/components'
 
-export type ValidateTriggers = 'onChange'
+export type CheckboxValidateTrigger = 'onChange'
 
 export const props = {
   modelValue: {
@@ -27,12 +27,12 @@ export const props = {
     default: true,
   },
   validateTrigger: {
-    type: Array as PropType<Array<ValidateTriggers>>,
+    type: Array as PropType<Array<CheckboxValidateTrigger>>,
     default: () => ['onChange'],
   },
-  rules: Array as PropType<Array<(value: any) => any>>,
+  rules: [Array, Function, Object] as PropType<any>,
   onClick: defineListenerProp<(e: Event) => void>(),
-  onChange: defineListenerProp<(value: any) => void>(),
+  onChange: defineListenerProp<(value: any, indeterminate: boolean) => void>(),
   'onUpdate:modelValue': defineListenerProp<(value: any) => void>(),
   'onUpdate:indeterminate': defineListenerProp<(value: boolean) => void>(),
 }

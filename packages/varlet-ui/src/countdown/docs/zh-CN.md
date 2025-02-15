@@ -71,11 +71,12 @@ const time = ref(30 * 60 * 60 * 1000)
 
 <style>
 .countdown-example-block {
-  background: #ff9f00;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   width: 30px;
   height: 30px;
   border-radius: 50%;
+  padding: 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -119,9 +120,9 @@ function change() {
     @change="change"
   />
   <var-row justify="space-between" align="center" style="margin-top: 10px">
-    <var-button type="primary" @click="$refs.countdown.start()">开始</var-button>
-    <var-button @click="$refs.countdown.pause()">暂停</var-button>
-    <var-button @click="$refs.countdown.reset()">重置</var-button>
+    <var-button type="primary" @click="countdown.start()">开始</var-button>
+    <var-button @click="countdown.pause()">暂停</var-button>
+    <var-button @click="countdown.reset()">重置</var-button>
   </var-row>
 </template>
 ```
@@ -187,5 +188,5 @@ function change() {
 
 | 变量名                         | 默认值 |
 |-----------------------------| --- |
-| `--countdown-text-color`     | `#555`                |
+| `--countdown-text-color`     | `var(--color-text)`                |
 | `--countdown-text-font-size` | `var(--font-size-lg)` |

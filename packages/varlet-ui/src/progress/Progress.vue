@@ -1,21 +1,27 @@
 <template>
-  <div :class="n()">
-    <div :class="n('linear')" v-if="mode === 'linear'">
+  <div
+    :class="n()"
+    role="progressbar"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    :aria-valuenow="indeterminate ? undefined : mode === 'linear' ? linearProps.value : circleProps.value"
+  >
+    <div v-if="mode === 'linear'" :class="n('linear')">
       <div
         :class="classes(n('linear-block'), [track, n('linear-background')])"
         :style="{ height: toSizeUnit(lineWidth), background: trackColor }"
       >
-        <div v-if="indeterminate" :class="classes([indeterminate, n('linear-indeterminate')])">
+        <div v-if="indeterminate" :class="n('linear-indeterminate')">
           <div :class="classes(n(`linear--${type}`))" :style="{ background: progressColor }"></div>
           <div :class="classes(n(`linear--${type}`))" :style="{ background: progressColor }"></div>
         </div>
         <div
           v-else
-          :class="classes(n('linear-certain'), n(`linear--${type}`), [ripple, n('linear-ripple')])"
+          :class="classes(n('linear-certain'), n(`linear--${type}`))"
           :style="{ background: progressColor, width: linearProps.width }"
         ></div>
       </div>
-      <div :class="classes(n('linear-label'), [labelClass, labelClass])" v-if="label">
+      <div v-if="label" :class="classes(n('linear-label'), [labelClass, labelClass])">
         <slot>
           {{ linearProps.roundValue }}
         </slot>
@@ -64,7 +70,7 @@
         ></path>
       </svg>
 
-      <div :class="classes(n('circle-label'), [labelClass, labelClass])" v-if="label">
+      <div v-if="label" :class="classes(n('circle-label'), labelClass)">
         <slot>
           {{ circleProps.roundValue }}
         </slot>
@@ -74,14 +80,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
-import { props } from './props'
-import { isPlainObject, toNumber } from '@varlet/shared'
-import { useId } from '@varlet/use'
-import { toSizeUnit, toPxNum } from '../utils/elements'
+import { computed, defineComponent } from 'vue'
+import { clamp, isPlainObject, toNumber } from '@varlet/shared'
+import { useClientId } from '@varlet/use'
 import { createNamespace } from '../utils/components'
+import { toPxNum, toSizeUnit } from '../utils/elements'
+import { props } from './props'
 
-const ONE_HUNDRED = 100
+const MAX = 100
+const MIN = 0
 const RADIUS = 20
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
@@ -91,15 +98,16 @@ export default defineComponent({
   name,
   props,
   setup(props) {
-    const id = useId()
+    const id = useClientId()
     const linearProps = computed(() => {
       const value = toNumber(props.value)
-      const width = value > ONE_HUNDRED ? ONE_HUNDRED : value
-      const roundValue = value > ONE_HUNDRED ? ONE_HUNDRED : Math.round(value)
+      const width = clamp(value, MIN, MAX)
+      const roundValue = clamp(Math.round(value), MIN, MAX)
 
       return {
         width: `${width}%`,
         roundValue: `${roundValue}%`,
+        value: width,
       }
     })
 
@@ -108,8 +116,8 @@ export default defineComponent({
 
       const diameter = (RADIUS / (1 - toPxNum(lineWidth) / toPxNum(size))) * 2
       const viewBox = `0 0 ${diameter} ${diameter}`
-      const roundValue = toNumber(value) > ONE_HUNDRED ? ONE_HUNDRED : Math.round(toNumber(value))
-      const strokeOffset = `${((ONE_HUNDRED - roundValue) / ONE_HUNDRED) * CIRCUMFERENCE}`
+      const roundValue = clamp(Math.round(toNumber(value)), MIN, MAX)
+      const strokeOffset = `${((MAX - roundValue) / MAX) * CIRCUMFERENCE}`
       const strokeWidth = (toPxNum(lineWidth) / toPxNum(size)) * diameter
 
       const beginPositionX = 0
@@ -125,6 +133,7 @@ export default defineComponent({
         strokeOffset,
         roundValue: `${roundValue}%`,
         path,
+        value: clamp(toNumber(value), MIN, MAX),
       }
     })
 
@@ -138,7 +147,7 @@ export default defineComponent({
     })
 
     const linearGradientProgress = computed(() =>
-      Object.keys(props.color!).sort((a, b) => parseFloat(a) - parseFloat(b))
+      Object.keys(props.color!).sort((a, b) => parseFloat(a) - parseFloat(b)),
     )
 
     return {

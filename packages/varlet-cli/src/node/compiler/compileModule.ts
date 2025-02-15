@@ -1,31 +1,30 @@
+import { resolve } from 'path'
+import { kebabCase } from '@varlet/shared'
 import fse from 'fs-extra'
 import { build } from 'vite'
-import { resolve } from 'path'
+import { getVarletConfig } from '../config/varlet.config.js'
+import { BundleBuildOptions, getBundleConfig } from '../config/vite.config.js'
 import {
-  EXAMPLE_DIR_NAME,
-  TESTS_DIR_NAME,
   DOCS_DIR_NAME,
-  SRC_DIR,
   ES_DIR,
-  STYLE_DIR_NAME,
+  EXAMPLE_DIR_NAME,
   LIB_DIR,
+  SRC_DIR,
+  STYLE_DIR_NAME,
+  TESTS_DIR_NAME,
   UMD_DIR,
 } from '../shared/constant.js'
-import { getPublicDirs, isDir, isDTS, isLess, isScript, isSFC } from '../shared/fsUtils.js'
-import { compileSFC } from './compileSFC.js'
+import { getPublicDirs, isDir, isDTS, isLess, isScript, isScss, isSFC } from '../shared/fsUtils.js'
 import { compileESEntry, compileScriptFile, getScriptExtname } from './compileScript.js'
-import { clearLessFiles, compileLess } from './compileStyle.js'
-import { BundleBuildOptions, getBundleConfig } from '../config/vite.config.js'
-import { getVarletConfig } from '../config/varlet.config.js'
+import { compileSFC } from './compileSFC.js'
+import { clearLessFiles, clearScssFiles, compileLess, compileScss } from './compileStyle.js'
 import { generateReference } from './compileTypes.js'
-import { get } from 'lodash-es'
-import { kebabCase } from '@varlet/shared'
 
 const { copy, ensureFileSync, readdir, removeSync } = fse
 
 export async function compileBundle() {
   const varletConfig = await getVarletConfig()
-  const name = kebabCase(get(varletConfig, 'name'))
+  const name = kebabCase(varletConfig?.name || '')
   const buildOptions: BundleBuildOptions[] = [
     {
       format: 'es',
@@ -68,7 +67,7 @@ export async function compileDir(dir: string) {
       }
 
       return compileFile(file)
-    })
+    }),
   )
 }
 
@@ -76,6 +75,7 @@ export async function compileFile(file: string) {
   isSFC(file) && (await compileSFC(file))
   isScript(file) && (await compileScriptFile(file))
   isLess(file) && (await compileLess(file))
+  isScss(file) && compileScss(file)
   isDir(file) && (await compileDir(file))
 }
 
@@ -91,11 +91,12 @@ export async function compileModule() {
       isDir(file) && ensureFileSync(resolve(file, `./style/index${getScriptExtname()}`))
 
       return isDir(file) ? compileDir(file) : null
-    })
+    }),
   )
 
   const publicDirs = await getPublicDirs()
   await compileESEntry(dest, publicDirs)
   clearLessFiles(dest)
+  clearScssFiles(dest)
   generateReference(dest)
 }

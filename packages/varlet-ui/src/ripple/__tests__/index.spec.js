@@ -1,8 +1,8 @@
-import Ripple from '..'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
-import { delay, mockOffset, trigger, triggerDrag } from '../../utils/test'
-import { expect } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test } from 'vitest'
+import Ripple from '..'
+import { delay, mockOffset, trigger, triggerDrag, triggerKeyboard } from '../../utils/test'
 
 mockOffset()
 
@@ -17,13 +17,13 @@ const Wrapper = {
   `,
 }
 
-test('test ripple use', () => {
+test('ripple use', () => {
   const app = createApp({}).use(Ripple)
   expect(app.directive('ripple')).toBeTruthy()
 })
 
 describe('test ripple component props', () => {
-  test('test ripple show & hide', async () => {
+  test('ripple show & hide', async () => {
     const wrapper = mount(Wrapper, { attachTo: document.body })
     await trigger(wrapper, 'touchstart')
     await delay(60)
@@ -35,7 +35,31 @@ describe('test ripple component props', () => {
     wrapper.unmount()
   })
 
-  test('test ripple update & color', async () => {
+  test('ripple show & hide via keydown and keyup and enter', async () => {
+    const wrapper = mount(Wrapper, { attachTo: document.body })
+    await triggerKeyboard(wrapper, 'keydown', { key: 'Enter' })
+    await delay(60)
+    expect(wrapper.find('.var-ripple').exists()).toBeTruthy()
+
+    await triggerKeyboard(wrapper, 'keyup', { key: 'Enter' })
+    await delay(1000)
+    expect(wrapper.find('.var-ripple').exists()).toBeFalsy()
+    wrapper.unmount()
+  })
+
+  test('ripple show & hide via keydown and blur and space', async () => {
+    const wrapper = mount(Wrapper, { attachTo: document.body })
+    await triggerKeyboard(wrapper, 'keydown', { key: ' ' })
+    await delay(60)
+    expect(wrapper.find('.var-ripple').exists()).toBeTruthy()
+
+    await trigger(wrapper, 'blur')
+    await delay(1000)
+    expect(wrapper.find('.var-ripple').exists()).toBeFalsy()
+    wrapper.unmount()
+  })
+
+  test('ripple update & color', async () => {
     const wrapper = mount(Wrapper, { attachTo: document.body })
     await wrapper.setData({ color: 'green' })
 
@@ -47,7 +71,7 @@ describe('test ripple component props', () => {
     wrapper.unmount()
   })
 
-  test('test ripple disabled', async () => {
+  test('ripple disabled', async () => {
     const wrapper = mount(Wrapper, { attachTo: document.body })
     await wrapper.setData({ disabled: true })
 
@@ -58,7 +82,7 @@ describe('test ripple component props', () => {
     wrapper.unmount()
   })
 
-  test('test ripple touchmove', async () => {
+  test('ripple touchmove', async () => {
     const wrapper = mount(Wrapper, { attachTo: document.body })
 
     await triggerDrag(wrapper, 0, 20)

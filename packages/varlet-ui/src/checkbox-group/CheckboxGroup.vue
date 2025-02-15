@@ -1,6 +1,18 @@
 <template>
   <div :class="n('wrap')">
     <div :class="classes(n(), n(`--${direction}`))">
+      <template v-if="options.length">
+        <var-checkbox
+          v-for="option in options"
+          :key="option[valueKey]"
+          :checked-value="option[valueKey]"
+          :disabled="option.disabled"
+        >
+          <template #default="{ checked }">
+            <maybe-v-node :is="isFunction(option[labelKey]) ? option[labelKey](option, checked) : option[labelKey]" />
+          </template>
+        </var-checkbox>
+      </template>
       <slot />
     </div>
     <var-form-details :error-message="errorMessage" />
@@ -8,19 +20,20 @@
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, nextTick, watch } from 'vue'
+import { call, isFunction, uniq } from '@varlet/shared'
+import VarCheckbox from '../checkbox'
 import VarFormDetails from '../form-details'
-import { defineComponent, computed, watch, nextTick } from 'vue'
-import { props, type CheckboxGroupValidateTrigger } from './props'
-import { useValidation, createNamespace } from '../utils/components'
-import { useCheckboxes, type CheckboxGroupProvider } from './provide'
 import { useForm } from '../form/provide'
-import { uniq, call } from '@varlet/shared'
+import { createNamespace, MaybeVNode, useValidation } from '../utils/components'
+import { props, type CheckboxGroupValidateTrigger } from './props'
+import { useCheckboxes, type CheckboxGroupProvider } from './provide'
 
 const { name, n, classes } = createNamespace('checkbox-group')
 
 export default defineComponent({
   name,
-  components: { VarFormDetails },
+  components: { VarFormDetails, VarCheckbox, MaybeVNode },
   props,
   setup(props) {
     const max = computed(() => props.max)
@@ -86,19 +99,13 @@ export default defineComponent({
     }
 
     function syncCheckboxes() {
-      return checkboxes.forEach(({ sync }) => sync(props.modelValue))
-    }
-
-    function resetWithAnimation() {
-      checkboxes.forEach((checkbox) => checkbox.resetWithAnimation())
+      checkboxes.forEach(({ sync }) => sync(props.modelValue))
     }
 
     // expose
     function checkAll() {
       const checkedValues: any[] = checkboxes.map(({ checkedValue }) => checkedValue.value)
       const changedModelValue: any[] = uniq(checkedValues)
-
-      resetWithAnimation()
 
       call(props['onUpdate:modelValue'], changedModelValue)
 
@@ -111,8 +118,6 @@ export default defineComponent({
         .filter(({ checked }) => !checked.value)
         .map(({ checkedValue }) => checkedValue.value)
       const changedModelValue: any[] = uniq(checkedValues)
-
-      resetWithAnimation()
 
       call(props['onUpdate:modelValue'], changedModelValue)
 
@@ -139,6 +144,7 @@ export default defineComponent({
       reset,
       validate,
       resetValidation,
+      isFunction,
     }
   },
 })
@@ -147,5 +153,9 @@ export default defineComponent({
 <style lang="less">
 @import '../styles/common';
 @import '../form-details/formDetails';
+@import '../ripple/ripple';
+@import '../icon/icon';
+@import '../hover-overlay/hoverOverlay';
+@import '../checkbox/checkbox';
 @import './checkboxGroup';
 </style>

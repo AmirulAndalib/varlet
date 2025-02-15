@@ -1,5 +1,5 @@
-import { VarComponent, BasicAttributes, ListenerProp, SetPropsDefaults } from './varComponent'
 import { VNode } from 'vue'
+import { BasicAttributes, ListenerProp, SetPropsDefaults, VarComponent } from './varComponent'
 
 export declare const datePickerProps: Record<keyof DatePickerProps, any>
 
@@ -11,8 +11,6 @@ export interface DatePickerProps extends BasicAttributes {
   allowedDates?: (val: string) => boolean
   color?: string
   hint?: string
-  /** @deprecated Use titleColor to instead. */
-  headerColor?: string
   titleColor?: string
   elevation?: boolean | string | number
   buttonElevation?: boolean | string | number

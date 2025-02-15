@@ -1,11 +1,11 @@
 import { type PropType } from 'vue'
 import { defineListenerProp } from '../utils/components'
 
-export type ValidateTrigger = 'onIncrement' | 'onDecrement' | 'onInputChange' | 'onLazyChange'
+export type CounterValidateTrigger = 'onIncrement' | 'onDecrement' | 'onInputChange' | 'onLazyChange'
 
 export const props = {
   modelValue: {
-    type: [String, Number],
+    type: Number,
     default: 0,
   },
   min: [String, Number],
@@ -46,11 +46,11 @@ export const props = {
     default: true,
   },
   validateTrigger: {
-    type: Array as PropType<Array<ValidateTrigger>>,
+    type: Array as PropType<Array<CounterValidateTrigger>>,
     default: () => ['onInputChange', 'onLazyChange', 'onIncrement', 'onDecrement'],
   },
-  rules: Array as PropType<Array<(v: number) => any>>,
-  onBeforeChange: defineListenerProp<(value: number, change: (value: string | number) => void) => void>(),
+  rules: [Array, Function, Object] as PropType<any>,
+  onBeforeChange: defineListenerProp<(value: number, change: (value: number) => void) => void>(),
   onChange: defineListenerProp<(value: number) => void>(),
   onIncrement: defineListenerProp<(value: number) => void>(),
   onDecrement: defineListenerProp<(value: number) => void>(),

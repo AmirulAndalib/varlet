@@ -1,23 +1,29 @@
 <template>
   <div class="var-site-code-example">
     <div class="var-site-code-example__toolbar">
-      <var-button text round @click="toggle" v-if="fold && !disabledFold">
-        <var-icon name="xml" size="18"/>
-      </var-button>
+      <var-tooltip placement="top" :content="height >= 0 ? 'Show Source' : 'Hide Source'">
+        <var-button text round @click="toggle" v-if="fold && !disabledFold">
+          <var-icon name="xml" size="18" />
+        </var-button>
+      </var-tooltip>
 
-      <var-button
-        :id="`clip-trigger-${cid}`"
-        :data-clipboard-target="`#clip-target-${cid}`"
-        text
-        round
-        v-if="clipboard"
-      >
-        <var-icon name="content-copy" size="18"/>
-      </var-button>
+      <var-tooltip placement="top" content="Copy Example Code">
+        <var-button
+          :id="`clip-trigger-${cid}`"
+          :data-clipboard-target="`#clip-target-${cid}`"
+          text
+          round
+          v-if="clipboard"
+        >
+          <var-icon name="content-copy" size="18" />
+        </var-button>
+      </var-tooltip>
 
-      <var-button text round @click="toPlayground" v-if="playground">
-        <var-icon name="code-json" size="18"/>
-      </var-button>
+      <var-tooltip placement="top" content="Edit In Playground">
+        <var-button text round @click="toPlayground" v-if="playground">
+          <var-icon name="code-json" size="18" />
+        </var-button>
+      </var-tooltip>
     </div>
     <div
       :id="`clip-target-${cid}`"
@@ -28,21 +34,20 @@
         height: height >= 0 ? `${height}px` : undefined,
       }"
     >
-      <slot/>
+      <slot />
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { defineComponent, nextTick, onMounted, ref, type Ref } from 'vue'
 import config from '@config'
-import Clipboard from 'clipboard'
-import { Context, Snackbar } from '@varlet/ui'
-import { defineComponent, nextTick, ref, onMounted, type Ref } from 'vue'
-import { doubleRaf } from '@varlet/shared'
-import { get } from 'lodash-es'
 import { getBrowserTheme, getPCLocationInfo } from '@varlet/cli/client'
-import { utoa } from '../../../utils'
+import { doubleRaf } from '@varlet/shared'
+import { Context, Snackbar } from '@varlet/ui'
+import Clipboard from 'clipboard'
 import { type SiteContext } from '../../../types'
+import { utoa } from '../../../utils'
 
 const context = Context as SiteContext
 
@@ -54,17 +59,19 @@ export default defineComponent({
   props: {
     playgroundIgnore: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   setup(props) {
     const code: Ref<HTMLElement | null> = ref(null)
     const cid: Ref<number> = ref(clipId++)
-    const fold: Ref = ref(get(config, 'pc.fold'))
+    const fold: Ref = ref(config?.pc?.fold)
     const disabledFold: Ref<boolean> = ref(false)
-    const clipboard: Ref = ref(get(config, 'pc.clipboard', {}))
+    const clipboard: Ref = ref(config?.pc?.clipboard || {})
     const height: Ref<number> = ref(-1)
-    const playground: Ref<string | undefined> = ref(!props.playgroundIgnore ? get(config, 'pc.header.playground') : undefined)
+    const playground: Ref<string | undefined> = ref(
+      !props.playgroundIgnore ? config?.pc?.header?.playground : undefined,
+    )
     let timer: any = null
 
     const toggle = async () => {
@@ -93,7 +100,7 @@ export default defineComponent({
     const toPlayground = () => {
       const codeText = code.value?.innerText ?? ''
       const file = { 'App.vue': codeText }
-      const initialTheme = getBrowserTheme().replace('Theme', '')
+      const initialTheme = getBrowserTheme()
 
       context.showPlayground = true
       context.playgroundURL = `${playground.value}/?initialTheme=${initialTheme}#${utoa(JSON.stringify(file))}`
@@ -120,12 +127,12 @@ export default defineComponent({
       clipboard,
       playground,
       toggle,
-      toPlayground
+      toPlayground,
     }
-  }
+  },
 })
 </script>
 
 <style lang="less">
-@import "./codeExample";
+@import './codeExample';
 </style>

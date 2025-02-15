@@ -1,21 +1,19 @@
 <div align="center">
-  <a href="https://varlet.gitee.io/varlet-ui/#/en-US/index">
-    <img src="https://varlet.gitee.io/varlet-ui/logo.svg" width="150">
+  <a href="https://varletjs.org/#/en-US/index">
+    <img src="https://varletjs.org/logo.svg" width="150">
   </a>
   <h1>VARLET</h1>
-  <p>Material design mobile component library for Vue3</p>
+  <p>A Vue3 component library based on Material Design 2 and 3, supporting mobile and desktop.</p>
   <p>
-    <a href="https://varlet-varletjs.vercel.app/#/en-US/index">Documentation(Vercel)</a> |
-    <a href="https://varlet.gitee.io/varlet-ui/#/en-US/index">Documentation(Gitee)</a> | 
-    <a href="https://github.com/varletjs/varlet/blob/dev/README.zh-CN.md">中文README</a>
+    <a href="https://varletjs.org/#/en-US/index">Documentation</a> |
+    <a href="https://github.com/varletjs/varlet/blob/dev/README.zh-CN.md">中文介绍</a>
   </p>
   <p>
     <img src="https://img.shields.io/npm/v/@varlet/ui?style=flat-square" alt="version">
     <img src="https://img.shields.io/github/stars/varletjs/varlet" alt="stars">
     <img src="https://img.shields.io/badge/vue-v3.2.0%2B-%23407fbc" alt="vue">
-    <img src="https://img.shields.io/npm/l/@varlet/ui.svg" alt="licence">
+    <img src="https://img.shields.io/npm/l/@varlet/ui.svg" alt="license">
     <img src="https://img.shields.io/codecov/c/github/varletjs/varlet" alt="coverage">
-    <img src="https://img.badgesize.io/https://unpkg.com/@varlet/ui/umd/varlet.js?compression=gzip&label=gzip" alt="gzip" />
     <img src="https://github.com/varletjs/varlet/workflows/CI/badge.svg" alt="ci">
   </p>
 </div>
@@ -24,7 +22,7 @@
 
 ### Intro
 
-Varlet is a Material design mobile component library developed based on `Vue3`, developed and maintained by `varletjs` community team.
+Varlet is a `Vue3` component library based on Material Design 2 and 3, supporting mobile and desktop, developed and maintained by `varletjs` organization.
 
 
 ### Features
@@ -37,10 +35,13 @@ Varlet is a Material design mobile component library developed based on `Vue3`, 
 - 🌍 &nbsp; Support internationalization
 - 💡 &nbsp; Support WebStorm syntax highlighting
 - 💪 &nbsp; Support the SSR
+- 📦 &nbsp; Support [Nuxt Module](https://github.com/varletjs/varlet-nuxt)
 - 💡 &nbsp; Support the Typescript
 - 💪 &nbsp; Make sure more than 90 percent unit test coverage, providing stability assurance
+- 🎨 &nbsp; Supports both Material Design 2 and Material Design 3 design systems
 - 🛠️ &nbsp; Support dark mode
-- 🛠️ &nbsp; Provide official VSCode extension
+- 🔧 &nbsp; Provide official VSCode extension
+- ⌨️ &nbsp; Support Accessibility (still improving)
 
 ### Install
 
@@ -84,6 +85,10 @@ import '@varlet/ui/es/style'
 createApp(App).use(Varlet).mount('#app')
 ```
 
+### AI Agent for documentation
+
+You can get more information about `varlet` by asking in [AI Agent for documentation](https://gpt.qilepan.com/chat/share?shareId=y3ytky9ifjgl6fxtva1ai16h). Thanks to [qile AI](https://ai.qilepan.com/auth?type=register&invite=MjM0) for providing service support.
+
 ### Official Ecosystem
 
 The following projects are maintained by the official team for a long time.
@@ -93,6 +98,10 @@ The following projects are maintained by the official team for a long time.
 | [@varlet/cli](https://github.com/varletjs/varlet/tree/dev/packages/varlet-cli) | `Vue3 component library rapid prototyping tool` |
 | [@varlet/touch-emulator](https://github.com/varletjs/varlet/tree/dev/packages/varlet-touch-emulator) | `Desktop adapter, so that the mobile component library can run on the desktop` |
 | [@varlet/ui-playground](https://github.com/varletjs/varlet/tree/dev/packages/varlet-ui-playground) | `Varlet component library online editing tool` |
+| [@varlet/import-resolver](https://github.com/varletjs/varlet/tree/dev/packages/varlet-import-resolver)  | `A resolver for` [unplugin-vue-components](https://github.com/unplugin/unplugin-vue-components) ` used to implement Varlet and import it on demand`   |
+| [@varlet/preset-unocss](https://github.com/varletjs/varlet/tree/dev/packages/varlet-preset-unocss)  | [UnoCss](https://unocss.dev/) `presets for varlet` |
+| [@varlet/preset-tailwindcss](https://github.com/varletjs/varlet/tree/dev/packages/varlet-preset-tailwindcss)  | [tailwindcss](https://tailwindcss.com/) `presets for varlet` |
+| [varlet-theme-builder](https://github.com/varletjs/varlet-theme-builder) | `Theme generator for generating theme variables for varlet Material Design 3` | 
 | [varlet-vscode-extension](https://github.com/varletjs/varlet/tree/dev/packages/varlet-vscode-extension) | `Varlet Component Library VSCode Plugin` |
 | [vscode-theme-varlet](https://github.com/varletjs/vscode-theme-varlet)  | `Varlet VSCode Theme`   |
 | [varlet-app-example](https://github.com/varletjs/varlet-app-template)  | `Varlet component library app template`   |
@@ -107,14 +116,19 @@ The following projects are maintained by community personnel, welcome to add.
 | [vue-h5-template](https://github.com/sunniejs/vue-h5-template) | `Vue-based mobile template scaffolding, providing mobile presets for Varlet component library` |
 | [create-vite-app](https://github.com/ErKeLost/create-vite-app) | `A desktop template scaffolding based on Vue3, providing desktop presets for Varlet component library` |
 | [vscode-common-intellisense](https://github.com/Simon-He95/vscode-common-intellisense) | `A VS Code extension that provides better intellisense to Varlet developers` |
+| [vue3-varlet-mobile](https://github.com/easy-temps/vue3-varlet-mobile) | `A mobile template based on Vue 3 and Varlet Component Library` |
 
 ### Playground
 
-See [Varlet UI Playground](https://varlet.gitee.io/varlet-ui-playground).
+See [Varlet UI Playground](https://varletjs.org/playground).
 
 ### Contribution
 
 See [Contributing Guide](https://github.com/varletjs/varlet/blob/dev/.github/CONTRIBUTING.md).
+
+### GitCode Repo
+
+See [Here](https://gitcode.com/varletjs/varlet).
 
 ### Community
 
@@ -140,11 +154,7 @@ We recommend that [issue](https://github.com/varletjs/varlet/issues) be used for
 
 ### Sponsor this project
 
-Sponsor this project to support our better creation. It is recommended to use afdian to subscribe, and your avatar will appear in this project.
-
-#### Afdian
-
-<a href="https://afdian.net/a/haoziqaq">https://afdian.net/a/haoziqaq</a>
+Sponsor this project to support our better creation. 
 
 #### Wechat / Alipay
 

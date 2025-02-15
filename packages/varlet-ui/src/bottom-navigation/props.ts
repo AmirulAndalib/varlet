@@ -1,6 +1,6 @@
-import { buttonProps } from '../button'
 import type { PropType } from 'vue'
-import { type ExtractPublicPropTypes, defineListenerProp } from '../utils/components'
+import { buttonProps } from '../button'
+import { defineListenerProp, type ExtractPublicPropTypes } from '../utils/components'
 
 export const props = {
   active: {
@@ -13,9 +13,11 @@ export const props = {
   },
   fixed: Boolean,
   border: Boolean,
+  variant: Boolean,
   safeArea: Boolean,
   activeColor: String,
   inactiveColor: String,
+  placeholder: Boolean,
   fabProps: Object as PropType<ExtractPublicPropTypes<typeof buttonProps>>,
   onChange: defineListenerProp<(active: number | string) => void>(),
   onBeforeChange: defineListenerProp<(active: number | string) => any | Promise<any>>(),

@@ -1,30 +1,30 @@
-import StyleProvider from '../index'
-import VarStyleProvider from '../StyleProvider'
 import { createApp } from 'vue'
 import { mount } from '@vue/test-utils'
+import { expect, test } from 'vitest'
 import { delay } from '../../utils/test'
-import { expect } from 'vitest'
+import StyleProvider from '../index'
+import VarStyleProvider from '../StyleProvider'
 
-test('test styleProvider component plugin', () => {
+test('styleProvider component plugin', () => {
   const app = createApp({}).use(StyleProvider)
   expect(app.component(StyleProvider.Component.name)).toBeTruthy()
 })
 
-test('test styleProvider plugin', () => {
+test('styleProvider plugin', () => {
   const app = createApp({}).use(VarStyleProvider)
   expect(app.component(VarStyleProvider.name)).toBeTruthy()
 })
 
-test('test styleProvider functional', async () => {
+test('styleProvider functional', async () => {
   StyleProvider({
-    'cell-font-size': '30px',
+    '--cell-font-size': '30px',
   })
 
   await delay(0)
   expect(getComputedStyle(document.documentElement).getPropertyValue('--cell-font-size')).toBe('30px')
 })
 
-test('test styleProvider component', async () => {
+test('styleProvider component', async () => {
   const wrapper = mount(VarStyleProvider)
 
   const el = wrapper.find('.var-style-provider')
@@ -32,9 +32,18 @@ test('test styleProvider component', async () => {
 
   await wrapper.setProps({
     styleVars: {
-      'cell-font-size': '30px',
+      '--cell-font-size': '30px',
     },
   })
   expect(el.attributes('style')).toBe('--cell-font-size: 30px;')
+  expect(wrapper.html()).toMatchSnapshot()
+
+  wrapper.unmount()
+})
+
+test('styleProvider tag', () => {
+  const wrapper = mount(VarStyleProvider, { props: { tag: 'span' } })
+  expect(wrapper.html()).toMatchSnapshot()
+
   wrapper.unmount()
 })

@@ -1,15 +1,15 @@
+import { createApp } from 'vue'
+import { expect, test, vi } from 'vitest'
+import { delay } from '../../utils/test'
 import Snackbar from '../index'
 import VarSnackbar from '../Snackbar'
-import { createApp } from 'vue'
-import { delay } from '../../utils/test'
-import { expect, vi } from 'vitest'
 
-test('test snackbar plugin', () => {
+test('snackbar plugin', () => {
   const app = createApp({}).use(Snackbar)
   expect(app.component(VarSnackbar.name)).toBeTruthy()
 })
 
-test('test snackbar functional', async () => {
+test('snackbar functional', async () => {
   expect(document.body.querySelector('.var-snackbar')).toBeFalsy()
 
   const { clear } = Snackbar('test snackbar')
@@ -24,7 +24,25 @@ test('test snackbar functional', async () => {
   Snackbar.clear()
 })
 
-test('test snackbar type', async () => {
+test('snackbar elevation', async () => {
+  expect(document.body.querySelector('.var-snackbar')).toBeFalsy()
+
+  const { clear } = Snackbar({
+    content: 'test snackbar',
+    elevation: 5,
+  })
+
+  await delay(200)
+  expect(document.body.querySelector('.var-elevation--5')).toBeTruthy()
+
+  clear()
+  await delay(200)
+  expect(document.body.querySelector('.var-elevation--5')).toBeFalsy()
+
+  Snackbar.clear()
+})
+
+test('snackbar type', async () => {
   Snackbar.success('test snackbar')
   await delay(200)
   expect(document.body.querySelector('.var-snackbar__wrapper-success')).toBeTruthy()
@@ -51,7 +69,7 @@ test('test snackbar type', async () => {
   Snackbar.clear()
 })
 
-test('test snackbar event', async () => {
+test('snackbar event', async () => {
   const open = vi.fn()
   const opened = vi.fn()
   const close = vi.fn()
@@ -78,7 +96,7 @@ test('test snackbar event', async () => {
   expect(closed).toHaveBeenCalledTimes(1)
 })
 
-test('test snackbar and clear', async () => {
+test('snackbar and clear', async () => {
   Snackbar.success('test snackbar')
   await delay(200)
   expect(document.body.querySelector('.var-snackbar__wrapper-success')).toBeTruthy()
@@ -111,7 +129,7 @@ test('test snackbar and clear', async () => {
   expect(document.body.querySelector('.var-snackbar__wrapper-warning')).toBeFalsy()
 })
 
-test('test setDefaultOptions and resetDefaultOptions', async () => {
+test('setDefaultOptions and resetDefaultOptions', async () => {
   Snackbar.setDefaultOptions({ content: 'snackbar content', duration: 300 })
 
   Snackbar()

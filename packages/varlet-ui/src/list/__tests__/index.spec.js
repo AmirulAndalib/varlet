@@ -1,18 +1,18 @@
-import List from '..'
-import VarList from '../List'
-import TabsItems from '../../tabs-items'
-import TabItem from '../../tab-item'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import List from '..'
+import TabItem from '../../tab-item'
+import TabsItems from '../../tabs-items'
 import { delay } from '../../utils/test'
-import { expect, vi } from 'vitest'
+import VarList from '../List'
 
-test('test list use', () => {
+test('list use', () => {
   const app = createApp({}).use(List)
   expect(app.component(List.name)).toBeTruthy()
 })
 
-test('test list component load event', async () => {
+test('list component load event', async () => {
   const onLoad = vi.fn()
   const onUpdateLoading = vi.fn()
 
@@ -34,7 +34,7 @@ test('test list component load event', async () => {
 })
 
 describe('test list component props', () => {
-  test('test list loading and loading-text', async () => {
+  test('list loading and loading-text', async () => {
     const wrapper = mount(VarList, {
       props: {
         loading: true,
@@ -52,7 +52,7 @@ describe('test list component props', () => {
     mockGetBoundingClientRect.mockRestore()
   })
 
-  test('test list error and error-text', async () => {
+  test('list error and error-text', async () => {
     const wrapper = mount(VarList, {
       props: {
         error: true,
@@ -70,7 +70,7 @@ describe('test list component props', () => {
     mockGetBoundingClientRect.mockRestore()
   })
 
-  test('test list finished and finished-text', async () => {
+  test('list finished and finished-text', async () => {
     const wrapper = mount(VarList, {
       props: {
         finished: true,
@@ -89,7 +89,7 @@ describe('test list component props', () => {
   })
 })
 
-test('test load event while list in tab-item', async () => {
+test('load event while list in tab-item', async () => {
   const load = vi.fn()
   const load2 = vi.fn()
 

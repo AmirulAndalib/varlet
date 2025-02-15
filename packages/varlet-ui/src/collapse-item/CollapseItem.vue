@@ -4,8 +4,14 @@
     :style="`--collapse-divider-top: ${divider ? 'var(--collapse-border-top)' : 'none'}`"
   >
     <div :class="classes(n('shadow'), formatElevation(elevation, 2))"></div>
-    <div :class="n('header')" @click="toggle">
-      <div :class="n('header-title')" v-if="$slots.title || title">
+    <div
+      :class="classes(n('header'), [!disabled, n('header--cursor-pointer')])"
+      :aria-expanded="isShow"
+      :aria-disabled="disabled"
+      :role="accordion ? 'tab' : 'button'"
+      @click="toggle"
+    >
+      <div v-if="$slots.title || title" :class="n('header-title')">
         <slot name="title">{{ title }}</slot>
       </div>
       <div :class="n('header-icon')">
@@ -17,7 +23,7 @@
               classes(
                 n('header-icon'),
                 [isShow && icon === 'chevron-down', n('header-open')],
-                [disabled, n('header--disable')]
+                [disabled, n('header--disable')],
               )
             "
           />
@@ -25,9 +31,9 @@
       </div>
     </div>
     <div
-      :class="n('content')"
       v-show="showContent"
       ref="contentEl"
+      :class="n('content')"
       @transitionend="handleTransitionEnd"
       @transitionstart="handleTransitionStart"
     >
@@ -39,12 +45,12 @@
 </template>
 
 <script lang="ts">
-import VarIcon from '../icon'
-import { defineComponent, ref, computed } from 'vue'
-import { createNamespace, formatElevation } from '../utils/components'
-import { useCollapse, type CollapseItemProvider } from './provide'
-import { props } from './props'
+import { computed, defineComponent, ref } from 'vue'
 import { useCollapseTransition } from '../collapse-transition/useCollapseTransition'
+import VarIcon from '../icon'
+import { createNamespace, formatElevation } from '../utils/components'
+import { props } from './props'
+import { useCollapse, type CollapseItemProvider } from './provide'
 
 const { name, n, classes } = createNamespace('collapse-item')
 
@@ -61,7 +67,7 @@ export default defineComponent({
     const name = computed(() => props.name)
     const disabled = computed(() => props.disabled)
     const { index, collapse, bindCollapse } = useCollapse()
-    const { offset, divider, elevation, updateItem } = collapse
+    const { offset, divider, elevation, accordion, updateItem } = collapse
 
     const collapseItemProvider: CollapseItemProvider = {
       index,
@@ -97,6 +103,7 @@ export default defineComponent({
       divider,
       elevation,
       contentEl,
+      accordion,
       n,
       classes,
       toggle,

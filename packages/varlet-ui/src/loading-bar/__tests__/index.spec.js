@@ -1,8 +1,8 @@
+import { expect, test } from 'vitest'
 import LoadingBar from '..'
 import { delay } from '../../utils/test'
-import { expect } from 'vitest'
 
-test('test loading-bar methods', async () => {
+test('loading-bar methods', async () => {
   LoadingBar.start()
 
   const el = document.querySelector('.var-loading-bar')
@@ -12,6 +12,7 @@ test('test loading-bar methods', async () => {
   expect(el.style.opacity).toBe('1')
 
   LoadingBar.finish()
+  await delay(0)
   await delay(300)
   expect(el.style.opacity).toBe('0')
 
@@ -22,7 +23,30 @@ test('test loading-bar methods', async () => {
   expect(document.querySelector('.var-loading-bar--error')).toBeFalsy()
 })
 
-test('test setDefaultOptions and resetDefaultOptions', async () => {
+test('loading-bar finish delay', async () => {
+  LoadingBar.setDefaultOptions({
+    finishDelay: 500,
+  })
+  LoadingBar.start()
+
+  const el = document.querySelector('.var-loading-bar')
+  expect(el).toBeTruthy()
+
+  await delay(300)
+  expect(el.style.opacity).toBe('1')
+
+  LoadingBar.finish()
+  await delay(0)
+  await delay(300)
+  expect(el.style.opacity).toBe('1')
+
+  await delay(800)
+  expect(el.style.opacity).toBe('0')
+
+  LoadingBar.resetDefaultOptions()
+})
+
+test('setDefaultOptions and resetDefaultOptions', async () => {
   LoadingBar.setDefaultOptions({
     color: 'white',
     errorColor: 'black',

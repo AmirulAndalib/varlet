@@ -9,6 +9,7 @@ export default {
   disabled: '禁用',
   readonly: '只读',
   validate: '字段校验',
+  validateWithZod: '使用 Zod 进行校验',
   validateMessage: '存在上传失败的文件',
   style: '自定义上传样式',
   upload: '上传',
@@ -22,4 +23,5 @@ export default {
   useProgress: '使用进度条',
   beforeFilter: '文件列表过滤',
   clickAction: '上传按钮点击事件',
+  removeButtonSlot: '自定义删除按钮',
 }

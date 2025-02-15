@@ -7,22 +7,25 @@
       :class="
         classes(
           n('controller'),
-          [isFocus, n('--focus')],
-          [errorMessage, n('--error')],
-          [formDisabled || disabled, n('--disabled')]
+          [isFocusing, n('--focus')],
+          [isError, n('--error')],
+          [formDisabled || disabled, n('--disabled')],
         )
       "
       :style="{
         color,
         cursor,
         overflow: isFloating ? 'visible' : 'hidden',
+        '--field-decorator-middle-offset-left': middleOffsetLeft,
+        '--field-decorator-middle-offset-width': middleOffsetWidth,
+        '--field-decorator-middle-offset-height': middleOffsetHeight,
       }"
     >
       <div :class="classes(n('icon'), [!hint, n('--icon-non-hint')])">
         <slot name="prepend-icon" />
       </div>
 
-      <div :class="classes(n('middle'), [!hint, n('--middle-non-hint')])">
+      <div ref="middleEl" :class="classes(n('middle'), [!hint, n('--middle-non-hint')])">
         <slot />
       </div>
 
@@ -32,10 +35,12 @@
           classes(
             n('placeholder'),
             n('$--ellipsis'),
-            [isFocus, n('--focus')],
+            [isFocusing, n('--focus')],
+            [hintCenter, n('--hint-center')],
             [formDisabled || disabled, n('--disabled')],
-            [errorMessage, n('--error')],
-            computePlaceholderState()
+            [isError, n('--error')],
+            [transitionDisabled, n('--transition-disabled')],
+            computePlaceholderState(),
           )
         "
         :style="{
@@ -47,7 +52,7 @@
       </label>
 
       <div :class="classes(n('icon'), [!hint, n('--icon-non-hint')])">
-        <slot name="clear-icon" v-if="clearable && !isEmpty(value)">
+        <slot v-if="clearable && !isEmpty(value)" name="clear-icon" :clear="handleClear">
           <var-icon :class="n('clear-icon')" var-field-decorator-cover name="close-circle" @click="handleClear" />
         </slot>
         <slot name="append-icon" />
@@ -60,9 +65,9 @@
         :class="
           classes(
             n('line'),
-            [isFocus, n('--line-focus')],
-            [errorMessage, n('--line-error')],
-            [formDisabled || disabled, n('--line-disabled')]
+            [isFocusing, n('--line-focus')],
+            [isError, n('--line-error')],
+            [formDisabled || disabled, n('--line-disabled')],
           )
         "
         :style="{ borderColor: color }"
@@ -71,7 +76,7 @@
           :class="classes(n('line-legend'), [isFloating, n('line-legend--hint')])"
           :style="{ width: legendWidth }"
         >
-          <teleport to="body" v-if="placeholder && hint">
+          <teleport v-if="placeholder && hint" to="body">
             <span
               ref="placeholderTextEl"
               :class="
@@ -84,20 +89,20 @@
       </fieldset>
 
       <div
-        :class="classes(n('line'), [formDisabled || disabled, n('--line-disabled')], [errorMessage, n('--line-error')])"
-        :style="{ background: !errorMessage ? blurColor : undefined }"
         v-else
+        :class="classes(n('line'), [formDisabled || disabled, n('--line-disabled')], [isError, n('--line-error')])"
+        :style="{ background: !isError ? blurColor : undefined }"
       >
         <div
           :class="
             classes(
               n('dot'),
-              [isFocus, n('--line-focus')],
+              [isFocusing, n('--line-focus')],
               [formDisabled || disabled, n('--line-disabled')],
-              [errorMessage, n('--line-error')]
+              [isError, n('--line-error')],
             )
           "
-          :style="{ background: !errorMessage ? focusColor : undefined }"
+          :style="{ background: !isError ? focusColor : undefined }"
         />
       </div>
     </template>
@@ -105,12 +110,14 @@
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, nextTick, onUpdated, ref, watch } from 'vue'
+import { call, doubleRaf, getStyle, isEmpty } from '@varlet/shared'
+import { onSmartMounted, onWindowResize } from '@varlet/use'
 import VarIcon from '../icon'
-import { defineComponent, ref, onUpdated, computed } from 'vue'
-import { props } from './props'
-import { isEmpty, getStyle, call } from '@varlet/shared'
+import { usePopup } from '../popup/provide'
+import { useSwipeResizeDispatcher } from '../swipe/provide'
 import { createNamespace } from '../utils/components'
-import { onWindowResize, onSmartMounted } from '@varlet/use'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('field-decorator')
 
@@ -118,17 +125,52 @@ export default defineComponent({
   name,
   components: { VarIcon },
   props,
-  setup(props, { slots }) {
+  setup(props) {
     const placeholderTextEl = ref<HTMLElement | null>(null)
+    const middleEl = ref<HTMLElement | null>(null)
     const legendWidth = ref('')
-    const isFloating = computed(() => props.hint && (!isEmpty(props.value) || props.isFocus || slots['prepend-icon']))
+    const middleOffsetLeft = ref('0px')
+    const middleOffsetWidth = ref('0px')
+    const middleOffsetHeight = ref('0px')
+    const transitionDisabled = ref(true)
+    const isFloating = computed(() => props.hint && (!isEmpty(props.value) || props.isFocusing))
+    const { popup, bindPopup } = usePopup()
+    const { bindSwipeResizeDispatcher } = useSwipeResizeDispatcher()
+
     const color = computed<string | undefined>(() =>
-      !props.errorMessage ? (props.isFocus ? props.focusColor : props.blurColor) : undefined
+      !props.isError ? (props.isFocusing ? props.focusColor : props.blurColor) : undefined,
     )
 
     onWindowResize(resize)
-    onSmartMounted(resize)
+
+    onSmartMounted(() => {
+      resize()
+
+      nextTick().then(() => {
+        transitionDisabled.value = false
+      })
+    })
+
     onUpdated(resize)
+
+    call(bindPopup, null)
+    call(bindSwipeResizeDispatcher, {
+      onResize() {
+        nextTick().then(resize)
+      },
+    })
+
+    if (popup) {
+      watch(
+        () => popup.show.value,
+        async (show) => {
+          if (show) {
+            await doubleRaf()
+            resize()
+          }
+        },
+      )
+    }
 
     function computePlaceholderState() {
       const { hint, value, composing } = props
@@ -142,18 +184,6 @@ export default defineComponent({
       }
     }
 
-    function resize() {
-      const { size, hint, variant, placeholder } = props
-      if (!placeholder || !hint || variant !== 'outlined') {
-        legendWidth.value = ''
-        return
-      }
-
-      const placeholderTextStyle = getStyle(placeholderTextEl.value!)
-      const placeholderSpace = `var(--field-decorator-outlined-${size}-placeholder-space)`
-      legendWidth.value = `calc(${placeholderTextStyle!.width} * 0.75 + ${placeholderSpace} * 2)`
-    }
-
     function handleClear(e: Event) {
       call(props.onClear, e)
     }
@@ -162,11 +192,29 @@ export default defineComponent({
       call(props.onClick, e)
     }
 
+    function resize() {
+      middleOffsetLeft.value = `${middleEl.value!.offsetLeft}px`
+      middleOffsetWidth.value = `${middleEl.value!.offsetWidth}px`
+      middleOffsetHeight.value = `${middleEl.value!.offsetHeight}px`
+
+      if (props.variant === 'outlined' && placeholderTextEl.value) {
+        const placeholderTextStyle = getStyle(placeholderTextEl.value)
+        const placeholderSpace = `var(--field-decorator-outlined-${props.size}-placeholder-space)`
+        legendWidth.value = `calc(${placeholderTextStyle.width} * 0.75 + ${placeholderSpace} * 2)`
+      }
+    }
+
     return {
       placeholderTextEl,
+      middleEl,
+      middleOffsetLeft,
+      middleOffsetWidth,
+      middleOffsetHeight,
       color,
       legendWidth,
       isFloating,
+      transitionDisabled,
+      resize,
       computePlaceholderState,
       n,
       classes,

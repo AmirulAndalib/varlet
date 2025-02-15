@@ -1,13 +1,14 @@
-import fse from 'fs-extra'
-import esbuild from 'esbuild'
+import { dirname, extname, relative, resolve } from 'path'
 import { transformAsync } from '@babel/core'
-import { bigCamelize } from '@varlet/shared'
-import { getVersion, isDir, isJsx, isTsx, replaceExt } from '../shared/fsUtils.js'
-import { extractStyleDependencies, IMPORT_CSS_RE, IMPORT_LESS_RE } from './compileStyle.js'
-import { resolve, extname, dirname } from 'path'
-import { getVarletConfig } from '../config/varlet.config.js'
-import { get } from 'lodash-es'
 import type { BabelFileResult } from '@babel/core'
+import { pascalCase } from '@varlet/shared'
+import jsx from '@vue/babel-plugin-jsx'
+import esbuild from 'esbuild'
+import fse from 'fs-extra'
+import { getVarletConfig, VarletConfig } from '../config/varlet.config.js'
+import { ES_DIR } from '../shared/constant.js'
+import { getVersion, isDir, isJsx, isTsx, replaceExt } from '../shared/fsUtils.js'
+import { extractStyleDependencies, IMPORT_CSS_RE, IMPORT_LESS_RE, IMPORT_SCSS_RE } from './compileStyle.js'
 
 const { writeFileSync, readdirSync, readFileSync, removeSync, writeFile, pathExistsSync } = fse
 
@@ -20,14 +21,13 @@ export const IMPORT_DEPENDENCE_RE = /import\s+(".*?"|'.*?')/g
 
 export const scriptExtNames = ['.vue', '.ts', '.tsx', '.mjs', '.js', '.jsx']
 
-export const styleExtNames = ['.less', '.css']
+export const styleExtNames = ['.less', '.scss', '.css']
 
 export const scriptIndexes = ['index.mjs', 'index.vue', 'index.ts', 'index.tsx', 'index.js', 'index.jsx']
 
-export const styleIndexes = ['index.less', 'index.css']
+export const styleIndexes = ['index.less', 'index.scss', 'index.css']
 
 export const tryMatchExtname = (file: string, extname: string[]) => {
-  // eslint-disable-next-line no-restricted-syntax
   for (const ext of extname) {
     const matched = `${file}${ext}`
 
@@ -37,20 +37,41 @@ export const tryMatchExtname = (file: string, extname: string[]) => {
   }
 }
 
-export const resolveDependence = (file: string, script: string) => {
+export const resolveAlias = (dependence: string, file: string, alias: VarletConfig['alias'] = {}) => {
+  let matchedAliasKey = Object.keys(alias).find((key) => dependence === key)
+
+  if (!matchedAliasKey) {
+    // @/ -> yes
+    // @varlet/ui -> no
+    matchedAliasKey = Object.keys(alias).find((key) => dependence.startsWith(`${key}/`))
+  }
+
+  if (!matchedAliasKey) {
+    return dependence
+  }
+
+  const matchedAliasValue = alias[matchedAliasKey as keyof typeof alias]
+  const isRelative = matchedAliasValue.startsWith('.')
+  const replacedValue = isRelative ? relative(dirname(file), resolve(ES_DIR, matchedAliasValue)) : matchedAliasValue
+
+  return dependence.replace(matchedAliasKey, replacedValue)
+}
+
+export const resolveDependence = (file: string, script: string, alias: VarletConfig['alias'] = {}) => {
   const replacer = (source: string, dependence: string) => {
+    // remove quotes
     dependence = dependence.slice(1, dependence.length - 1)
-
-    const ext = extname(dependence)
-    const targetDependenceFile = resolve(dirname(file), dependence)
-    const scriptExtname = getScriptExtname()
-    const inNodeModules = !dependence.startsWith('.')
     const done = (targetDependence: string) => source.replace(dependence, targetDependence)
+    const resolvedDependence = resolveAlias(dependence, file, alias)
 
-    if (inNodeModules) {
+    const isNodeModule = !resolvedDependence.startsWith('.')
+    if (isNodeModule) {
       // e.g. @varlet/shared
-      return source
+      return done(resolvedDependence)
     }
+
+    const ext = extname(resolvedDependence)
+    const scriptExtname = getScriptExtname()
 
     if (ext) {
       if (scriptExtNames.includes(ext)) {
@@ -64,18 +85,20 @@ export const resolveDependence = (file: string, script: string) => {
       }
     }
 
+    const targetDependenceFile = resolve(dirname(file), resolvedDependence)
+
     if (!ext) {
       // e.g. ../button/props -> ../button/props.mjs
       const matchedScript = tryMatchExtname(targetDependenceFile, scriptExtNames)
 
       if (matchedScript) {
-        return done(`${dependence}${scriptExtname}`)
+        return done(`${resolvedDependence}${scriptExtname}`)
       }
 
       const matchedStyle = tryMatchExtname(targetDependenceFile, styleExtNames)
 
       if (matchedStyle) {
-        return done(`${dependence}${matchedStyle}`)
+        return done(`${resolvedDependence}${matchedStyle}`)
       }
     }
 
@@ -87,14 +110,14 @@ export const resolveDependence = (file: string, script: string) => {
 
       if (hasScriptIndex) {
         // e.g. -> ../button/index.mjs
-        return done(`${dependence}/index${scriptExtname}`)
+        return done(`${resolvedDependence}/index${scriptExtname}`)
       }
 
       const hasStyleIndex = files.some((file) => styleIndexes.some((name) => file.endsWith(name)))
 
       if (hasStyleIndex) {
         // e.g. -> ../button/index.css
-        return done(`${dependence}/index.css`)
+        return done(`${resolvedDependence}/index.css`)
       }
     }
 
@@ -114,7 +137,7 @@ export async function compileScriptByBabel(script: string, file: string) {
     presets: ['@babel/preset-typescript'],
     plugins: [
       [
-        '@vue/babel-plugin-jsx',
+        jsx,
         {
           enableObjectSlots: false,
         },
@@ -124,12 +147,13 @@ export async function compileScriptByBabel(script: string, file: string) {
 
   return code!
 }
+
 export async function compileScriptByEsbuild(script: string) {
   const varletConfig = await getVarletConfig()
 
   const { code } = await esbuild.transform(script, {
     loader: 'ts',
-    target: get(varletConfig, 'esbuild.target'),
+    target: varletConfig?.esbuild?.target,
     format: 'esm',
   })
 
@@ -138,16 +162,18 @@ export async function compileScriptByEsbuild(script: string) {
 
 export async function compileScript(script: string, file: string) {
   let code = isJsx(file) || isTsx(file) ? await compileScriptByBabel(script, file) : script
-
   code = await compileScriptByEsbuild(code)
+  const { alias } = await getVarletConfig()
 
   if (code) {
-    code = resolveDependence(file, code)
+    code = resolveDependence(file, code, alias)
     code = extractStyleDependencies(file, code, IMPORT_CSS_RE)
     code = extractStyleDependencies(file, code, IMPORT_LESS_RE)
-    removeSync(file)
-    writeFileSync(replaceExt(file, getScriptExtname()), code, 'utf8')
+    code = extractStyleDependencies(file, code, IMPORT_SCSS_RE)
   }
+
+  removeSync(file)
+  writeFileSync(replaceExt(file, getScriptExtname()), code, 'utf8')
 }
 
 export async function compileScriptFile(file: string) {
@@ -175,7 +201,7 @@ export function generateEsEntryTemplate(options: GenerateEsEntryTemplateOptions)
   const publicComponents: string[] = []
 
   publicDirs.forEach((dirname: string) => {
-    const publicComponent = bigCamelize(dirname)
+    const publicComponent = pascalCase(dirname)
     const module = `'${root}${dirname}/index${scriptExtname}'`
 
     publicComponents.push(publicComponent)

@@ -1,7 +1,7 @@
-import VarDialog from './Dialog.vue'
-import { reactive, nextTick, type TeleportProps } from 'vue'
-import { inBrowser, isString, call } from '@varlet/shared'
+import { nextTick, reactive, type TeleportProps } from 'vue'
+import { call, inBrowser, isString } from '@varlet/shared'
 import { mountInstance, withInstall, withPropsDefaultsSetter } from '../utils/components'
+import VarDialog from './Dialog.vue'
 import { props as dialogProps } from './props'
 
 export interface DialogOptions {
@@ -25,6 +25,7 @@ export interface DialogOptions {
   overlayStyle?: Record<string, any>
   lockScroll?: boolean
   closeOnClickOverlay?: boolean
+  closeOnKeyEscape?: boolean
   onOpen?: () => void
   onOpened?: () => void
   onBeforeClose?: (done: () => void) => void
@@ -33,6 +34,7 @@ export interface DialogOptions {
   onConfirm?: () => void
   onCancel?: () => void
   onClickOverlay?: () => void
+  onKeyEscape?: () => void
   // internal
   teleport?: TeleportProps['to']
 }

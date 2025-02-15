@@ -1,10 +1,10 @@
 :root {
   --pagination-text-color: #555;
   --pagination-font-size: var(--font-size-md);
-  --pagination-active-color: #fff;
+  --pagination-active-color: var(--color-on-primary);
   --pagination-active-bg-color: var(--color-primary);
   --pagination-hover-bg-color: rgba(85, 85, 85, 0.15);
-  --pagination-total-margin: 0 12px;
+  --pagination-total-margin: 0 10px;
   --pagination-total-line-height: 24px;
   --pagination-item-width: 32px;
   --pagination-item-height: 32px;
@@ -12,17 +12,15 @@
   --pagination-item-background: #fff;
   --pagination-item-border-radius: 4px;
   --pagination-item-simple-border-radius: 50%;
-  --pagination-list-bg-color: #fff;
-  --pagination-list-active-bg-color: #edf5ff;
-  --pagination-list-active-color: var(--color-primary);
   --pagination-input-width: 32px;
   --pagination-disabled-color: var(--color-text-disabled);
   --pagination-bg-disabled-color: var(--color-disabled);
   --pagination-size-line-height: 24px;
+  --pagination-size-padding: 0 4px;
+  --pagination-quick-jumper-margin: 0 10px;
 }
 
-// Mixins
-.pagination-flex-nowrap {
+.var-pagination-flex-nowrap {
   display: flex;
   white-space: nowrap;
   align-items: center;
@@ -70,18 +68,13 @@
     }
 
     &--disabled {
-      cursor: not-allowed;
+      cursor: not-allowed !important;
       color: var(--pagination-disabled-color);
       background-color: unset;
+      box-shadow: none !important;
 
       &:hover {
         background-color: unset;
-      }
-
-      &--hover {
-        &:hover {
-          background-color: inherit;
-        }
       }
 
       &--active {
@@ -99,17 +92,19 @@
   }
 
   &__total {
-    .pagination-flex-nowrap();
+    .var-pagination-flex-nowrap();
 
     line-height: var(--pagination-total-line-height);
     margin: var(--pagination-total-margin);
   }
 
   &__size {
-    .pagination-flex-nowrap();
-
+    .var-pagination-flex-nowrap();
+    height: var(--pagination-item-height);
     line-height: var(--pagination-size-line-height);
     margin: var(--pagination-item-margin);
+    padding: var(--pagination-size-padding);
+    cursor: pointer;
 
     &--open {
       display: flex;
@@ -122,25 +117,9 @@
     }
   }
 
-  &__list {
-    background-color: var(--pagination-list-bg-color);
-    cursor: pointer;
-    transition: all 0.25s;
-
-    &:hover {
-      color: var(--pagination-list-active-color);
-      background-color: var(--pagination-list-active-bg-color);
-    }
-
-    &--active {
-      background-color: var(--pagination-list-active-bg-color) !important;
-      color: var(--pagination-list-active-color);
-    }
-  }
-
   &__quickly,
   &__simple {
-    .pagination-flex-nowrap();
+    .var-pagination-flex-nowrap();
 
     [var-pagination-cover] {
       width: var(--pagination-input-width);
@@ -150,6 +129,9 @@
       .var-input__input {
         height: auto;
         text-align: center;
+        font-weight: normal;
+        font-size: var(--pagination-font-size);
+        padding-top: 1px;
       }
     }
 
@@ -160,7 +142,7 @@
   }
 
   &__quickly {
-    margin: var(--pagination-item-margin);
+    margin: var(--pagination-quick-jumper-margin);
 
     [var-pagination-cover] {
       margin-left: 6px;

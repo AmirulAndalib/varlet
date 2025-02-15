@@ -1,5 +1,5 @@
-import { VarComponent, ListenerProp, SetPropsDefaults } from './varComponent'
-import { VNode, App } from 'vue'
+import { App, VNode } from 'vue'
+import { ListenerProp, SetPropsDefaults, VarComponent } from './varComponent'
 
 export declare const pickerProps: Record<keyof PickerProps, any>
 
@@ -24,13 +24,16 @@ export interface PickerProps {
   cascade?: boolean
   optionHeight?: string | number
   optionCount?: string | number
+  columnsCount?: string | number
   confirmButtonText?: string
   cancelButtonText?: string
   confirmButtonTextColor?: string
   cancelButtonTextColor?: string
+  closeOnKeyEscape?: boolean
   onChange?: ListenerProp<(values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void>
   onConfirm?: ListenerProp<(values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void>
   onCancel?: ListenerProp<(values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void>
+  onKeyEscape?: ListenerProp<() => void>
   'onUpdate:modelValue'?: ListenerProp<(values: (string | number)[]) => void>
 }
 
@@ -68,12 +71,14 @@ export interface PickerOptions {
   cascade?: boolean
   optionHeight?: number | string
   optionCount?: number | string
+  columnsCount?: number | string
   confirmButtonText?: string
   cancelButtonText?: string
   confirmButtonTextColor?: string
   cancelButtonTextColor?: string
   safeArea?: boolean
   closeOnClickOverlay?: boolean
+  closeOnKeyEscape?: boolean
   onClickOverlay?: () => void
   onOpen?: () => void
   onOpened?: () => void
@@ -82,6 +87,7 @@ export interface PickerOptions {
   onChange?: (values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void
   onConfirm?: (values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void
   onCancel?: (values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void
+  onKeyEscape?: () => void
 }
 
 export interface IPicker {
@@ -95,6 +101,6 @@ export interface IPicker {
   close(): void
 }
 
-export const Picker: IPicker
+export declare const Picker: IPicker
 
 export class _PickerComponent extends PickerComponent {}

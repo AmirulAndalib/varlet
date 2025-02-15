@@ -1,6 +1,6 @@
 import { type PropType } from 'vue'
-import { defineListenerProp, pickProps } from '../utils/components'
 import { popupProps } from '../popup'
+import { defineListenerProp, pickProps } from '../utils/components'
 
 export type PickerColumnOption = {
   text?: string | number
@@ -47,6 +47,7 @@ export const props = {
     type: [Number, String],
     default: 6,
   },
+  columnsCount: [String, Number],
   confirmButtonText: String,
   cancelButtonText: String,
   confirmButtonTextColor: String,
@@ -60,11 +61,11 @@ export const props = {
   onCancel:
     defineListenerProp<(values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void>(),
   'onUpdate:modelValue': defineListenerProp<(values: (string | number)[]) => void>(),
-  // dynamic internal
   ...pickProps(popupProps, [
     'show',
     'onUpdate:show',
     'closeOnClickOverlay',
+    'closeOnKeyEscape',
     'teleport',
     'safeArea',
     'onOpen',
@@ -73,5 +74,6 @@ export const props = {
     'onClosed',
     'onClickOverlay',
     'onRouteChange',
+    'onKeyEscape',
   ]),
 }

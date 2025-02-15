@@ -1,21 +1,25 @@
 <template>
   <button
+    v-ripple="{ disabled: disabled || !ripple || loading || pending }"
+    v-hover:desktop="handleHovering"
     :class="
       classes(
         n(),
         n('$--box'),
         n(`--${states.size}`),
         [block, `${n('$--flex')} ${n('--block')}`, n('$--inline-flex')],
-        [disabled, n('--disabled')],
-        [states.text, `${n(`--text-${states.type}`)} ${n('--text')}`, `${n(`--${states.type}`)} ${states.elevation}`],
-        [states.text && disabled, n('--text-disabled')],
+        [!states.text, states.elevation],
+        [!states.iconContainer && !states.text, n(`--${states.type}`)],
+        [states.text, `${n('--text')} ${n(`--text-${states.type}`)}`],
+        [states.iconContainer, n(`--icon-container-${states.type}`)],
         [round, n('--round')],
         [states.outline, n('--outline')],
-        [loading || pending, n('--loading')]
+        [loading || pending, n('--loading')],
+        [disabled, n('--disabled')],
+        [states.text && disabled, n('--text-disabled')],
       )
     "
-    v-ripple="{ disabled: disabled || !ripple || loading || pending }"
-    v-hover:desktop="handleHovering"
+    :tabindex="focusable ? undefined : '-1'"
     :style="{
       color: states.textColor,
       background: states.color,
@@ -24,34 +28,39 @@
     :disabled="disabled"
     @click="handleClick"
     @touchstart="handleTouchstart"
+    @focus="handleFocus"
+    @blur="isFocusing = false"
   >
     <var-loading
+      v-if="loading || pending"
       :class="n('loading')"
       var-button-cover
       :color="loadingColor"
       :type="loadingType"
-      :size="loadingSize"
+      :size="loadingSize || states.size"
       :radius="loadingRadius"
-      v-if="loading || pending"
     />
     <div :class="classes(n('content'), [loading || pending, n('--hidden')])">
       <slot />
     </div>
 
-    <var-hover-overlay :hovering="disabled || loading || pending ? false : hovering" />
+    <var-hover-overlay
+      :hovering="disabled || loading || pending ? false : hovering"
+      :focusing="disabled || loading || pending ? false : isFocusing"
+    />
   </button>
 </template>
 
 <script lang="ts">
-import Ripple from '../ripple'
-import VarLoading from '../loading'
-import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
-import Hover from '../hover'
 import { computed, defineComponent, ref } from 'vue'
-import { props } from './props'
+import { call, normalizeToArray } from '@varlet/shared'
+import Hover from '../hover'
+import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
+import VarLoading from '../loading'
+import Ripple from '../ripple'
 import { createNamespace, formatElevation } from '../utils/components'
+import { props } from './props'
 import { useButtonGroup } from './provide'
-import { isArray, call } from '@varlet/shared'
 
 const { name, n, classes } = createNamespace('button')
 
@@ -64,6 +73,7 @@ export default defineComponent({
   directives: { Ripple, Hover },
   props,
   setup(props) {
+    const isFocusing = ref(false)
     const pending = ref(false)
     const { buttonGroup } = useButtonGroup()
     const { hovering, handleHovering } = useHoverOverlay()
@@ -71,12 +81,13 @@ export default defineComponent({
       if (!buttonGroup) {
         return {
           elevation: formatElevation(props.elevation, 2),
-          type: props.type != null ? props.type : 'default',
-          size: props.size != null ? props.size : 'normal',
+          type: props.type ?? 'default',
+          size: props.size ?? 'normal',
           color: props.color,
           text: props.text,
           textColor: props.textColor,
           outline: props.outline,
+          iconContainer: props.iconContainer,
         }
       }
 
@@ -84,12 +95,13 @@ export default defineComponent({
 
       return {
         elevation: '',
-        type: props.type != null ? props.type : type.value,
-        size: props.size != null ? props.size : size.value,
-        color: props.color != null ? props.color : color.value,
-        textColor: props.textColor != null ? props.textColor : textColor.value,
-        text: mode.value !== 'normal',
+        type: props.type ?? type.value,
+        size: props.size ?? size.value,
+        color: props.color ?? color.value,
+        textColor: props.textColor ?? textColor.value,
+        text: mode.value === 'text' || mode.value === 'outline',
         outline: mode.value === 'outline',
+        iconContainer: mode.value === 'icon-container',
       }
     })
 
@@ -97,9 +109,7 @@ export default defineComponent({
       if (props.autoLoading) {
         pending.value = true
 
-        result = isArray(result) ? result : [result]
-
-        Promise.all(result)
+        Promise.all(normalizeToArray(result))
           .then(() => {
             pending.value = false
           })
@@ -129,15 +139,25 @@ export default defineComponent({
       attemptAutoLoading(call(onTouchstart, e))
     }
 
+    function handleFocus() {
+      if (!props.focusable) {
+        return
+      }
+
+      isFocusing.value = true
+    }
+
     return {
       pending,
       states,
       hovering,
+      isFocusing,
       n,
       classes,
       handleHovering,
       handleClick,
       handleTouchstart,
+      handleFocus,
     }
   },
 })

@@ -8,6 +8,11 @@ export const props = {
     default: true,
   },
   teleport: [String, Object, Boolean] as PropType<TeleportProps['to'] | false>,
+  closeOnKeyEscape: {
+    type: Boolean,
+    default: true,
+  },
   onClick: defineListenerProp<() => void>(),
+  onKeyEscape: defineListenerProp<() => void>(),
   'onUpdate:show': defineListenerProp<(show: boolean) => void>(),
 }

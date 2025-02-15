@@ -1,12 +1,13 @@
 <script setup>
-import { Themes } from '@varlet/ui'
 import { ref } from 'vue'
-import { watchDarkMode } from '@varlet/cli/client'
+import { onThemeChange } from '@varlet/cli/client'
 
 const data1 = Array(30).fill('List Item')
 const data2 = Array(30).fill('This is new List Item')
 const isRefresh = ref(false)
 const data = ref(data1)
+
+onThemeChange()
 
 function refresh() {
   setTimeout(() => {
@@ -14,12 +15,10 @@ function refresh() {
     isRefresh.value = false
   }, 2000)
 }
-
-watchDarkMode(Themes.dark)
 </script>
 
 <template>
-  <var-pull-refresh @refresh="refresh" v-model="isRefresh" success-duration="2000">
+  <var-pull-refresh v-model="isRefresh" success-duration="2000" @refresh="refresh">
     <var-cell v-for="(item, index) in data" :key="index" border>{{ item + ' ' + (index + 1) }}</var-cell>
   </var-pull-refresh>
 </template>

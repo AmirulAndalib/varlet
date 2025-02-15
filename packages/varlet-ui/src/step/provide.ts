@@ -1,7 +1,7 @@
 import { type ComputedRef } from 'vue'
+import { assert } from '@varlet/shared'
 import { useParent } from '@varlet/use'
-import { error } from '../utils/logger'
-import { type StepsProvider, STEPS_BIND_STEP_KEY } from '../steps/provide'
+import { STEPS_BIND_STEP_KEY, type StepsProvider } from '../steps/provide'
 
 export interface StepProvider {
   index: ComputedRef<number>
@@ -10,9 +10,7 @@ export interface StepProvider {
 export function useSteps() {
   const { parentProvider, index, bindParent } = useParent<StepsProvider, StepProvider>(STEPS_BIND_STEP_KEY)
 
-  if (!bindParent) {
-    error('Steps', '<step/> must in <steps>')
-  }
+  assert(!!bindParent, 'Steps', '<step/> must in <steps>')
 
   return {
     index,

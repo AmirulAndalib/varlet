@@ -1,20 +1,18 @@
-import Menu from '..'
-import VarMenu from '../Menu'
 import { createApp } from 'vue'
-import { mount } from '@vue/test-utils'
-import { delay, mockStubs, trigger } from '../../utils/test'
 import { doubleRaf } from '@varlet/shared'
-import { expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
+import Menu from '..'
+import { delay, mockStubs, trigger, triggerKeyboard } from '../../utils/test'
+import VarMenu from '../Menu'
 
-test('test menu plugin', () => {
+test('menu plugin', () => {
   const app = createApp({}).use(Menu)
   expect(app.component(Menu.name)).toBeTruthy()
 })
 
-test('test menu placement', async () => {
-  const { mockRestore } = mockStubs()
-
-  for (const placement of [
+test('menu placement', () => {
+  ;[
     'top',
     'top-start',
     'top-end',
@@ -35,25 +33,26 @@ test('test menu placement', async () => {
     'cover-bottom-end',
     'cover-left',
     'cover-right',
-  ]) {
+  ].forEach((placement) => {
+    const { mockRestore } = mockStubs()
+
     const root = document.createElement('div')
 
-    mount(VarMenu, {
+    const wrapper = mount(VarMenu, {
       props: {
         placement,
         teleport: root,
       },
     })
 
-    await doubleRaf()
-
     expect(root.innerHTML).toMatchSnapshot()
-  }
 
-  mockRestore()
+    wrapper.unmount()
+    mockRestore()
+  })
 })
 
-test('test menu click trigger', async () => {
+test('menu click trigger', async () => {
   const { mockRestore } = mockStubs()
 
   const wrapper = mount(VarMenu, {
@@ -73,7 +72,28 @@ test('test menu click trigger', async () => {
   mockRestore()
 })
 
-test('test menu hover trigger and events', async () => {
+test('menu manual trigger', async () => {
+  const { mockRestore } = mockStubs()
+
+  const root = document.createElement('div')
+
+  const wrapper = mount(VarMenu, {
+    props: {
+      trigger: 'manual',
+      teleport: root,
+    },
+  })
+
+  await doubleRaf()
+  await wrapper.trigger('click')
+  await trigger(root.querySelector('.var-menu__menu'), 'mouseenter')
+  await delay(300)
+  expect(root.innerHTML).toMatchSnapshot()
+
+  mockRestore()
+})
+
+test('menu hover trigger and events', async () => {
   const { mockRestore } = mockStubs()
 
   const onOpen = vi.fn()
@@ -116,7 +136,33 @@ test('test menu hover trigger and events', async () => {
   mockRestore()
 })
 
-test('test menu default style', async () => {
+test('menu close on escape', async () => {
+  const { mockRestore } = mockStubs()
+
+  const onClose = vi.fn()
+
+  const root = document.createElement('div')
+
+  const wrapper = mount(VarMenu, {
+    props: {
+      teleport: root,
+      show: true,
+      onClose,
+    },
+  })
+
+  await wrapper.trigger('mouseenter')
+  await triggerKeyboard(window, 'keydown', { key: 'Escape' })
+
+  await doubleRaf()
+  await delay(0)
+  expect(onClose).toHaveBeenCalledTimes(1)
+
+  wrapper.unmount()
+  mockRestore()
+})
+
+test('menu default style', async () => {
   const root = document.createElement('div')
 
   mount(VarMenu, {
@@ -131,7 +177,7 @@ test('test menu default style', async () => {
   expect(root.innerHTML).toMatchSnapshot()
 })
 
-test('test menu offset', async () => {
+test('menu offset', async () => {
   const { mockRestore } = mockStubs()
 
   const root = document.createElement('div')
@@ -151,7 +197,7 @@ test('test menu offset', async () => {
   mockRestore()
 })
 
-test('test menu hover the menu list', async () => {
+test('menu hover the menu list', async () => {
   const { mockRestore } = mockStubs()
 
   const root = document.createElement('div')
@@ -173,7 +219,7 @@ test('test menu hover the menu list', async () => {
   mockRestore()
 })
 
-test('test menu same width', async () => {
+test('menu same width', async () => {
   const { mockRestore } = mockStubs()
 
   const root = document.createElement('div')
@@ -193,7 +239,7 @@ test('test menu same width', async () => {
   mockRestore()
 })
 
-test('test menu elevation', async () => {
+test('menu elevation', async () => {
   const { mockRestore } = mockStubs()
 
   const root = document.createElement('div')

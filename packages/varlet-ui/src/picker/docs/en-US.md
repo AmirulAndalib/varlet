@@ -4,10 +4,6 @@
 
 Two calling methods, function and component, are provided. It also supports cascade mode and can handle multi-level linkage.
 
-### Notice
-
-In order to make the API more friendly, this component was refactored in `2.17.0`, but break changes were introduced. For the old version documentation, please [check here](https://github.com/varletjs/varlet/blob/v2.16.7/packages/varlet-ui/src/picker/docs/en-US.md).
-
 ## Function call
 
 ### Single Column Picker
@@ -163,6 +159,32 @@ async function picker() {
 
 <template>
   <var-button type="primary" block @click="picker">Area Picker</var-button>
+</template>
+```
+
+### Columns Count
+
+The maximum number of displayed columns can be set via `columnsCount`, which is very useful in cascading mode.
+
+```html
+<script setup>
+import { Picker, Snackbar } from '@varlet/ui'
+import columns from '@varlet/ui/json/area.json'
+
+async function picker() {
+  const { state, texts, indexes } = await Picker({
+    cascade: true,
+    columns,
+    columnsCount: 2,
+    onChange(values, indexes) {
+      Snackbar(`values: ${values.toString()}, indexes: ${indexes.toString()}`)
+    },
+  })
+}
+</script>
+
+<template>
+  <var-button type="primary" block @click="picker">Columns Count</var-button>
 </template>
 ```
 
@@ -348,6 +370,26 @@ function handleChange(values, indexes) {
 </template>
 ```
 
+### Columns Count
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { Snackbar } from '@varlet/ui'
+import area from '@varlet/ui/json/area.json'
+
+const columns = ref(area)
+
+function handleChange(values, indexes) {
+  Snackbar(`values: ${values.toString()}, indexes: ${indexes.toString()}`)
+}
+</script>
+
+<template>
+  <var-picker cascade :columns="columns" :columns-count="2" @change="handleChange" />
+</template>
+```
+
 ### Value Mapping
 
 ```html
@@ -450,11 +492,13 @@ function handleChange(values, indexes) {
 | `toolbar` | Whether to display the upper toolbar | _boolean_ | `true` |
 | `cascade` | Whether to enable cascade mode | _boolean_ | `true` |
 | `option-height` | The height of the option | _string \| number_ | `44` |
-| `option-count` | Number of visible options | _string \| number_ | `6` |
+| `option-count` | Number of visible columns | _string \| number_ | `6` |
+| `columns-count`  ***3.3.11***  | Number of visible columns | _string \| number_ | `-` |
 | `confirm-button-text` | Confirm button text | _string_ | `Confirm` |
 | `cancel-button-text` | Cancel button text | _string_ | `Cancel` |
 | `confirm-button-text-color` | Confirm button text color | _string_ | `-` |
 | `cancel-button-text-color` | Cancel button text color | _string_ | `-` |
+| `close-on-key-escape` | Whether to support keyboard ESC to close the picker | _boolean_ | `true`  |
 
 ### Picker Options
 
@@ -469,11 +513,13 @@ function handleChange(values, indexes) {
 | `cascade`                | Whether to enable cascade mode | _boolean_ | `true` |
 | `optionHeight`           | The height of the option | _string \| number_ | `44` |
 | `optionCount`            | Number of visible options | _string \| number_ | `6` |
+| `columnsCount`  ***3.3.11***  | Number of visible columns(defaults to display total columns) | _string \| number_ | `-` |
 | `confirmButtonText`      | Confirm button text | _string_ | `Confirm` |
 | `cancelButtonText`       | Cancel button text | _string_ | `Cancel` |
 | `confirmButtonTextColor` | Confirm button text color | _string_ | `-` |
 | `cancelButtonTextColor`  | Cancel button text color | _string_ | `-` |
-| `closeOnClickOverlay`    | Whether to click the overlay to close the picker       | _boolean_ | `true`       |
+| `closeOnClickOverlay`    | Whether to click the overlay to close the picker  | _boolean_ |  `true`  |
+| `closeOnKeyEscape`       | Whether to support keyboard ESC to close the picker | _boolean_ |`true`  |
 | `safeArea`               | Whether to enable bottom safety zone adaptation      | _boolean_             | `false`  |
 | `onClickOverlay`         | Click overlay callback  | _() => void_   | `-`  |
 | `onOpen`                 | Popup open callback | _() => void_ | `-` |
@@ -483,6 +529,7 @@ function handleChange(values, indexes) {
 | `onChange`               | Pick callbacks when content changes | _(values: (string \| number)[], indexes: number[], options: PickerColumnOption[]) => void_ | `() => void` |
 | `onConfirm`              | Pick callbacks when confirm | _(values: (string \| number)[], indexes: number[], options: PickerColumnOption[]) => void_ | `() => void` |
 | `onCancel`               | Pick callbacks when cancel | _(values: (string \| number)[], indexes: number[], options: PickerColumnOption[]) => void_ | `() => void` |
+| `onKeyEscape`            | Triggered when click keyboard ESC | _() => void_ | `-` |
 
 ### PickerColumnOption
 
@@ -508,6 +555,7 @@ function handleChange(values, indexes) {
 | `change` | Triggered when the pick content changes | `values: (string \| number)[]` Selected Values <br> `indexes: number[]` Selected indexes <br> `options: PickerColumnOption[]` Selected options |
 | `cancel` | Triggered when you click the cancel button | `values: (string \| number)[]` Selected Values <br> `indexes: number[]` Selected indexes <br> `options: PickerColumnOption[]` Selected options |
 | `confirm` | Triggered when you click the confirm button | `values: (string \| number)[]` Selected Values <br> `indexes: number[]` Selected indexes <br> `options: PickerColumnOption[]` Selected options |
+| `key-escape` | Triggered when click keyboard ESC  | `-` |
 
 ### Slots
 
@@ -527,7 +575,7 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--picker-toolbar-height` | `44px` |
 | `--picker-confirm-button-text-color` | `var(--color-primary)` |
 | `--picker-cancel-button-text-color` | `#888` |
-| `--picker-picked-border` | `1px solid rgba(0, 0, 0, 0.12)` |
+| `--picker-picked-border` | `1px solid var(--color-outline)` |
 | `--picker-title-font-size` | `var(--font-size-lg)` |
 | `--picker-title-text-color` | `#555` |
 | `--picker-option-font-size` | `var(--font-size-lg)` |

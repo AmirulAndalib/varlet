@@ -1,17 +1,18 @@
-import Switch from '..'
-import VarSwitch from '../Switch'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
-import { delay } from '../../utils/test'
-import { expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import { z } from 'zod'
+import Switch from '..'
+import { delay, triggerKeyboard } from '../../utils/test'
+import VarSwitch from '../Switch'
 
-test('test switch plugin', () => {
+test('switch plugin', () => {
   const app = createApp({}).use(Switch)
   expect(app.component(Switch.name)).toBeTruthy()
 })
 
 describe('test switch component props', () => {
-  test('test switch value', () => {
+  test('switch value', () => {
     const wrapper = mount(VarSwitch, {
       props: {
         modelValue: true,
@@ -23,7 +24,7 @@ describe('test switch component props', () => {
     wrapper.unmount()
   })
 
-  test('test switch activeValue and inactiveValue', async () => {
+  test('switch activeValue and inactiveValue', async () => {
     const wrapper = mount(VarSwitch, {
       props: {
         modelValue: 1,
@@ -42,7 +43,7 @@ describe('test switch component props', () => {
     wrapper.unmount()
   })
 
-  test('test switch disabled', () => {
+  test('switch disabled', () => {
     const wrapper = mount(VarSwitch, {
       props: {
         modelValue: true,
@@ -55,7 +56,20 @@ describe('test switch component props', () => {
     wrapper.unmount()
   })
 
-  test('test switch loading', () => {
+  test('switch buttonElevation', async () => {
+    const wrapper = mount(VarSwitch)
+
+    expect(wrapper.find('.var-elevation--2').exists()).toBeTruthy()
+
+    await wrapper.setProps({
+      buttonElevation: 4,
+    })
+
+    expect(wrapper.find('.var-elevation--4').exists()).toBeTruthy()
+    wrapper.unmount()
+  })
+
+  test('switch loading', () => {
     const wrapper = mount(VarSwitch, {
       props: {
         loading: true,
@@ -66,7 +80,7 @@ describe('test switch component props', () => {
     wrapper.unmount()
   })
 
-  test('test switch color, loadingColor, closeColor', async () => {
+  test('switch color, loadingColor, closeColor', async () => {
     const wrapper = mount(VarSwitch, {
       props: {
         loading: true,
@@ -88,7 +102,7 @@ describe('test switch component props', () => {
     wrapper.unmount()
   })
 
-  test('test switch size', () => {
+  test('switch size', () => {
     const wrapper = mount(VarSwitch, {
       props: {
         size: '25px',
@@ -98,10 +112,30 @@ describe('test switch component props', () => {
     expect(wrapper.find('.var-switch__handle').attributes('style')).toContain('width: 25px; height: 25px;')
     wrapper.unmount()
   })
+
+  test('variant mode', async () => {
+    const wrapper = mount({
+      components: {
+        [VarSwitch.name]: VarSwitch,
+      },
+      data() {
+        return {
+          value: true,
+          variant: false,
+        }
+      },
+      template: `<var-switch :variant="variant" v-model="value" />`,
+    })
+
+    expect(wrapper.html()).toMatchSnapshot()
+    await wrapper.setData({ variant: true })
+    expect(wrapper.html()).toMatchSnapshot()
+    wrapper.unmount()
+  })
 })
 
 describe('test switch events', () => {
-  test('test switch v-model and events', async () => {
+  test('switch v-model and events', async () => {
     const clickFn = vi.fn()
     const changeFn = vi.fn()
 
@@ -130,7 +164,7 @@ describe('test switch events', () => {
     wrapper.unmount()
   })
 
-  test('test switch event not trigger', async () => {
+  test('switch event not trigger', async () => {
     const clickFn = vi.fn()
     const changeFn = vi.fn()
     const template = `
@@ -159,7 +193,7 @@ describe('test switch events', () => {
 
     await wrapper.find('.var-switch__block').trigger('click')
 
-    expect(clickFn).toHaveBeenCalledTimes(1)
+    expect(clickFn).toHaveBeenCalledTimes(0)
     expect(changeFn).toHaveBeenCalledTimes(0)
     expect(wrapper.vm.value).toBe(true)
 
@@ -169,10 +203,97 @@ describe('test switch events', () => {
     })
 
     await wrapper.find('.var-switch__block').trigger('click')
-    expect(clickFn).toHaveBeenCalledTimes(2)
+    expect(clickFn).toHaveBeenCalledTimes(1)
     expect(changeFn).toHaveBeenCalledTimes(0)
     expect(wrapper.vm.value).toBe(true)
 
     wrapper.unmount()
   })
+
+  test('counter lazy change', async () => {
+    const wrapper = mount({
+      components: {
+        [VarSwitch.name]: VarSwitch,
+      },
+      data() {
+        return {
+          value: true,
+        }
+      },
+      methods: {
+        async onBeforeChange(value, change) {
+          await delay(500)
+          change(value)
+        },
+      },
+      template: `<var-switch lazy-change v-model="value" @before-change="onBeforeChange" />`,
+    })
+
+    await wrapper.find('.var-switch__block').trigger('click')
+    expect(wrapper.vm.value).toBe(true)
+
+    await delay(600)
+    expect(wrapper.vm.value).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  test('switch keyboard enter for switch', async () => {
+    const click = vi.fn()
+    const origin = HTMLElement.prototype.click
+    HTMLElement.prototype.click = click
+
+    const wrapper = mount(VarSwitch, {
+      props: {
+        modelValue: true,
+      },
+    })
+
+    await wrapper.find('.var-switch__ripple').trigger('focus')
+    await triggerKeyboard(window, 'keydown', { key: 'Enter' })
+    expect(click).toHaveBeenCalledTimes(1)
+
+    HTMLElement.prototype.click = origin
+    wrapper.unmount()
+  })
+
+  test('switch keyboard space for switch', async () => {
+    const click = vi.fn()
+    const origin = HTMLElement.prototype.click
+    HTMLElement.prototype.click = click
+
+    const wrapper = mount(VarSwitch, {
+      props: {
+        modelValue: true,
+      },
+    })
+
+    await wrapper.find('.var-switch__ripple').trigger('focus')
+    await triggerKeyboard(window, 'keydown', { key: ' ' })
+    await triggerKeyboard(window, 'keyup', { key: ' ' })
+    expect(click).toHaveBeenCalledTimes(1)
+
+    HTMLElement.prototype.click = origin
+    wrapper.unmount()
+  })
+})
+
+test('switch valiation with zod', async () => {
+  const wrapper = mount({
+    components: {
+      [VarSwitch.name]: VarSwitch,
+    },
+    data: () => ({
+      modelValue: true,
+      rules: z.boolean().refine((v) => v, 'value must be true'),
+    }),
+    template: `<var-switch v-model="modelValue" :rules="rules" />`,
+  })
+
+  await wrapper.setData({
+    modelValue: false,
+  })
+  await wrapper.find('.var-switch__block').trigger('click')
+  await delay(16)
+  expect(wrapper.html()).toMatchSnapshot()
 })

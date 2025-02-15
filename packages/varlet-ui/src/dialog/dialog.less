@@ -12,17 +12,17 @@
   --dialog-title-color: #555;
   --dialog-confirm-button-color: var(--color-primary);
   --dialog-cancel-button-color: var(--color-primary);
-  --dialog-background: #fff;
+  --dialog-background: var(--color-surface-container-low);
 }
 
 .var-dialog {
   width: var(--dialog-width);
-  border-radius: var(--dialog-border-radius);
   background: var(--dialog-background);
   transition: 0.25s background-color;
 
   &__popup[var-dialog-cover] {
     background: transparent;
+    border-radius: var(--dialog-border-radius);
   }
 
   &__title {

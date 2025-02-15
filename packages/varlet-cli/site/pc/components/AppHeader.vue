@@ -1,7 +1,7 @@
 <template>
   <div class="varlet-site-header">
     <div class="varlet-site-header__lead">
-      <img class="varlet-site-header__logo" :src="config.logo" @click="backRoot"/>
+      <img class="varlet-site-header__logo" :src="config.logo" @click="backRoot" />
       <div class="varlet-site-header__title" v-if="title" @click="backRoot">{{ title }}</div>
     </div>
 
@@ -12,8 +12,8 @@
         @mouseleave="isOpenVersionsMenu = false"
         v-if="isShowVersion"
       >
-        <span style="font-size: 16px;">{{ currentVersion }}</span>
-        <var-icon name="chevron-down"/>
+        <span style="font-size: 16px">{{ currentVersion }}</span>
+        <var-icon name="chevron-down" />
         <transition name="fade">
           <div
             class="varlet-site-header__animation-list varlet-site-header__animation-versions var-elevation--5"
@@ -27,30 +27,62 @@
               :class="{ 'varlet-site-header__animation-list--active': currentVersion === i.label }"
               @click="open(i.link)"
             >
-            {{ i.label }}
+              {{ i.label }}
             </var-cell>
           </div>
         </transition>
       </div>
 
-      <a class="varlet-site-header__link" style="margin-right: 8px;" target="_blank" :href="changelog" v-ripple v-if="changelog">
-        <var-icon name="history" :size="28"/>
+      <a
+        class="varlet-site-header__link"
+        style="width: auto; border-radius: 3px; padding: 0 12px; height: 40px"
+        target="_blank"
+        :href="ai"
+        v-ripple
+        v-if="ai"
+      >
+        <span>AI Agent</span>
+      </a>
+      <a
+        class="varlet-site-header__link"
+        style="margin-right: 8px"
+        target="_blank"
+        :href="changelog"
+        v-ripple
+        v-if="changelog"
+      >
+        <var-icon name="history" :size="28" />
       </a>
       <a class="varlet-site-header__link" target="_blank" :href="playground" v-ripple v-if="playground">
-        <var-icon name="code-json" :size="24"/>
+        <var-icon name="code-json" :size="24" />
       </a>
       <a class="varlet-site-header__link" target="_blank" :href="github" v-ripple v-if="github">
-        <var-icon name="github" :size="28"/>
+        <var-icon name="github" :size="28" />
       </a>
-      <div class="varlet-site-header__theme" v-ripple v-if="darkMode" @click="toggleTheme">
-        <var-icon
-          size="26px"
-          :name="currentTheme === 'lightTheme' ? 'white-balance-sunny' : 'weather-night'"
-          :style="{
-            marginBottom: currentTheme === 'darkTheme' && '2px',
-            marginTop: currentTheme === 'lightTheme' && '2px',
-          }"
-        />
+      <div
+        class="varlet-site-header__theme"
+        @mouseenter="isOpenThemeMenu = true"
+        @mouseleave="isOpenThemeMenu = false"
+        v-if="themes.length > 1"
+      >
+        <var-icon name="palette" :size="28" />
+        <var-icon name="chevron-down" />
+        <transition name="fade">
+          <div
+            class="varlet-site-header__animation-list var-elevation--5"
+            v-show="isOpenThemeMenu"
+            :style="{ pointerEvents: isOpenThemeMenu ? 'auto' : 'none' }"
+          >
+            <var-cell
+              v-for="t in themes"
+              v-ripple
+              :key="t.value"
+              :class="{ 'varlet-site-header__animation-list--active': currentTheme === t.value }"
+              @click="() => toggleTheme(t.value as Theme)"
+              >{{ t[language as keyof typeof t] }}
+            </var-cell>
+          </div>
+        </transition>
       </div>
       <div
         class="varlet-site-header__language"
@@ -58,8 +90,8 @@
         @mouseleave="isOpenLanguageMenu = false"
         v-if="languages"
       >
-        <var-icon name="translate" :size="26"/>
-        <var-icon name="chevron-down"/>
+        <var-icon name="translate" :size="26" />
+        <var-icon name="chevron-down" />
         <transition name="fade">
           <div
             class="varlet-site-header__animation-list var-elevation--5"
@@ -72,49 +104,51 @@
               :key="key"
               :class="{ 'varlet-site-header__animation-list--active': language === key }"
               @click="handleLanguageChange(key)"
-            >{{ value }}
+              >{{ value }}
             </var-cell>
           </div>
         </transition>
       </div>
-
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, ref } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 import config from '@config'
-import { ref, computed, defineComponent } from 'vue'
-import { get } from 'lodash-es'
-import { getBrowserTheme, getPCLocationInfo, Theme, watchTheme } from '@varlet/cli/client'
-import { setTheme } from '../../utils'
-import { removeEmpty } from '../../utils'
+import { getBrowserTheme, getPCLocationInfo, setTheme, Theme, watchTheme } from '@varlet/cli/client'
 import { useRouter } from 'vue-router'
-import type { Ref, ComputedRef } from 'vue'
+import { removeEmpty } from '../../utils'
 
 export default defineComponent({
   name: 'AppHeader',
   props: {
     language: {
       type: String,
-    }
+    },
   },
   setup() {
-    const title: Ref<string> = ref(get(config, 'title'))
-    const logo: Ref<string> = ref(get(config, 'logo'))
-    const languages: Ref<Record<string, string>> = ref(get(config, 'pc.header.i18n'))
-    const currentVersion: Ref<string> = ref(get(config, 'pc.header.currentVersion'))
-    const versions = get(config, 'pc.header.versions') 
+    const title: Ref<string> = ref(config?.title)
+    const logo: Ref<string> = ref(config?.pc?.logo)
+    const languages: Ref<Record<string, string>> = ref(config?.pc?.header?.i18n ?? {})
+    const currentVersion: Ref<string> = ref(config?.pc?.header?.currentVersion ?? '')
+    const versions = config?.pc?.header?.versions
     const isShowVersion: Ref<boolean> = ref(!!versions)
-    const versionItems: Ref<Array<Record<string, any>>> = ref((versions ?? []).find((i: any) => window.location.host.includes(i.name))?.items ?? versions?.[0]?.items ?? [])
-    const playground: Ref<string> = ref(get(config, 'pc.header.playground'))
-    const github: Ref<string> = ref(get(config, 'pc.header.github'))
-    const changelog: Ref<string> = ref(get(config, 'pc.header.changelog'))
-    const redirect = get(config, 'pc.redirect')
-    const darkMode: Ref<boolean> = ref(get(config, 'pc.header.darkMode'))
+    const versionItems: Ref<Array<Record<string, any>>> = ref(
+      (versions ?? []).find((i: any) => window.location.host.includes(i.name))?.items ?? versions?.[0]?.items ?? [],
+    )
+    const playground: Ref<string> = ref(config?.pc?.header?.playground)
+    const github: Ref<string> = ref(config?.pc?.header?.github)
+    const themes: Ref<Record<string, any>> = ref(config?.pc?.header?.themes ?? {})
+    const changelog: Ref<string> = ref(config?.pc?.header?.changelog)
+    const ai: Ref<string> = ref(config?.pc?.header?.ai)
+    const redirect = config?.pc?.redirect ?? ''
+    const darkMode: Ref<boolean> = ref(config?.pc?.header?.darkMode ?? false)
     const currentTheme = ref(getBrowserTheme())
 
     const isOpenLanguageMenu: Ref<boolean> = ref(false)
+    const isOpenThemeMenu: Ref<boolean> = ref(false)
     const isOpenVersionsMenu: Ref<boolean> = ref(false)
     const router = useRouter()
     const nonEmptyLanguages: ComputedRef<Record<string, string>> = computed(() => removeEmpty(languages.value))
@@ -132,21 +166,23 @@ export default defineComponent({
 
     const setCurrentTheme = (theme: Theme) => {
       currentTheme.value = theme
-      setTheme(config, currentTheme.value)
-      window.localStorage.setItem(get(config, 'themeKey'), currentTheme.value)
+      setTheme(currentTheme.value)
+      window.localStorage.setItem(config?.themeKey, currentTheme.value)
     }
 
     const getThemeMessage = () => ({ action: 'theme-change', from: 'pc', data: currentTheme.value })
 
-    const toggleTheme = () => {
-      setCurrentTheme(currentTheme.value === 'darkTheme' ? 'lightTheme' : 'darkTheme')
+    const toggleTheme = (value: Theme) => {
+      setCurrentTheme(value)
 
       window.postMessage(getThemeMessage(), '*')
       notifyThemeChange('mobile')
+      isOpenThemeMenu.value = false
     }
 
     const notifyThemeChange = (target: 'mobile' | 'window') => {
-      const contentWindow = target === 'window' ? window : (document.getElementById(target) as HTMLIFrameElement | undefined)?.contentWindow
+      const contentWindow =
+        target === 'window' ? window : (document.getElementById(target) as HTMLIFrameElement | undefined)?.contentWindow
       if (!contentWindow) {
         return
       }
@@ -169,7 +205,7 @@ export default defineComponent({
       }
     })
 
-    setTheme(config, currentTheme.value)
+    setTheme(currentTheme.value)
     notifyThemeChange('window')
 
     return {
@@ -180,12 +216,15 @@ export default defineComponent({
       languages,
       isShowVersion,
       versionItems,
+      themes,
       nonEmptyLanguages,
       playground,
       changelog,
+      ai,
       github,
       isOpenLanguageMenu,
       isOpenVersionsMenu,
+      isOpenThemeMenu,
       darkMode,
       currentTheme,
       open,
@@ -199,7 +238,7 @@ export default defineComponent({
 
 <style lang="less">
 .varlet-site-header {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   display: flex;
@@ -244,21 +283,6 @@ export default defineComponent({
     }
   }
 
-  &__language {
-    border-radius: 3px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    position: relative;
-    cursor: pointer;
-    transition: background-color 0.25s;
-
-    &:hover {
-      background: var(--site-config-color-nav-button-hover-background);
-    }
-  }
-
   &__versions {
     border-radius: 3px;
     height: 40px;
@@ -298,16 +322,31 @@ export default defineComponent({
     }
   }
 
-  &__theme {
-    border-radius: 50%;
-    width: 42px;
-    height: 42px;
+  &__language {
+    border-radius: 3px;
+    height: 40px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    padding: 0 10px;
+    position: relative;
     cursor: pointer;
     transition: background-color 0.25s;
-    margin-right: 4px;
+
+    &:hover {
+      background: var(--site-config-color-nav-button-hover-background);
+    }
+  }
+
+  &__theme {
+    border-radius: 3px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.25s;
+    margin-right: 6px;
 
     &:hover {
       background: var(--site-config-color-nav-button-hover-background);
@@ -335,6 +374,30 @@ export default defineComponent({
     &--active {
       background: var(--site-config-color-pc-language-active-background) !important;
       color: var(--site-config-color-pc-language-active) !important;
+    }
+  }
+
+  &__theme-animation-list {
+    background: var(--site-config-color-bar);
+    cursor: pointer;
+    color: var(--site-config-color-text);
+    border-radius: 2px;
+    position: absolute;
+    top: 40px;
+    left: -20px;
+
+    .var-cell {
+      width: 100px !important;
+      color: var(--site-config-color-text);
+
+      &__content {
+        color: inherit !important;
+      }
+    }
+
+    &--active {
+      background: var(--site-config-color-pc-theme-active-background) !important;
+      color: var(--site-config-color-pc-theme-active) !important;
     }
   }
 

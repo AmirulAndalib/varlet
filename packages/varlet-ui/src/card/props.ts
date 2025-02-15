@@ -5,6 +5,8 @@ export type CardFit = 'fill' | 'contain' | 'cover' | 'none' | 'scale-down'
 
 export type CardLayout = 'row' | 'column'
 
+export type CardVariant = 'standard' | 'outlined' | 'filled'
+
 export const props = {
   src: String,
   fit: {
@@ -13,7 +15,10 @@ export const props = {
   },
   imageHeight: [String, Number],
   imageWidth: [String, Number],
-  outline: Boolean,
+  variant: {
+    type: String as PropType<CardVariant>,
+    default: 'standard',
+  },
   layout: {
     type: String as PropType<CardLayout>,
     default: 'column',
@@ -34,4 +39,9 @@ export const props = {
   ripple: Boolean,
   onClick: defineListenerProp<(e: Event) => void>(),
   'onUpdate:floating': defineListenerProp<(value: boolean) => void>(),
+
+  /**
+   * @deprecated use outlined variant instead
+   */
+  outline: Boolean,
 }

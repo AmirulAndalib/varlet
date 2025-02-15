@@ -1,15 +1,15 @@
-import Hover from '..'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
+import Hover from '..'
 import { mockUserAgent } from '../../utils/test'
-import { expect, vi } from 'vitest'
 
-test('test hover use', () => {
+test('hover use', () => {
   const app = createApp({}).use(Hover)
   expect(app.directive('hover')).toBeTruthy()
 })
 
-test('test hover style binding', async () => {
+test('hover style binding', async () => {
   const Wrapper = {
     directives: { Hover },
     template: `<div v-hover="{ color: 'rgb(1, 1, 1)' }"></div>`,
@@ -27,7 +27,7 @@ test('test hover style binding', async () => {
   wrapper.unmount()
 })
 
-test('test hover function binding', async () => {
+test('hover function binding', async () => {
   const handleHover = vi.fn()
 
   const Wrapper = {
@@ -51,7 +51,7 @@ test('test hover function binding', async () => {
   wrapper.unmount()
 })
 
-test('test hover style binding on update', async () => {
+test('hover style binding on update', async () => {
   const Wrapper = {
     data: () => ({
       count: 1,
@@ -68,7 +68,7 @@ test('test hover style binding on update', async () => {
   wrapper.unmount()
 })
 
-test('test hover style binding restore', async () => {
+test('hover style binding restore', async () => {
   const Wrapper = {
     directives: { Hover },
     template: `<div style="color: rgb(255, 255, 255)" v-hover="{ color: 'rgb(1, 1, 1)' }"></div>`,
@@ -89,9 +89,9 @@ test('test hover style binding restore', async () => {
   wrapper.unmount()
 })
 
-test('test hover desktop args', async () => {
+test('hover desktop args', async () => {
   const { restore } = mockUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
   )
 
   const Wrapper = {
@@ -106,7 +106,7 @@ test('test hover desktop args', async () => {
   restore()
 
   const { restore: restoreToRaw } = mockUserAgent(
-    'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1'
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
   )
 
   wrapper = mount(Wrapper)
@@ -116,9 +116,9 @@ test('test hover desktop args', async () => {
   restoreToRaw()
 })
 
-test('test hover mobile args', async () => {
+test('hover mobile args', async () => {
   const { restore } = mockUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
   )
 
   const Wrapper = {
@@ -133,7 +133,7 @@ test('test hover mobile args', async () => {
   restore()
 
   const { restore: restoreToRaw } = mockUserAgent(
-    'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1'
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
   )
 
   wrapper = mount(Wrapper)

@@ -1,19 +1,17 @@
-import VarTooltip from '..'
-import { createApp, h } from 'vue'
-import { mount } from '@vue/test-utils'
-import { delay, mockStubs, trigger } from '../../utils/test'
+import { createApp } from 'vue'
 import { doubleRaf } from '@varlet/shared'
-import { expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
+import VarTooltip from '..'
+import { delay, mockStubs, trigger } from '../../utils/test'
 
-test('test tooltip plugin', () => {
+test('tooltip plugin', () => {
   const app = createApp({}).use(VarTooltip)
   expect(app.component(VarTooltip.name)).toBeTruthy()
 })
 
-test('test tooltip placement', async () => {
-  const { mockRestore } = mockStubs()
-
-  for (const placement of [
+test('tooltip placement', () => {
+  ;[
     'top',
     'top-start',
     'top-end',
@@ -26,29 +24,32 @@ test('test tooltip placement', async () => {
     'left',
     'left-start',
     'left-end',
-  ]) {
+  ].forEach((placement) => {
+    const { mockRestore } = mockStubs()
     const root = document.createElement('div')
 
-    mount(VarTooltip, {
+    const wrapper = mount(VarTooltip, {
       props: {
         placement,
         teleport: root,
       },
     })
 
-    await doubleRaf()
-
     expect(root.innerHTML).toMatchSnapshot()
-  }
 
-  mockRestore()
+    wrapper.unmount()
+    mockRestore()
+  })
 })
 
-test('test tooltip click trigger', async () => {
+test('tooltip click trigger', async () => {
   const { mockRestore } = mockStubs()
 
   const wrapper = mount(VarTooltip, {
     attachTo: document.body,
+    props: {
+      trigger: 'click',
+    },
   })
 
   await wrapper.trigger('click')
@@ -65,7 +66,7 @@ test('test tooltip click trigger', async () => {
   wrapper.unmount()
 })
 
-test('test tooltip hover trigger and events', async () => {
+test('tooltip hover trigger and events', async () => {
   const { mockRestore } = mockStubs()
 
   const onOpen = vi.fn()
@@ -77,7 +78,6 @@ test('test tooltip hover trigger and events', async () => {
 
   const wrapper = mount(VarTooltip, {
     props: {
-      trigger: 'hover',
       teleport: root,
       onOpen,
       onOpened,
@@ -107,33 +107,31 @@ test('test tooltip hover trigger and events', async () => {
   mockRestore()
 })
 
-test('test tooltip type', async () => {
-  const { mockRestore } = mockStubs()
-
-  for (const type of ['default', 'primary', 'info', 'success', 'warning', 'danger']) {
+test('tooltip type', () => {
+  ;['default', 'primary', 'info', 'success', 'warning', 'danger'].forEach((type) => {
+    const { mockRestore } = mockStubs()
     const root = document.createElement('div')
 
-    mount(VarTooltip, {
+    const wrapper = mount(VarTooltip, {
       props: {
         type,
         teleport: root,
       },
     })
 
-    await doubleRaf()
-
     expect(root.innerHTML).toMatchSnapshot()
-  }
 
-  mockRestore()
+    wrapper.unmount()
+    mockRestore()
+  })
 })
 
-test('test tooltip content', async () => {
+test('tooltip content', async () => {
   const { mockRestore } = mockStubs()
 
   const root = document.createElement('div')
 
-  mount(VarTooltip, {
+  const wrapper = mount(VarTooltip, {
     props: {
       content: 'test tooltip',
       teleport: root,
@@ -144,15 +142,16 @@ test('test tooltip content', async () => {
 
   expect(root.innerHTML).toMatchSnapshot()
 
+  wrapper.unmount()
   mockRestore()
 })
 
-test('test tooltip color', async () => {
+test('tooltip color', async () => {
   const { mockRestore } = mockStubs()
 
   const root = document.createElement('div')
 
-  mount(VarTooltip, {
+  const wrapper = mount(VarTooltip, {
     props: {
       color: '#000',
       teleport: root,
@@ -163,15 +162,36 @@ test('test tooltip color', async () => {
 
   expect(root.innerHTML).toMatchSnapshot()
 
+  wrapper.unmount()
   mockRestore()
 })
 
-test('test tooltip offset', async () => {
+test('tooltip text-color', async () => {
   const { mockRestore } = mockStubs()
 
   const root = document.createElement('div')
 
-  mount(VarTooltip, {
+  const wrapper = mount(VarTooltip, {
+    props: {
+      textColor: '#fff',
+      teleport: root,
+    },
+  })
+
+  await doubleRaf()
+
+  expect(root.innerHTML).toMatchSnapshot()
+
+  wrapper.unmount()
+  mockRestore()
+})
+
+test('tooltip offset', async () => {
+  const { mockRestore } = mockStubs()
+
+  const root = document.createElement('div')
+
+  const wrapper = mount(VarTooltip, {
     props: {
       offsetX: 100,
       offsetY: 100,
@@ -183,15 +203,16 @@ test('test tooltip offset', async () => {
 
   expect(root.innerHTML).toMatchSnapshot()
 
+  wrapper.unmount()
   mockRestore()
 })
 
-test('test tooltip hover the tooltip list', async () => {
+test('tooltip hover the tooltip list', async () => {
   const { mockRestore } = mockStubs()
 
   const root = document.createElement('div')
 
-  mount(VarTooltip, {
+  const wrapper = mount(VarTooltip, {
     props: {
       show: true,
       trigger: 'hover',
@@ -205,5 +226,6 @@ test('test tooltip hover the tooltip list', async () => {
   await delay(300)
   expect(root.innerHTML).toMatchSnapshot()
 
+  wrapper.unmount()
   mockRestore()
 })

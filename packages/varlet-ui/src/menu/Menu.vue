@@ -1,20 +1,15 @@
 <template>
-  <div
-    ref="host"
-    :class="classes(n(), n('$--box'))"
-    @click="handleHostClick"
-    @mouseenter="handleHostMouseenter"
-    @mouseleave="handleHostMouseleave"
-  >
+  <div ref="host" :class="classes(n(), n('$--box'))">
     <slot />
 
     <Teleport :to="teleport === false ? undefined : teleport" :disabled="teleportDisabled || teleport === false">
       <transition :name="n()" @after-enter="onOpened" @after-leave="handleClosed">
         <div
+          v-show="show"
           ref="popover"
           :style="{
             zIndex,
-            width: sameWidth ? toSizeUnit(Math.ceil(hostSize.width)) : undefined,
+            width: sameWidth ? toSizeUnit(Math.ceil(referenceSize.width)) : undefined,
           }"
           :class="
             classes(
@@ -22,10 +17,9 @@
               n('$--box'),
               popoverClass,
               [defaultStyle, n('--menu-background-color')],
-              [defaultStyle, formatElevation(elevation, 3)]
+              [defaultStyle, formatElevation(elevation, 3)],
             )
           "
-          v-show="show"
           @click.stop
           @mouseenter="handlePopoverMouseenter"
           @mouseleave="handlePopoverMouseleave"
@@ -38,11 +32,11 @@
 </template>
 
 <script lang="ts">
-import { createNamespace, formatElevation, useTeleport } from '../utils/components'
 import { defineComponent } from 'vue'
+import { createNamespace, formatElevation, useTeleport } from '../utils/components'
+import { toSizeUnit } from '../utils/elements'
 import { props } from './props'
 import { usePopover } from './usePopover'
-import { toSizeUnit } from '../utils/elements'
 
 const { name, n, classes } = createNamespace('menu')
 
@@ -54,38 +48,40 @@ export default defineComponent({
     const {
       popover,
       host,
-      hostSize,
+      referenceSize,
       show,
       zIndex,
-      handleHostClick,
-      handleHostMouseenter,
-      handleHostMouseleave,
       handlePopoverMouseenter,
       handlePopoverMouseleave,
       handlePopoverClose,
       handleClosed,
+      setAllowClose,
       // expose
       open,
       // expose
       close,
       // expose
       resize,
+      // expose
+      setReference,
     } = usePopover(props)
+
+    function allowClose() {
+      setAllowClose(true)
+    }
 
     return {
       popover,
       host,
-      hostSize,
+      referenceSize,
       show,
       zIndex,
       teleportDisabled,
+      allowClose,
       formatElevation,
       toSizeUnit,
       n,
       classes,
-      handleHostClick,
-      handleHostMouseenter,
-      handleHostMouseleave,
       handlePopoverMouseenter,
       handlePopoverMouseleave,
       handlePopoverClose,
@@ -93,6 +89,7 @@ export default defineComponent({
       resize,
       open,
       close,
+      setReference,
     }
   },
 })

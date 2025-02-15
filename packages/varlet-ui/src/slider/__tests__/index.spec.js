@@ -1,9 +1,10 @@
-import Slider from '..'
-import VarSlider from '../Slider'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
-import { delay, trigger, mockConsole } from '../../utils/test'
-import { expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest'
+import { z } from 'zod'
+import Slider from '..'
+import { delay, mockConsole, trigger } from '../../utils/test'
+import VarSlider from '../Slider'
 
 const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth')
 beforeAll(() => {
@@ -17,13 +18,26 @@ afterAll(() => {
   Object.defineProperty(HTMLElement.prototype, 'offsetWidth', originalOffsetWidth)
 })
 
-test('test slider plugin', () => {
+test('slider plugin', () => {
   const app = createApp({}).use(Slider)
   expect(app.component(Slider.name)).toBeTruthy()
 })
 
 describe('test slider props', () => {
-  test('test step prop', async () => {
+  test('slider direction prop', async () => {
+    const wrapper = mount(VarSlider)
+
+    expect(wrapper.find('.var-slider__horizontal').exists()).toBe(true)
+
+    await wrapper.setProps({
+      direction: 'vertical',
+    })
+    expect(wrapper.find('.var-slider__vertical').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  test('step prop', async () => {
     const { mockRestore } = mockConsole('warn')
 
     const wrapper = mount({
@@ -35,7 +49,7 @@ describe('test slider props', () => {
         step: NaN,
       }),
       template: `
-        <var-slider v-model="value" :step="step"/>`,
+        <var-slider v-model="value" :step="step" />`,
     })
 
     await wrapper.setData({ step: -1 })
@@ -54,7 +68,7 @@ describe('test slider props', () => {
     wrapper.unmount()
   })
 
-  test('test range prop', async () => {
+  test('range prop', () => {
     const wrapper = mount(VarSlider, {
       props: {
         range: true,
@@ -67,7 +81,7 @@ describe('test slider props', () => {
     wrapper.unmount()
   })
 
-  test('test slider labelVisible prop', async () => {
+  test('slider labelVisible prop', async () => {
     const wrapper = mount(VarSlider, {
       props: {
         modelValue: 20,
@@ -98,7 +112,7 @@ describe('test slider props', () => {
   })
 
   describe('test slider color props', () => {
-    test('test activeColor prop', () => {
+    test('activeColor prop', () => {
       const wrapper = mount(VarSlider, {
         props: {
           modelValue: 2,
@@ -111,7 +125,7 @@ describe('test slider props', () => {
       wrapper.unmount()
     })
 
-    test('test trackColor prop', () => {
+    test('trackColor prop', () => {
       const wrapper = mount(VarSlider, {
         props: {
           modelValue: 2,
@@ -124,7 +138,7 @@ describe('test slider props', () => {
       wrapper.unmount()
     })
 
-    test('test thumbColor prop', () => {
+    test('thumbColor prop', () => {
       const wrapper = mount(VarSlider, {
         props: {
           modelValue: 2,
@@ -137,7 +151,7 @@ describe('test slider props', () => {
       wrapper.unmount()
     })
 
-    test('test labelColor and labelTextColor prop', () => {
+    test('labelColor and labelTextColor prop', () => {
       const wrapper = mount(VarSlider, {
         props: {
           modelValue: 2,
@@ -153,7 +167,7 @@ describe('test slider props', () => {
     })
   })
 
-  test('test trackHeight prop', () => {
+  test('trackHeight prop', async () => {
     const wrapper = mount(VarSlider, {
       props: {
         modelValue: 2,
@@ -163,10 +177,15 @@ describe('test slider props', () => {
 
     expect(wrapper.find('.var-slider__horizontal-track-background').attributes('style')).toContain('height: 4px;')
 
+    await wrapper.setProps({
+      trackHeight: 8,
+    })
+    expect(wrapper.find('.var-slider__horizontal-track-background').attributes('style')).toContain('height: 8px;')
+
     wrapper.unmount()
   })
 
-  test('test slider range', async () => {
+  test('slider range', async () => {
     const wrapper = mount({
       components: {
         [VarSlider.name]: VarSlider,
@@ -192,7 +211,7 @@ describe('test slider props', () => {
     wrapper.unmount()
   })
 
-  test('test thumbSize prop', () => {
+  test('thumbSize prop', () => {
     const wrapper = mount(VarSlider, {
       props: {
         modelValue: 2,
@@ -202,12 +221,12 @@ describe('test slider props', () => {
     })
 
     expect(wrapper.find('.var-slider__horizontal-thumb-label--active').attributes('style')).toContain(
-      'height: 20px; width: 20px;'
+      'height: 20px; width: 20px;',
     )
     wrapper.unmount()
   })
 
-  test('test slider not available', async () => {
+  test('slider not available', async () => {
     const changeFn = vi.fn()
     const startFn = vi.fn()
     const endFn = vi.fn()
@@ -234,6 +253,10 @@ describe('test slider props', () => {
       template,
     })
 
+    expect(wrapper.find('.var-slider--disabled').exists()).toBe(true)
+    expect(wrapper.find('.var-slider__horizontal-thumb').attributes('aria-disabled')).toBe('true')
+    expect(wrapper.find('.var-slider__horizontal-thumb').attributes('tabindex')).toBe(undefined)
+
     const el = wrapper.find('.var-slider__horizontal-thumb')
 
     await trigger(el, 'touchstart', 0, 0)
@@ -244,6 +267,10 @@ describe('test slider props', () => {
       disabled: false,
       readonly: true,
     })
+
+    expect(wrapper.find('.var-slider--disabled').exists()).toBe(false)
+    expect(wrapper.find('.var-slider__horizontal-thumb').attributes('aria-disabled')).toBe(undefined)
+    expect(wrapper.find('.var-slider__horizontal-thumb').attributes('tabindex')).toBe('0')
 
     await trigger(el, 'touchstart', 0, 0)
     await trigger(el, 'touchmove', 0, 50)
@@ -256,7 +283,61 @@ describe('test slider props', () => {
     wrapper.unmount()
   })
 
-  test('test slider value legal', async () => {
+  test('slider getValue function when the type of value is number', async () => {
+    const wrapper = mount(VarSlider, {
+      props: {
+        modelValue: 2,
+      },
+    })
+
+    expect(wrapper.find('.var-slider__horizontal-thumb').attributes('aria-valuemin')).toBe('0')
+    expect(wrapper.find('.var-slider__horizontal-thumb').attributes('aria-valuemax')).toBe('100')
+    expect(wrapper.find('.var-slider__horizontal-thumb').attributes('aria-valuenow')).toBe('2')
+
+    await wrapper.setProps({
+      modelValue: -1,
+    })
+    expect(wrapper.find('.var-slider__horizontal-thumb').attributes('aria-valuenow')).toBe('0')
+
+    await wrapper.setProps({
+      modelValue: 101,
+    })
+    expect(wrapper.find('.var-slider__horizontal-thumb').attributes('aria-valuenow')).toBe('100')
+
+    wrapper.unmount()
+  })
+
+  test('slider getValue function when the type of value is array', async () => {
+    const wrapper = mount(VarSlider, {
+      props: {
+        modelValue: [2, 4],
+        range: true,
+      },
+    })
+
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[0].attributes('aria-valuemin')).toBe('0')
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[0].attributes('aria-valuemin')).toBe('0')
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[1].attributes('aria-valuemax')).toBe('100')
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[1].attributes('aria-valuemax')).toBe('100')
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[0].attributes('aria-valuenow')).toBe('2')
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[1].attributes('aria-valuenow')).toBe('4')
+
+    await wrapper.setProps({
+      modelValue: [-1, 4],
+    })
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[0].attributes('aria-valuenow')).toBe('0')
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[1].attributes('aria-valuenow')).toBe('4')
+
+    await wrapper.setProps({
+      modelValue: [1, 400],
+    })
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[0].attributes('aria-valuenow')).toBe('1')
+    expect(wrapper.findAll('.var-slider__horizontal-thumb')[1].attributes('aria-valuenow')).toBe('100')
+
+    wrapper.unmount()
+  })
+
+  test('slider value legal', async () => {
     const fn = vi.fn()
     const { mockRestore } = mockConsole('error', fn)
     const template = `<var-slider v-model="value" :range="range" /> `
@@ -279,7 +360,7 @@ describe('test slider props', () => {
     mockRestore()
   })
 
-  test('test slider rules prop', async () => {
+  test('slider rules prop', async () => {
     const wrapper = mount({
       components: {
         [VarSlider.name]: VarSlider,
@@ -308,7 +389,7 @@ describe('test slider props', () => {
   })
 })
 
-test('test slider events', async () => {
+test('slider events', async () => {
   const changeFn = vi.fn()
   const startFn = vi.fn()
   const endFn = vi.fn()
@@ -370,4 +451,27 @@ test('test slider events', async () => {
   expect(wrapper.vm.value).not.toEqual([20, 30])
 
   wrapper.unmount()
+})
+
+test('slider validation with zod', async () => {
+  const wrapper = mount({
+    components: {
+      [VarSlider.name]: VarSlider,
+    },
+    data: () => ({
+      value: 0,
+      rules: z.number().min(10, 'slider value must be greater than 10'),
+    }),
+    template: `<var-slider v-model="value" :rules="rules" />`,
+  })
+
+  const el = wrapper.find('.var-slider__horizontal-thumb')
+
+  await trigger(el, 'touchstart', 0, 0)
+  await trigger(document, 'touchmove', 5, 0)
+  await trigger(document, 'touchend', 5, 0)
+  await delay(100)
+
+  expect(wrapper.find('.var-slider__horizontal--error').exists()).toBeTruthy()
+  expect(wrapper.find('.var-form-details__error-message').text()).toBe('slider value must be greater than 10')
 })

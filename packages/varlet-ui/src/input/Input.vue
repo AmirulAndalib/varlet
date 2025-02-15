@@ -7,18 +7,20 @@
         size,
         variant,
         placeholder,
+        ariaLabel,
         line,
         hint,
         textColor,
         focusColor,
         blurColor,
-        isFocus,
-        errorMessage,
+        isFocusing: isForceFocusingEffect != null ? isForceFocusingEffect : isFocusing,
+        isError: isForceErrorEffect != null ? isForceErrorEffect : !!errorMessage,
         formDisabled,
         disabled,
         clearable,
         cursor,
         composing: isComposing,
+        hintCenter: !textarea,
         onClick: handleClick,
         onClear: handleClear,
       }"
@@ -30,6 +32,7 @@
       <input
         v-if="normalizedType === 'password'"
         tabindex="-1"
+        :aria-label="ariaLabel"
         :class="n('autocomplete')"
         :placeholder="!hint ? placeholder : undefined"
         :style="{
@@ -39,18 +42,19 @@
       />
       <textarea
         v-if="textarea"
+        :id="id"
+        ref="el"
+        :aria-label="ariaLabel"
         :class="
           classes(
             n('input'),
             n('--textarea'),
             [formDisabled || disabled, n('--disabled')],
             [errorMessage, n('--error')],
-            [errorMessage, n('--caret-error')]
+            [errorMessage, n('--caret-error')],
           )
         "
-        ref="el"
-        autocomplete="new-password"
-        :id="id"
+        :autocomplete="autocomplete ? autocomplete : 'new-password'"
         :disabled="formDisabled || disabled"
         :readonly="formReadonly || readonly"
         :type="normalizedType"
@@ -59,7 +63,7 @@
         :maxlength="maxlength"
         :rows="rows"
         :enterkeyhint="enterkeyhint"
-        :inputmode="type === 'number' ? 'numeric' : undefined"
+        :inputmode="type === 'number' ? 'decimal' : undefined"
         :style="{
           color: !errorMessage ? textColor : undefined,
           caretColor: !errorMessage ? focusColor : undefined,
@@ -75,17 +79,18 @@
       />
       <input
         v-else
+        :id="id"
+        ref="el"
+        :aria-label="ariaLabel"
         :class="
           classes(
             n('input'),
             [formDisabled || disabled, n('--disabled')],
             [errorMessage, n('--error')],
-            [errorMessage, n('--caret-error')]
+            [errorMessage, n('--caret-error')],
           )
         "
-        ref="el"
-        autocomplete="new-password"
-        :id="id"
+        :autocomplete="autocomplete ? autocomplete : 'new-password'"
         :disabled="formDisabled || disabled"
         :readonly="formReadonly || readonly"
         :type="normalizedType"
@@ -93,7 +98,7 @@
         :placeholder="!hint ? placeholder : undefined"
         :maxlength="maxlength"
         :enterkeyhint="enterkeyhint"
-        :inputmode="type === 'number' ? 'numeric' : undefined"
+        :inputmode="type === 'number' ? 'decimal' : undefined"
         :style="{
           color: !errorMessage ? textColor : undefined,
           caretColor: !errorMessage ? focusColor : undefined,
@@ -107,8 +112,8 @@
         @compositionend="handleCompositionEnd"
       />
 
-      <template #clear-icon>
-        <slot name="clear-icon" />
+      <template #clear-icon="{ clear }">
+        <slot name="clear-icon" :clear="clear" />
       </template>
 
       <template #append-icon>
@@ -116,7 +121,7 @@
       </template>
     </var-field-decorator>
 
-    <var-form-details :error-message="errorMessage" :extra-message="maxlengthText" @mousedown.stop>
+    <var-form-details v-if="isShowFormDetails" :error-message="errorMessage" :extra-message="maxlengthText">
       <template v-if="$slots['extra-message']" #extra-message>
         <slot name="extra-message" />
       </template>
@@ -125,14 +130,14 @@
 </template>
 
 <script lang="ts">
-import VarFormDetails from '../form-details'
+import { computed, defineComponent, nextTick, ref } from 'vue'
+import { call, isEmpty, preventDefault, toNumber } from '@varlet/shared'
+import { onSmartMounted, useClientId } from '@varlet/use'
 import VarFieldDecorator from '../field-decorator'
-import { defineComponent, ref, computed, nextTick } from 'vue'
-import { props, type InputType, type InputValidateTrigger } from './props'
-import { isEmpty, preventDefault, toNumber, call } from '@varlet/shared'
-import { useValidation, createNamespace } from '../utils/components'
+import VarFormDetails from '../form-details'
 import { useForm } from '../form/provide'
-import { onSmartMounted, useId } from '@varlet/use'
+import { createNamespace, useValidation } from '../utils/components'
+import { props, type InputType, type InputValidateTrigger } from './props'
 import { type InputProvider } from './provide'
 
 const { name, n, classes } = createNamespace('input')
@@ -145,9 +150,9 @@ export default defineComponent({
   },
   props,
   setup(props) {
-    const id = useId()
+    const id = useClientId()
     const el = ref<HTMLInputElement | null>(null)
-    const isFocus = ref(false)
+    const isFocusing = ref(false)
     const isComposing = ref(false)
     const { bindForm, form } = useForm()
     const {
@@ -189,7 +194,7 @@ export default defineComponent({
         return 'var(--field-decorator-error-color)'
       }
 
-      if (isFocus.value) {
+      if (isFocusing.value) {
         return focusColor || 'var(--field-decorator-focus-color)'
       }
 
@@ -218,14 +223,14 @@ export default defineComponent({
     }
 
     function handleFocus(e: FocusEvent) {
-      isFocus.value = true
+      isFocusing.value = true
 
       call(props.onFocus, e)
       validateWithTrigger('onFocus')
     }
 
     function handleBlur(e: FocusEvent) {
-      isFocus.value = false
+      isFocusing.value = false
 
       call(props.onBlur, e)
       validateWithTrigger('onBlur')
@@ -241,7 +246,7 @@ export default defineComponent({
       }
 
       // avoid vue cannot render when the target is the same with props.modelValue
-      const targetValue = withMaxlength(withTrim(value))
+      const targetValue = withMaxlength(value)
       if (targetValue === props.modelValue) {
         target.value = targetValue
       }
@@ -275,7 +280,11 @@ export default defineComponent({
     }
 
     function handleChange(e: Event) {
-      const value = updateValue(e)
+      const value = withTrim(updateValue(e))
+
+      if (props.modelModifiers.trim) {
+        call(props['onUpdate:modelValue'], value)
+      }
 
       call(props.onChange, value, e)
       validateWithTrigger('onChange')
@@ -362,7 +371,7 @@ export default defineComponent({
     return {
       el,
       id,
-      isFocus,
+      isFocusing,
       isComposing,
       errorMessage,
       placeholderColor,

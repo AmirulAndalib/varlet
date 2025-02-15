@@ -1,17 +1,17 @@
-import Rate from '..'
-import VarRate from '../Rate'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import Rate from '..'
 import { delay, trigger } from '../../utils/test'
-import { describe, expect, vi } from 'vitest'
+import VarRate from '../Rate'
 
-test('test rate use', () => {
+test('rate use', () => {
   const app = createApp({}).use(Rate)
   expect(app.component(Rate.name)).toBeTruthy()
 })
 
 describe('test rate component props', () => {
-  test('test rate modelValue', async () => {
+  test('rate modelValue', async () => {
     const wrapper = mount(VarRate, {
       props: {
         modelValue: 3,
@@ -30,7 +30,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate icon', async () => {
+  test('rate icon', async () => {
     const wrapper = mount(VarRate, {
       props: {
         modelValue: 1,
@@ -47,7 +47,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate color', async () => {
+  test('rate color', async () => {
     const wrapper = mount(VarRate, {
       props: {
         modelValue: 1,
@@ -65,7 +65,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate emptyIcon', async () => {
+  test('rate emptyIcon', async () => {
     const wrapper = mount(VarRate)
 
     expect(wrapper.findAll('.var-icon-star-outline').length).toBe(5)
@@ -78,7 +78,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate emptyColor', async () => {
+  test('rate emptyColor', async () => {
     const wrapper = mount(VarRate, {
       props: {
         emptyColor: 'red',
@@ -95,7 +95,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate count', async () => {
+  test('rate count', async () => {
     const wrapper = mount(VarRate)
 
     expect(wrapper.findAll('.var-rate__content').length).toBe(5)
@@ -108,7 +108,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate gap', async () => {
+  test('rate gap', async () => {
     const wrapper = mount(VarRate, {
       props: {
         gap: 10,
@@ -125,7 +125,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate size', async () => {
+  test('rate size', async () => {
     const wrapper = mount(VarRate, {
       props: {
         size: 13,
@@ -142,7 +142,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate half', async () => {
+  test('rate half', async () => {
     const onChange = vi.fn()
     const onUpdateModelValue = vi.fn((value) => wrapper.setProps({ modelValue: value }))
 
@@ -164,7 +164,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate halfIcon', async () => {
+  test('rate halfIcon', async () => {
     const wrapper = mount(VarRate, {
       props: {
         modelValue: 1.5,
@@ -182,7 +182,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate disabled', async () => {
+  test('rate disabled', async () => {
     const onChange = vi.fn()
 
     const wrapper = mount(VarRate, {
@@ -204,7 +204,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate disabledColor', async () => {
+  test('rate disabledColor', async () => {
     const wrapper = mount(VarRate, {
       props: {
         disabled: true,
@@ -222,7 +222,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate readonly', async () => {
+  test('rate readonly', async () => {
     const onChange = vi.fn()
 
     const wrapper = mount(VarRate, {
@@ -242,20 +242,20 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate rules', async () => {
+  test('rate rules', async () => {
     const onUpdateModelValue = vi.fn((value) => wrapper.setProps({ modelValue: value }))
 
     const wrapper = mount(VarRate, {
       props: {
         modelValue: 0,
-        rules: [(v) => v >= 1 || '至少选择一分'],
+        rules: [(v) => v >= 1 || 'The lowest score is one'],
         'onUpdate:modelValue': onUpdateModelValue,
       },
     })
 
     wrapper.vm.validate()
     await delay(16)
-    expect(wrapper.find('.var-form-details__error-message').text()).toBe('至少选择一分')
+    expect(wrapper.find('.var-form-details__error-message').text()).toBe('The lowest score is one')
     await wrapper.find('.var-rate__content').trigger('click')
     await delay(16)
     expect(wrapper.find('.var-form-details__error-message').exists()).toBeFalsy()
@@ -266,7 +266,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate clearable', async () => {
+  test('rate clearable', async () => {
     const onChange = vi.fn()
     const onUpdateModelValue = vi.fn((value) => wrapper.setProps({ modelValue: value }))
 
@@ -287,7 +287,7 @@ describe('test rate component props', () => {
     wrapper.unmount()
   })
 
-  test('test rate half clearable', async () => {
+  test('rate half clearable', async () => {
     const onChange = vi.fn()
     const onUpdateModelValue = vi.fn((value) => wrapper.setProps({ modelValue: value }))
 
@@ -316,7 +316,7 @@ describe('test rate component props', () => {
 })
 
 describe('test rate component events', () => {
-  test('test rate component onUpdateModelValue event', async () => {
+  test('rate component onUpdateModelValue event', async () => {
     const onUpdateModelValue = vi.fn((value) => wrapper.setProps({ modelValue: value }))
 
     const wrapper = mount(VarRate, {
@@ -333,7 +333,7 @@ describe('test rate component events', () => {
     wrapper.unmount()
   })
 
-  test('test rate component onChange event', async () => {
+  test('rate component onChange event', async () => {
     const onChange = vi.fn()
     const onUpdateModelValue = vi.fn((value) => wrapper.setProps({ modelValue: value }))
 

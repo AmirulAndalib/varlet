@@ -1,22 +1,32 @@
-import { useEventListener } from '@varlet/use'
 import {
+  Comment,
   createApp,
+  defineComponent,
+  Fragment,
   h,
-  ref,
   onActivated,
   onDeactivated,
-  Comment,
-  Fragment,
-  type PropType,
-  type ExtractPropTypes,
-  type Component,
-  type VNode,
-  type Ref,
-  type ComponentPublicInstance,
-  type Plugin,
+  ref,
   type App,
+  type Component,
+  type ComponentPublicInstance,
+  type ExtractPropTypes,
+  type Plugin,
+  type PropType,
+  type Ref,
+  type VNode,
 } from 'vue'
-import { createNamespaceFn, isArray, isPlainObject } from '@varlet/shared'
+import {
+  createNamespaceFn,
+  hasOwn,
+  isArray,
+  isFunction,
+  isPlainObject,
+  isString,
+  normalizeToArray,
+} from '@varlet/shared'
+import { useEventListener } from '@varlet/use'
+import type { SafeParseReturnType, ZodType } from 'zod'
 
 export type ListenerProp<F> = F | F[]
 
@@ -30,7 +40,7 @@ export type ExtractPublicPropTypes<P> = Partial<ExtractPropTypes<P>>
 export function pickProps<T, U extends keyof T>(props: T, propsKey: U): T[U]
 export function pickProps<T, U extends keyof T>(props: T, propsKey: U[]): Pick<T, U>
 export function pickProps(props: any, propsKey: any): any {
-  return Array.isArray(propsKey)
+  return isArray(propsKey)
     ? propsKey.reduce((pickedProps: any, key) => {
         pickedProps[key] = props[key]
         return pickedProps
@@ -89,7 +99,9 @@ export function mount(component: Component): MountInstance {
     instance: app.mount(host),
     unmount() {
       app.unmount()
-      document.body.removeChild(host)
+      if (host.parentNode) {
+        document.body.removeChild(host)
+      }
     },
   }
 }
@@ -97,7 +109,7 @@ export function mount(component: Component): MountInstance {
 export function mountInstance(
   component: any,
   props: Record<string, any> = {},
-  eventListener: Record<string, any> = {}
+  eventListener: Record<string, any> = {},
 ): {
   unmountInstance: () => void
 } {
@@ -136,19 +148,34 @@ export function flatFragment(vNodes: any) {
   return result
 }
 
+export function isZodRule(rule: unknown): rule is ZodType {
+  return isPlainObject(rule) && isFunction(rule.safeParseAsync)
+}
+
+export function isZodResult(result: unknown): result is SafeParseReturnType<any, any> {
+  return isPlainObject(result) && hasOwn(result, 'success')
+}
+
 export function useValidation() {
   const errorMessage: Ref<string> = ref('')
 
-  const validate = async (rules: any, value: any, apis?: any): Promise<boolean> => {
-    if (!isArray(rules) || !rules.length) {
-      return true
-    }
+  const validate = async (ruleOrRules: any | any[], value: any, apis?: any): Promise<boolean> => {
+    const rules = normalizeToArray(ruleOrRules).filter((rule) => isZodRule(rule) || isFunction(rule))
 
-    const resArr = await Promise.all(rules.map((rule) => rule(value, apis)))
+    const results = await Promise.all(
+      rules.map((rule) => (isZodRule(rule) ? rule.safeParseAsync(value) : rule(value, apis))),
+    )
 
-    return !resArr.some((res) => {
-      if (res !== true) {
-        errorMessage.value = String(res)
+    resetValidation()
+
+    return !results.some((result) => {
+      if (isZodResult(result)) {
+        if (result.success === false) {
+          errorMessage.value = result.error.issues[0].message
+          return true
+        }
+      } else if (result !== true) {
+        errorMessage.value = String(result)
         return true
       }
 
@@ -215,3 +242,19 @@ export function formatElevation(elevation: number | boolean | string, defaultLev
 
   return `var-elevation--${elevation}`
 }
+
+export const MaybeVNode = defineComponent({
+  props: {
+    is: {
+      type: [String, Object] as PropType<string | VNode>,
+    },
+
+    tag: {
+      type: String,
+      default: 'span',
+    },
+  },
+  setup(props) {
+    return () => (isString(props.is) ? h(props.tag, props.is) : props.is)
+  },
+})

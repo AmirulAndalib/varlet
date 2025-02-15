@@ -16,7 +16,7 @@ The out-of-the-box `Vue3 component library` rapid prototyping tool provides a se
 - 💪 &nbsp;Support for `VSCode` extension development
 - 💪 &nbsp;Support `build svg to web fonts`
 - 💪 &nbsp;Support for `Typescript`
-- 💪 &nbsp;Support `Dark Mode`
+- 💪 &nbsp;Support `Various themes, including Material Design 2, Material Design 3`
 - 🌍 &nbsp;Support `Internationalization`
 - 🚀 &nbsp;Based on `pnpm`
 
@@ -40,30 +40,40 @@ The default configuration can be viewed [varlet.default.config.ts](https://githu
 Also refer to `@varlet/ui` [varlet.config.mjs](https://github.com/varletjs/varlet/blob/dev/packages/varlet-ui/varlet.config.mjs).
 
 | Parameter | Description | Type | Default |
-| -- | -------------- | -------- | ---------- |
+| --- | -------------- | -------- | ---------- |
 | `name` | The full name of the component library, which will be used as the package name | _string_ | `Varlet` |
-| `namespace` | Component library namespace, which will be used as a component prefix | _string_ | `var` |
+| `namespace` | Component library namespace, will be used as component prefix | _string_ | `var` |
 | `host` | Development server host | _number_ | `localhost` |
 | `port` | Development server port | _number_ | `8080` |
-| `title` | The title of the component library in the documentation | _string_ | `VARLET` |
-| `logo` | The logo of the component library in the documentation | _string_ | `-` |
-| `defaultLanguage` | Documentation default language | _string_ | `zh-CN` |
-| `useMobile` | Whether to show the preview of the right mobile phone | _boolean_ | `false` |
-| `lightTheme` | Light Mode Documentation Theme | _Record<string, any>_ | `-` |
-| `darkTheme` | Dark Mode Documentation Theme | _Record<string, any>_ | `-` |
-| `highlight` | Documentation snippet style related | _{ style: string }_ | `-` |
+| `proxy` | Development server proxy | _Record<string, string \| ProxyOptions>_ | `-` |
+| `title` | The title of the component library in the document | _string_ | `VARLET` |
+| `logo` | The logo of the component library in the document | _string_ | `-` |
+| `alias` | Path alias (root is src folder when use relative path) | _Record<string, string>_ | `-` |
+| `defaultLanguage` | Document default language | _string_ | `zh-CN` |
+| `defaultLightTheme` | The default light theme | _string_ | `md3LightTheme` |
+| `defaultDarkTheme` | The default dark theme | _string_ | `md3DarkTheme` |
+| `useMobile` | Whether to display the mobile phone preview on the right | _boolean_ | `false` |
+| `themeKey` | The key of the theme in local storage | _string_ | `VARLET_THEME` |
+| `lightTheme` | md2 light mode document theme | _Record<string, any>_ | `-` |
+| `darkTheme` | md2 dark mode document theme | _Record<string, any>_ | `-` |
+| `md3LightTheme` | md3 light mode document theme | _Record<string, any>_ | `-` |
+| `md3DarkTheme` | md3 dark mode document theme | _Record<string, any>_ | `-` |
+| `highlight` | Document code snippet style related | _{ style: string }_ | `-` |
 | `analysis` | Document statistics related | _{ baidu: string }_ | `-` |
-| `pc` | PC-side document structure configuration | _Record<string, any>_ | `-` |
-| `mobile` | Mobile side document structure configuration | _Record<string, any>_ | `-` |
-| `directives` | Directive folder names | _string[]_ | `[]` |
-| `copy` | Copy file options | _[CopyPath[]](https://github.com/varletjs/varlet/blob/dev/packages/varlet-vite-plugins/src/copy.ts)_ | `-` |
-| `icons` | Font icon packaging related configuration | _[VarletConfigIcons](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
-| `esbuild` | Esbuild configuration | _[VarletConfigEsbuild](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
+| `pc` | PC side document structure configuration | _[VarletConfigPc](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
+| `mobile` | Mobile document structure configuration | _[VarletConfigMobile](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
+| `bundle` | Bundle output options | _{ external: string[], globals: Record<string, string> }_ | `-` |
+| `vitePlugins` | vite plugins | _[Plugin](https://vite.dev/guide/using-plugins.html)[]_ \| `(plugins: Plugin[]) => Plugin[])` | `-` |
+| `directives` | Component library directive folder name | _string[]_ | `[]` |
+| `copy` | Copy file configuration | _[CopyPath[]](https://github.com/varletjs/varlet/blob/dev/packages/varlet-vite-plugins/src/copy.ts)_ | `- ` |
+| `icons` | Font icon packaging related configurations | _[VarletConfigIcons](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts) _ | `-` |
+| `esbuild` | esbuild configuration | _[VarletConfigEsbuild](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | ` -` |
+| `seo` | seo options | _[VarletConfigSeo](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | ` -` |
 
 #### Menu
 
-| 参数 | 说明 | 类型 | 默认值 |
-| -- | -------------- | -------- | ---------- |
+| Parameter | Description | Type | Default |
+| --- | -------------- | -------- | ---------- |
 | `doc` | The document page corresponds to the matching file name, required | _string_ | `-` |
 | `type` | The type of menu, when the type is `1`, it means the category menu, when the type is `2`, the doc field matches the component file under src, when the type is `3`, the doc field matches the md file under docs, required | _MenuTypes_ | `-` |
 | `text` | The text displayed in the menu, English display text can be configured when internationalization is set, required | _Record<string, string>_ | `-` |
@@ -129,6 +139,8 @@ varlet-cli build
 ```shell
 # playground-ignore
 varlet-cli preview
+# set port number
+varlet-cli preview -p <port>
 ```
 
 #### Compile component library
@@ -136,6 +148,13 @@ varlet-cli preview
 ```shell
 # playground-ignore
 varlet-cli compile
+```
+
+#### Compile style vars types declaration file
+
+```shell
+# playground-ignore
+varlet-cli compile:style-vars
 ```
 
 #### Run VSCode extension development environment
@@ -156,6 +175,7 @@ varlet-cli build:extension
 
 ```shell
 # playground-ignore
+varlet-cli build:icons -w
 varlet-cli build:icons
 ```
 
@@ -164,6 +184,13 @@ varlet-cli build:icons
 ```shell
 # playground-ignore
 varlet-cli test
+```
+
+#### Execute a unit test
+
+```shell
+# playground-ignore
+varlet-cli test -c <componentName>
 ```
 
 #### Execute unit tests in watch mode
@@ -178,13 +205,6 @@ varlet-cli test -w
 ```shell
 # playground-ignore
 varlet-cli test -cov
-```
-
-#### Lint the code
-
-```shell
-# playground-ignore
-varlet-cli lint
 ```
 
 #### Lint git commit message
@@ -259,12 +279,12 @@ varlet-cli create
 
 ### Note before publish
 
-- 1.`npm` repository registry must set to `npm` official mirror
-- 2.Execute `npm login` to log in
+1. `npm` repository registry must set to `npm` official mirror
+2. Execute `npm login` to log in
 
 ### Q & A
 
-> How to solve failure of installing sharp ?
+#### How to solve failure of installing sharp ?
 
 - You can choose to change mirror site which contains binaries for both sharp and libvips.
 
@@ -272,4 +292,3 @@ varlet-cli create
 pnpm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp"
 pnpm config set sharp_libvips_binary_host "https://npmmirror.com/mirrors/sharp-libvips"
 ```
-

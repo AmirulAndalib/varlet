@@ -1,18 +1,16 @@
-import App from './App.vue'
-import routes from '@pc-routes'
-import config from '@config'
-import Varlet, { Snackbar } from '@varlet/ui'
-import CodeExample from './components/code-example'
 import { createApp } from 'vue'
+import config from '@config'
+import routes from '@pc-routes'
+import Varlet, { Snackbar } from '@varlet/ui'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { get } from 'lodash-es'
-
+import App from './App.vue'
+import CodeExample from './components/code-example'
 import '@varlet/ui/es/style'
 import '@varlet/touch-emulator'
 
-const defaultLanguage = get(config, 'defaultLanguage')
-const redirect = get(config, 'pc.redirect')
-const mobileRedirect = get(config, 'mobile.redirect')
+const defaultLanguage = config?.defaultLanguage
+const redirect = config?.pc?.redirect
+const mobileRedirect = config?.mobile?.redirect
 
 Snackbar.allowMultiple(true)
 
@@ -30,11 +28,11 @@ const router = createRouter({
       return {
         el: to.hash,
         behavior: 'smooth',
-        top: 100
-      };
+        top: 100,
+      }
     }
 
-    return { top: 0 };
+    return { top: 0 }
   },
 })
 
@@ -52,7 +50,6 @@ router.beforeEach((to: any, from: any) => {
   }
 })
 
-
 Object.defineProperty(window, 'onMobileRouteChange', {
   value: (path: string, language: string, replace: string, hash: string) => {
     if (path === mobileRedirect) {
@@ -61,7 +58,7 @@ Object.defineProperty(window, 'onMobileRouteChange', {
     }
 
     router.replace(`/${language}${path}${hash}`)
-  }
+  },
 })
 
 Object.defineProperty(window, 'scrollToMenu', {
@@ -71,7 +68,7 @@ Object.defineProperty(window, 'scrollToMenu', {
       const scroller = cell.parentNode as HTMLElement
       scroller.scrollTo({ top: cell.offsetTop - scroller.offsetHeight / 2 })
     })
-  }
+  },
 })
 
 createApp(App)

@@ -10,7 +10,7 @@ Supports `Lazy load`, `loading images`, `error images`, and default Settings for
 
 ```html
 <template>
-  <var-image src="https://varlet.gitee.io/varlet-ui/cat.jpg" />
+  <var-image src="https://varletjs.org/cat.jpg" />
 </template>
 ```
 
@@ -22,35 +22,35 @@ Supports `Lazy load`, `loading images`, `error images`, and default Settings for
     <var-image
       width="85px"
       height="85px"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+      src="https://varletjs.org/cat.jpg"
     />
 
     <var-image 
       width="85px" 
       height="85px"
       fit="cover" 
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg" 
+      src="https://varletjs.org/cat.jpg" 
     />
 
     <var-image 
       width="85px"
       height="85px"
       fit="none"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+      src="https://varletjs.org/cat.jpg"
     />
 
     <var-image 
       width="85px"
       height="85px" 
       fit="contain"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg" 
+      src="https://varletjs.org/cat.jpg" 
     />
     
     <var-image 
       width="85px"
       height="85px" 
       fit="scale-down"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg" 
+      src="https://varletjs.org/cat.jpg" 
     />
   </var-space>
 </template>
@@ -66,7 +66,7 @@ Supports `Lazy load`, `loading images`, `error images`, and default Settings for
       height="85px"
       fit="cover"
       :radius="10"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+      src="https://varletjs.org/cat.jpg"
     />
 
     <var-image
@@ -74,7 +74,7 @@ Supports `Lazy load`, `loading images`, `error images`, and default Settings for
       height="85px"
       fit="cover"
       radius="50%"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+      src="https://varletjs.org/cat.jpg"
     />
   </var-space>
 </template>
@@ -88,7 +88,7 @@ Supports `Lazy load`, `loading images`, `error images`, and default Settings for
     width="85px"
     height="85px"
     ripple
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
   />
 </template>
 ```
@@ -101,7 +101,7 @@ Supports `Lazy load`, `loading images`, `error images`, and default Settings for
     width="85px"
     height="85px"
     lazy
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
   />
 </template>
 ```
@@ -117,7 +117,7 @@ Supports `Lazy load`, `loading images`, `error images`, and default Settings for
     height="85px"
     loading="https://xxx.xxx/loading.png"
     error="https://xxx.xxx/error.png"
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
   />
 </template>
 ```
@@ -129,7 +129,7 @@ Supports `Lazy load`, `loading images`, `error images`, and default Settings for
   <var-image 
     width="22.666vw" 
     height="22.666vw" 
-    src="https://varlet.gitee.io/varlet-ui/ca.jpg"
+    src="https://varletjs.org/ca.jpg"
   >
     <template #error>
       <svg viewBox="0 0 24 24" style="width: 100%; height: 100%;">
@@ -210,10 +210,13 @@ import logo from '../../assets/logo.png'
 | --- |--------------------------------------------------------------------------------| --- | --- |
 | `src` | Image src                                                                      | _string_ | `-` |
 | `fit` | Image fit mode, optional value is `fill` `contain` `cover` `none` `scale-down` | _string_ | `fill` |
+| `position` ***3.2.3*** | The position of the replaceable element's content in its content box, equal to [object-position](https://developer.mozilla.org/en-US/docs/Web/CSS/object-position) | _string_ | `50% 50%` |
 | `alt` | Image alt text, the same as the native attribute of the `img` tag              | _string_ | `-` |
-| `width` | Image title text, the same as the native attribute of the `img` tag            | _string \| number_ | `-` |
-| `height` | Image height                                                                   | _string \| number_ | `-` |
-| `radius` | Image radius                                                                   | _string \| number_ | `-` |
+| `title`   | Image title text, the same as with the native attributes of the `img` tag             | _string_ | `-` |
+| `referrerpolicy`  | Indicate which referrer to use when fetching the resource. This attribute requires attention to browser compatibility, see [MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img)             | _string_ | `-` |
+| `width` | Image width            | _string \| number_ | `-` |
+| `height` | Image height          | _string \| number_ | `-` |
+| `radius` | Image radius                                                                   | _string \| number_ | `0` |
 | `lazy` | Whether to enable lazy loading                                                 | _boolean_ | `false` |
 | `loading` | When lazy loading is enabled, the image displayed in loading                   | _string_ | `-` |
 | `error` | When lazy loading is enabled, the image displayed in error                        | _string_ | `-` |

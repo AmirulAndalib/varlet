@@ -3,39 +3,40 @@
     <header>
       <var-app-bar class="app-bar" title-position="left" :title="bigCamelizeComponentName">
         <template #left>
-          <var-button v-if="showBackIcon" style="margin-right: 6px;" text round @click="back" color="transparent" text-color="#fff">
-            <var-icon name="chevron-left" class="arrow-left" style="margin-top: 1px"/>
+          <var-button
+            v-if="showBackIcon"
+            style="margin-right: 6px"
+            text
+            round
+            @click="back"
+            color="transparent"
+            text-color="#fff"
+          >
+            <var-icon name="chevron-left" class="arrow-left" style="margin-top: 1px" />
           </var-button>
           <var-button
             v-if="!showBackIcon && github"
-            style="margin-left: 2px; margin-right: 6px;"
+            style="margin-left: 2px; margin-right: 6px"
             text
             round
             color="transparent"
             text-color="#fff"
             @click="toGithub"
           >
-            <var-icon name="github" class="github" style="margin-top: 1px;"/>
+            <var-icon name="github" class="github" style="margin-top: 1px" />
           </var-button>
         </template>
         <template #right>
           <var-button
-            v-if="darkMode"
+            v-if="themes.length > 1"
+            class="theme-button"
             text
-            round
             color="transparent"
             text-color="#fff"
-            :style="{
-              transform: languages ? 'translateX(-4px)' : 'translateX(-6px)',
-            }"
-            @click="toggleTheme"
+            @click.stop="showThemeMenu = true"
           >
-            <var-icon
-              class="theme"
-              color="#fff"
-              :size="24"
-              :name="currentTheme === 'lightTheme' ? 'white-balance-sunny' : 'weather-night'"
-            />
+            <var-icon name="palette" :size="28" class="palette" />
+            <var-icon name="chevron-down" class="arrow-down" />
           </var-button>
           <var-button
             v-if="languages"
@@ -45,14 +46,14 @@
             text-color="#fff"
             @click.stop="showMenu = true"
           >
-            <var-icon name="translate" class="i18n"/>
-            <var-icon name="chevron-down" class="arrow-down"/>
+            <var-icon name="translate" class="i18n" />
+            <var-icon name="chevron-down" class="arrow-down" />
           </var-button>
         </template>
       </var-app-bar>
     </header>
     <div class="router-view__block">
-      <router-view/>
+      <router-view />
     </div>
 
     <transition name="site-menu">
@@ -69,22 +70,31 @@
         </var-cell>
       </div>
     </transition>
+
+    <transition name="site-menu">
+      <div class="theme-settings var-elevation--3" v-if="showThemeMenu">
+        <var-cell
+          v-for="t in themes"
+          :key="t.value"
+          class="mobile-theme-cell"
+          :class="[currentTheme === t.value && 'mobile-theme-cell--active']"
+          v-ripple
+          @click="toggleTheme(t.value)"
+        >
+          {{ t[language] }}
+        </var-cell>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, ref, watch, type ComputedRef, type Ref } from 'vue'
 import config from '@config'
-import { computed,  defineComponent, ref, watch, type Ref, type ComputedRef } from 'vue'
+import { getBrowserTheme, getMobileIndex, setTheme, watchLang, watchTheme, type Theme } from '@varlet/cli/client'
+import { pascalCase } from '@varlet/shared'
 import { useRoute } from 'vue-router'
-import {
-  getBrowserTheme,
-  type Theme,
-  watchLang,
-  watchTheme
-} from '@varlet/cli/client'
-import { removeEmpty, setTheme, inIframe, isPhone } from '../utils'
-import { bigCamelize } from '@varlet/shared'
-import { get } from 'lodash-es'
+import { inIframe, isPhone, removeEmpty } from '../utils'
 
 export default defineComponent({
   setup() {
@@ -92,18 +102,22 @@ export default defineComponent({
     const route = useRoute()
     const showBackIcon: Ref<boolean> = ref(false)
     const showMenu: Ref<boolean> = ref(false)
+    const showThemeMenu: Ref<boolean> = ref(false)
     const language: Ref<string> = ref('')
-    const languages: Ref<Record<string, string>> = ref(get(config, 'mobile.header.i18n'))
+    const languages: Ref<Record<string, string>> = ref(config?.mobile?.header?.i18n ?? {})
+    const themes: Ref<Record<string, any>[]> = ref(config?.mobile?.header?.themes ?? {})
     const nonEmptyLanguages: ComputedRef<Record<string, string>> = computed(() => removeEmpty(languages.value))
-    const redirect = get(config, 'mobile.redirect', '')
-    const github: Ref<string> = ref(get(config, 'mobile.header.github'))
-    const darkMode: Ref<string> = ref(get(config, 'mobile.header.darkMode'))
+    const redirect = config?.mobile?.redirect ?? ''
+    const github: Ref<string> = ref(config?.mobile?.header?.github ?? '')
+    const darkMode: Ref<string> = ref(config?.mobile?.header?.darkMode ?? '')
     const currentTheme = ref(getBrowserTheme())
 
     const changeLanguage = (lang: string) => {
       language.value = lang
       showMenu.value = false
-      window.location.href = `./mobile.html#${route.path}?language=${language.value}&replace=${route.query.replace}`
+      window.location.href = `${getMobileIndex()}#${route.path}?language=${language.value}&replace=${
+        route.query.replace
+      }`
 
       if (!isPhone() && inIframe()) {
         ;(window.top as any).scrollToMenu(redirect.slice(1))
@@ -111,7 +125,7 @@ export default defineComponent({
     }
 
     const back = () => {
-      window.location.href = `./mobile.html#${redirect}?language=${language.value}&replace=${redirect.slice(1)}`
+      window.location.href = `${getMobileIndex()}#${redirect}?language=${language.value}&replace=${redirect.slice(1)}`
 
       if (!isPhone() && inIframe()) {
         ;(window.top as any).scrollToMenu(redirect.slice(1))
@@ -133,24 +147,25 @@ export default defineComponent({
     watch(
       () => route.path,
       (to: string) => {
-        const componentName = bigCamelize(to.slice(1))
-        const redirectName = bigCamelize(redirect.slice(1))
+        const componentName = pascalCase(to.slice(1))
+        const redirectName = pascalCase(redirect.slice(1))
         bigCamelizeComponentName.value = componentName === redirectName ? '' : componentName
         showBackIcon.value = componentName !== redirectName
-      }
+      },
     )
 
     const getThemeMessage = () => ({ action: 'theme-change', from: 'mobile', data: currentTheme.value })
 
     const setCurrentTheme = (theme: Theme) => {
       currentTheme.value = theme
-      setTheme(config, currentTheme.value)
-      window.localStorage.setItem(get(config, 'themeKey'), currentTheme.value)
+      setTheme(currentTheme.value)
+      window.localStorage.setItem(config?.themeKey, currentTheme.value)
     }
 
-    const toggleTheme = () => {
-      setCurrentTheme(currentTheme.value === 'darkTheme' ? 'lightTheme' : 'darkTheme')
+    const toggleTheme = (value: Theme) => {
+      setCurrentTheme(value)
       window.postMessage(getThemeMessage(), '*')
+      showThemeMenu.value = false
 
       if (!isPhone() && inIframe()) {
         ;(window.top as any).postMessage(getThemeMessage(), '*')
@@ -158,11 +173,12 @@ export default defineComponent({
     }
 
     ;(window as any).toggleTheme = toggleTheme
-    setTheme(config, currentTheme.value)
+    setTheme(currentTheme.value)
     window.postMessage(getThemeMessage(), '*')
 
     document.body.addEventListener('click', () => {
       showMenu.value = false
+      showThemeMenu.value = false
     })
 
     watchTheme((theme, from) => {
@@ -175,6 +191,7 @@ export default defineComponent({
       github,
       showMenu,
       languages,
+      themes,
       language,
       nonEmptyLanguages,
       currentTheme,
@@ -183,6 +200,7 @@ export default defineComponent({
       back,
       changeLanguage,
       toggleTheme,
+      showThemeMenu,
     }
   },
 })
@@ -197,13 +215,15 @@ export default defineComponent({
 body {
   margin: 0;
   padding: 0;
-  min-height: 100%;
+  min-height: 100vh;
   font-size: 16px;
   font-family: 'Roboto', sans-serif;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  background: var(--site-config-color-bar);
+  -webkit-tap-highlight-color: transparent;
+  background: var(--site-config-color-mobile-body);
   color: var(--site-config-color-text);
-  transition: background-color 0.25s, color 0.25s;
+  transition:
+    background-color 0.25s,
+    color 0.25s;
 }
 
 ::-webkit-scrollbar {
@@ -217,6 +237,7 @@ body {
   padding: 15px 0;
   color: var(--site-config-color-sub-text);
   font-size: 14px;
+  min-height: 50px;
 }
 
 header {
@@ -248,6 +269,14 @@ header {
   background: var(--site-config-color-bar);
 }
 
+.theme-settings {
+  position: fixed;
+  z-index: 200;
+  top: 48px;
+  right: 68px;
+  background: var(--site-config-color-bar);
+}
+
 .router-view__block {
   padding: 55px 15px 15px;
 }
@@ -263,6 +292,17 @@ header {
   }
 }
 
+.mobile-theme-cell {
+  color: var(--site-config-color-text) !important;
+  background: var(--site-config-color-bar) !important;
+  cursor: pointer !important;
+
+  &--active {
+    color: var(--site-config-color-mobile-theme-active) !important;
+    background: var(--site-config-color-mobile-theme-active-background) !important;
+  }
+}
+
 .arrow-left {
   font-size: 28px !important;
 }
@@ -271,11 +311,11 @@ header {
   font-size: 28px !important;
 }
 
-.theme {
+.i18n {
   font-size: 24px !important;
 }
 
-.i18n {
+.palette {
   font-size: 24px !important;
 }
 
@@ -284,6 +324,12 @@ header {
 }
 
 .i18n-button {
+  padding-right: 6px !important;
+  margin-right: 4px;
+  padding-left: 12px !important;
+}
+
+.theme-button {
   padding-right: 6px !important;
   margin-right: 4px;
   padding-left: 12px !important;

@@ -1,6 +1,6 @@
-import { type PropType } from 'vue'
-import { defineListenerProp, pickProps } from '../utils/components'
+import { InputHTMLAttributes, type PropType } from 'vue'
 import { fieldDecoratorProps } from '../field-decorator'
+import { defineListenerProp, pickProps } from '../utils/components'
 
 export type InputType = 'text' | 'password' | 'number' | 'tel' | 'email'
 
@@ -17,6 +17,7 @@ export const props = {
     default: 'text',
   },
   textarea: Boolean,
+  ariaLabel: String,
   rows: {
     type: [String, Number],
     default: 8,
@@ -29,15 +30,14 @@ export const props = {
     type: Array as PropType<InputValidateTrigger[]>,
     default: () => ['onInput', 'onClear'],
   },
-  rules: Array as PropType<Array<(v: string) => any>>,
-  enterkeyhint: String,
+  rules: [Array, Function, Object] as PropType<any>,
+  enterkeyhint: String as PropType<InputHTMLAttributes['enterKeyHint']>,
   onFocus: defineListenerProp<(e: FocusEvent) => void>(),
   onBlur: defineListenerProp<(e: FocusEvent) => void>(),
   onInput: defineListenerProp<(value: string, e: Event) => void>(),
   onChange: defineListenerProp<(value: string, e: Event) => void>(),
   onClear: defineListenerProp<(value: string) => void>(),
   'onUpdate:modelValue': defineListenerProp<(value: string) => void>(),
-  // dynamic internal
   ...pickProps(fieldDecoratorProps, [
     'size',
     'variant',
@@ -51,4 +51,19 @@ export const props = {
     'clearable',
     'onClick',
   ]),
+  // internal start
+  autocomplete: String,
+  isForceFocusingEffect: {
+    type: Boolean,
+    default: undefined,
+  },
+  isForceErrorEffect: {
+    type: Boolean,
+    default: undefined,
+  },
+  isShowFormDetails: {
+    type: Boolean,
+    default: true,
+  },
+  // internal end
 }

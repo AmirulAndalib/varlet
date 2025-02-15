@@ -1,20 +1,20 @@
 <template>
-  <div :class="classes(n(), formatElevation(elevation, 2))" ref="picker">
-    <div :class="n('title')" :style="{ background: titleColor || headerColor || color }">
-      <div :class="n('title-hint')">{{ hint ?? pack.timePickerHint }}</div>
+  <div ref="picker" :class="classes(n(), formatElevation(elevation, 2))">
+    <div :class="n('title')" :style="{ background: titleColor || color }">
+      <div :class="n('title-hint')">{{ hint ?? (pt ? pt : t)('timePickerHint') }}</div>
       <div :class="n('title-time-container')">
         <div :class="n('title-time')">
           <div :class="classes(n('title-btn'), [type === 'hour', n('title-btn--active')])" @click="checkPanel('hour')">
             {{ time.hour }}
           </div>
-          <span>:</span>
+          <span :class="n('title-splitter')">:</span>
           <div
             :class="classes(n('title-btn'), [type === 'minute', n('title-btn--active')])"
             @click="checkPanel('minute')"
           >
             {{ time.minute }}
           </div>
-          <span v-if="useSeconds">:</span>
+          <span v-if="useSeconds" :class="n('title-splitter')">:</span>
           <div
             v-if="useSeconds"
             :class="classes(n('title-btn'), [type === 'second', n('title-btn--active')])"
@@ -23,7 +23,7 @@
             {{ time.second }}
           </div>
         </div>
-        <div :class="n('title-ampm')" v-if="format === 'ampm'">
+        <div v-if="format === 'ampm'" :class="n('title-ampm')">
           <div :class="classes(n('title-btn'), [ampm === 'am', n('title-btn--active')])" @click="checkAmpm('am')">
             AM
           </div>
@@ -34,7 +34,7 @@
       </div>
     </div>
     <div :class="n('body')">
-      <div :class="n('clock-container')" @touchstart="moveHand" @touchmove="moveHand" @touchend="end" ref="container">
+      <div ref="container" :class="n('clock-container')" @touchstart="moveHand" @touchmove="moveHand" @touchend="end">
         <transition :name="`${n()}-panel-fade`">
           <clock
             :key="type"
@@ -64,15 +64,16 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs/esm'
-import Clock from './clock.vue'
 import { computed, defineComponent, reactive, ref, watch, type DefineComponent } from 'vue'
-import { props, hoursAmpm, hours24, type Time, type AmPm } from './props'
-import { toNumber, getRect, preventDefault, call } from '@varlet/shared'
+import { call, getRect, preventDefault, toNumber } from '@varlet/shared'
+import dayjs from 'dayjs/esm/index.js'
+import { t } from '../locale'
+import { injectLocaleProvider } from '../locale-provider/provide'
 import { createNamespace, formatElevation } from '../utils/components'
 import { padStart } from '../utils/shared'
-import { getNumberTime, getIsDisableMinute, getIsDisableSecond } from './utils'
-import { pack } from '../locale'
+import Clock from './clock.vue'
+import { hours24, hoursAmpm, props, type AmPm, type Time } from './props'
+import { getIsDisableMinute, getIsDisableSecond, getNumberTime } from './utils'
 
 const { name, n, classes } = createNamespace('time-picker')
 
@@ -110,38 +111,58 @@ export default defineComponent({
       y: [],
     })
     const getRad = computed(() => {
-      if (type.value === 'hour') return hourRad.value
-      if (type.value === 'minute') return minuteRad.value
+      if (type.value === 'hour') {
+        return hourRad.value
+      }
+      if (type.value === 'minute') {
+        return minuteRad.value
+      }
 
       return secondRad.value
     })
+    const { t: pt } = injectLocaleProvider()
 
     watch(
       () => props.modelValue,
       (value) => {
-        if (value) {
-          const { hour, minute, second } = getNumberTime(value)
-
-          const formatHour12 = dayjs().hour(hour).format('hh')
-          const formatHour24 = dayjs().hour(hour).format('HH')
-          const formatMinute = dayjs().minute(minute).format('mm')
-          const formatSecond = dayjs().second(second).format('ss')
-
-          hourRad.value = (formatHour12 === '12' ? 0 : toNumber(formatHour12)) * 30
-          minuteRad.value = toNumber(formatMinute) * 6
-          secondRad.value = toNumber(formatSecond) * 6
-
-          time.value = getTime(value)
-
-          if (props.format !== '24hr') {
-            ampm.value = padStart(`${hour}`, 2, '0') === formatHour24 && hours24.includes(formatHour24) ? 'pm' : 'am'
-          }
-
-          isInner.value = props.format === '24hr' && hours24.includes(formatHour24)
+        if (value === undefined || value === '') {
+          resetTime()
+          return
         }
+
+        const { hour, minute, second } = getNumberTime(value)
+
+        const formatHour12 = dayjs().hour(hour).format('hh')
+        const formatHour24 = dayjs().hour(hour).format('HH')
+        const formatMinute = dayjs().minute(minute).format('mm')
+        const formatSecond = dayjs().second(second).format('ss')
+
+        hourRad.value = (formatHour12 === '12' ? 0 : toNumber(formatHour12)) * 30
+        minuteRad.value = toNumber(formatMinute) * 6
+        secondRad.value = toNumber(formatSecond) * 6
+
+        time.value = getTime(value)
+
+        if (props.format !== '24hr') {
+          ampm.value = padStart(`${hour}`, 2, '0') === formatHour24 && hours24.includes(formatHour24) ? 'pm' : 'am'
+        }
+
+        isInner.value = props.format === '24hr' && hours24.includes(formatHour24)
       },
-      { immediate: true }
+      { immediate: true },
     )
+
+    function resetTime() {
+      hourRad.value = undefined
+      minuteRad.value = 0
+      secondRad.value = 0
+      time.value = {
+        hour: '00',
+        minute: '00',
+        second: '00',
+      }
+      ampm.value = 'am'
+    }
 
     function update(newTime: string) {
       call(props['onUpdate:modelValue'], newTime)
@@ -173,11 +194,15 @@ export default defineComponent({
     }
 
     function checkAmpm(ampmType: AmPm) {
-      if (props.readonly) return
+      if (props.readonly) {
+        return
+      }
 
       ampm.value = ampmType
       const newHour = findAvailableHour(ampmType)
-      if (!newHour) return
+      if (!newHour) {
+        return
+      }
 
       const second = props.useSeconds ? `:${time.value.second}` : ''
       const newTime = `${padStart(newHour, 2, '0')}:${time.value.minute}${second}`
@@ -235,11 +260,15 @@ export default defineComponent({
       if (!disableHour.includes(anotherHour)) {
         isInner.value = props.format === '24hr' ? getInner(clientX, clientY) : false
       }
-      if (isInner.value !== isActualInner.value) return
+      if (isInner.value !== isActualInner.value) {
+        return
+      }
 
       const newHour = isInner.value || ampm.value === 'pm' ? hours24[index] : hoursAmpm[index]
       isDisableHour.value = disableHour.includes(newHour)
-      if (isDisableHour.value) return
+      if (isDisableHour.value) {
+        return
+      }
       hourRad.value = rad
       isChosenUsableHour.value = true
     }
@@ -261,7 +290,9 @@ export default defineComponent({
       }
       isDisableMinute.value = getIsDisableMinute(values)
 
-      if (isDisableMinute.value) return
+      if (isDisableMinute.value) {
+        return
+      }
       minuteRad.value = rad
       isChosenUsableMinute.value = true
     }
@@ -283,7 +314,9 @@ export default defineComponent({
         allowedTime: props.allowedTime,
       }
 
-      if (!getIsDisableSecond(values)) secondRad.value = rad
+      if (!getIsDisableSecond(values)) {
+        secondRad.value = rad
+      }
     }
 
     function setCenterAndRange() {
@@ -302,7 +335,9 @@ export default defineComponent({
 
     function moveHand(event: TouchEvent) {
       preventDefault(event)
-      if (props.readonly) return
+      if (props.readonly) {
+        return
+      }
 
       setCenterAndRange()
 
@@ -312,13 +347,19 @@ export default defineComponent({
       const y = clientY - center.y
       const roundDeg = Math.round(rad2deg(Math.atan2(y, x)))
 
-      if (type.value === 'hour') setHourRad(clientX, clientY, roundDeg)
-      else if (type.value === 'minute') setMinuteRad(roundDeg)
-      else setSecondRad(roundDeg)
+      if (type.value === 'hour') {
+        setHourRad(clientX, clientY, roundDeg)
+      } else if (type.value === 'minute') {
+        setMinuteRad(roundDeg)
+      } else {
+        setSecondRad(roundDeg)
+      }
     }
 
     function end() {
-      if (props.readonly) return
+      if (props.readonly) {
+        return
+      }
 
       if (type.value === 'hour' && isChosenUsableHour.value) {
         type.value = 'minute'
@@ -346,7 +387,8 @@ export default defineComponent({
       isPreventNextUpdate,
       n,
       classes,
-      pack,
+      t,
+      pt,
       moveHand,
       checkPanel,
       checkAmpm,

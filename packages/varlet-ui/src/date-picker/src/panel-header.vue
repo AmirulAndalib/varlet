@@ -1,6 +1,13 @@
 <template>
   <div :class="n()">
-    <var-button round text style="filter: opacity(0.54)" :disabled="disabled.left" @click="checkDate('prev')">
+    <var-button
+      :class="n('arrow')"
+      var-date-picker-header-cover
+      round
+      text
+      :disabled="disabled.left"
+      @click="checkDate('prev')"
+    >
       <var-icon name="chevron-left" />
     </var-button>
     <div :class="n('value')" @click="$emit('check-panel')">
@@ -8,23 +15,31 @@
         <div :key="showDate">{{ showDate }}</div>
       </transition>
     </div>
-    <var-button round text style="filter: opacity(0.54)" :disabled="disabled.right" @click="checkDate('next')">
+    <var-button
+      :class="n('arrow')"
+      var-date-picker-header-cover
+      round
+      text
+      :disabled="disabled.right"
+      @click="checkDate('next')"
+    >
       <var-icon name="chevron-right" />
     </var-button>
   </div>
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, ref, watch } from 'vue'
+import type { ComputedRef, PropType, Ref } from 'vue'
+import { toNumber } from '@varlet/shared'
 import VarButton from '../../button'
 import VarIcon from '../../icon'
-import { defineComponent, ref, computed, watch } from 'vue'
-import { toNumber } from '@varlet/shared'
+import { t } from '../../locale'
+import { injectLocaleProvider } from '../../locale-provider/provide'
 import { createNamespace } from '../../utils/components'
-import { pack } from '../../locale'
-import type { Ref, ComputedRef, PropType } from 'vue'
-import type { Preview, PanelBtnDisabled } from '../props'
+import type { PanelBtnDisabled, Preview } from '../props'
 
-const { n } = createNamespace('picker-header')
+const { n } = createNamespace('date-picker-header')
 
 export default defineComponent({
   name: 'PanelHeader',
@@ -51,21 +66,28 @@ export default defineComponent({
   setup(props, { emit }) {
     const reverse: Ref<boolean> = ref(false)
     const forwardOrBackNum: Ref<number> = ref(0)
+    const { t: pt } = injectLocaleProvider()
 
     const showDate: ComputedRef<number | string> = computed(() => {
       const { date, type } = props
       const { previewMonth, previewYear }: Preview = date
 
-      if (type === 'year') return previewYear
+      if (type === 'year') {
+        return previewYear
+      }
 
-      if (type === 'month') return toNumber(previewYear) + forwardOrBackNum.value
+      if (type === 'month') {
+        return toNumber(previewYear) + forwardOrBackNum.value
+      }
 
-      const monthName = pack.value.datePickerMonthDict?.[previewMonth!].name
-      return pack.value.lang === 'zh-CN' ? `${previewYear} ${monthName}` : `${monthName} ${previewYear}`
+      const monthName = (pt || t)('datePickerMonthDict')?.[previewMonth!].name
+      return (pt || t)('lang') === 'zh-CN' ? `${previewYear} ${monthName}` : `${monthName} ${previewYear}`
     })
 
     const checkDate = (checkType: string) => {
-      if ((checkType === 'prev' && props.disabled.left) || (checkType === 'next' && props.disabled.right)) return
+      if ((checkType === 'prev' && props.disabled.left) || (checkType === 'next' && props.disabled.right)) {
+        return
+      }
 
       emit('check-date', checkType)
       reverse.value = checkType === 'prev'
@@ -76,7 +98,7 @@ export default defineComponent({
       () => props.date,
       () => {
         forwardOrBackNum.value = 0
-      }
+      },
     )
 
     return {

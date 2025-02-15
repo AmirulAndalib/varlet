@@ -1,9 +1,8 @@
-import VarPicker from './Picker.vue'
 import { nextTick, reactive, type Component, type TeleportProps } from 'vue'
-import { isArray, call } from '@varlet/shared'
+import { call, isArray } from '@varlet/shared'
 import { mountInstance, withInstall, withPropsDefaultsSetter } from '../utils/components'
-import { type PickerColumnOption } from './props'
-import { props as pickerProps } from './props'
+import VarPicker from './Picker.vue'
+import { props as pickerProps, type PickerColumnOption } from './props'
 
 interface PickerOptions {
   modelValue?: (string | number)[]
@@ -17,12 +16,14 @@ interface PickerOptions {
   cascade?: boolean
   optionHeight?: number | string
   optionCount?: number | string
+  columnsCount?: number | string
   confirmButtonText?: string
   cancelButtonText?: string
   confirmButtonTextColor?: string
   cancelButtonTextColor?: string
   safeArea?: boolean
   closeOnClickOverlay?: boolean
+  closeOnKeyEscape?: boolean
   teleport?: TeleportProps['to']
   dynamic?: boolean
   onClickOverlay?: () => void
@@ -33,6 +34,7 @@ interface PickerOptions {
   onChange?: (values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void
   onConfirm?: (values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void
   onCancel?: (values: (string | number)[], indexes: number[], options: PickerColumnOption[]) => void
+  onKeyEscape?: () => void
 }
 
 type PickerResolvedState = 'confirm' | 'cancel' | 'close'

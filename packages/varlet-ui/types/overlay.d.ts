@@ -1,12 +1,14 @@
-import { VarComponent, BasicAttributes, ListenerProp, SetPropsDefaults } from './varComponent'
-import { VNode, TeleportProps } from 'vue'
+import { TeleportProps, VNode } from 'vue'
+import { BasicAttributes, ListenerProp, SetPropsDefaults, VarComponent } from './varComponent'
 
 export declare const overlayProps: Record<keyof OverlayProps, any>
 
 export interface OverlayProps extends BasicAttributes {
   lockScroll?: boolean
   teleport?: TeleportProps['to'] | false
+  closeOnKeyEscape?: boolean
   onClick?: ListenerProp<() => void>
+  onKeyEscape?: ListenerProp<() => void>
   'onUpdate:show'?: ListenerProp<(show: boolean) => void>
 }
 

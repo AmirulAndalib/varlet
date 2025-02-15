@@ -218,20 +218,21 @@ Menu 是一个 `inline-block` 元素，通过默认插槽点击时显示菜单�
 
 | 参数              | 说明                                                          | 类型                    | 默认值               |
 |-----------------|-------------------------------------------------------------|-----------------------|-------------------|
-| `v-model:show`  | 是否显示菜单                                                      | _string_              | `default`         |
+| `v-model:show`  | 是否显示菜单                                                      | _boolean_              | `false`         |
 | `placement`     | 菜单弹出位置                                                      | _Placement_           | `cover-top-start` |
 | `strategy`       | 菜单定位方式，可选值为 `absolute` `fixed` | _string_              | `absolute`           |
 | `offset-x`      | x 轴偏移量， 相对于菜单对齐后的位置                                         | _number \| string_           | `0` |
 | `offset-y`      | y 轴偏移量， 相对于菜单对齐后的位置                                         | _number \| string_           | `0` |
 | `teleport`      | 菜单挂载的位置                                                     | _TeleportProps['to'] \| false_ | `body`            |
 | `disabled`      | 是否禁用菜单                                                      | _boolean_             | `false`           |
-| `trigger`       | 菜单触发方式，可选值为 `click` `hover`, `click` 为点击时触发, `hover` 为悬停时触发 | _string_              | `click`           |
-| `reference`       | 菜单关联的触发元素选择器，用于指定菜单的特定子元素为触发元素 | _string_              | `-`           |
+| `trigger`       | 菜单触发方式，可选值为 `click` `hover` `manual` | _string_              | `click`           |
+| `reference`       | 菜单关联的触发元素，`string` 类型为菜单组件的子孙元素选择器， `HTMLElement` 类型为任意指定的元素节点 | _string \| HTMLElement_              | `-`           |
 | `elevation` | 海拔高度，可选值为 `true` `false` 和 `0-24` 的等级 | _string \| number \| boolean_|   `true`    |
 | `same-width`    | 是否与触发元素同宽                                                   | _boolean_             | `false`           |
 | `default-style` | 是否启用默认样式                                                    | _boolean_             | `true`            |
 | `popover-class` | 弹出层的 class                                                    | _string_             | `-`            |
 | `close-on-click-reference` | 是否在点击菜单触发元素后关闭菜单 | _boolean_ | `false` |
+| `close-on-key-escape` | 是否支持键盘 ESC 菜单 | _boolean_ | `true`  |
 
 ### Placement
 
@@ -259,11 +260,13 @@ Menu 是一个 `inline-block` 元素，通过默认插槽点击时显示菜单�
 | `cover-right` | 右侧位置, 覆盖触发器 |
 
 ### 方法
+
 | 方法名 | 说明 | 参数 | 返回值 |
 | --- | --- | --- | --- |
 | `open` | 打开 Menu | `-` | `-` |
 | `close` | 关闭 Menu | `-` | `-` |
 | `resize` | Menu 默认插槽元素产生位置大小变化时可以调用此方法进行重绘 | `-` | `-` |
+| `setReference` ***3.7.2*** | 设置菜单关联的触发元素 | `reference: 与组件属性的 reference 一致` | `-` |
 
 ### 事件
 
@@ -288,5 +291,5 @@ Menu 是一个 `inline-block` 元素，通过默认插槽点击时显示菜单�
 
 | 变量名 | 默认值 |
 | --- | --- |
-| `--menu-background-color` | `#fff` |
+| `--menu-background-color` | `var(--color-surface-container-high)` |
 | `--menu-border-radius` | `2px` |

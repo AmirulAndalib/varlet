@@ -20,10 +20,10 @@
 </template>
 
 <script lang="ts">
-import config from '@config'
-import { useRouter } from 'vue-router'
 import { reactive, ref } from 'vue'
+import config from '@config'
 import { watchLang, watchPlatform } from '@varlet/cli/client'
+import { useRouter } from 'vue-router'
 import { inIframe, isPhone } from '../utils'
 
 export default {
@@ -53,7 +53,7 @@ export default {
         query: {
           language: lang.value,
           platform: platform.value,
-          replace: component.doc
+          replace: component.doc,
         },
       })
 
@@ -77,9 +77,7 @@ export default {
 
 <style lang="less">
 .varlet-logo {
-  height: 100px;
   padding-top: 30px;
-  margin-bottom: 20px;
 }
 
 .varlet-home__title {
@@ -96,9 +94,9 @@ export default {
 }
 
 .varlet-home__desc {
-  margin: 0 0 40px;
   color: var(--site-config-color-sub-text);
   font-size: 14px;
+  line-height: 22px;
 }
 
 .varlet-home__image {
@@ -124,7 +122,7 @@ export default {
   padding: 10px 12px;
   font-size: 15px;
   cursor: pointer;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
   transition: all 0.3s;
   color: var(--site-config-color-text);
 

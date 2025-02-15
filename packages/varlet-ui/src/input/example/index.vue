@@ -1,8 +1,8 @@
 <script setup>
-import { Themes } from '@varlet/ui'
-import { AppType, watchLang, watchDarkMode } from '@varlet/cli/client'
 import { ref } from 'vue'
-import { use, pack } from './locale'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { z } from 'zod'
+import { t, use } from './locale'
 
 const standardValue = ref('')
 const standardValue2 = ref('')
@@ -14,6 +14,10 @@ const standardValue7 = ref('')
 const standardValue8 = ref('')
 const standardValue9 = ref('')
 const standardValue10 = ref('')
+const standardValue11 = ref('')
+const standardValue12 = ref('')
+const standardValue13 = ref('')
+const standardValue14 = ref('')
 
 const outlinedValue = ref('')
 const outlinedValue2 = ref('')
@@ -25,24 +29,35 @@ const outlinedValue7 = ref('')
 const outlinedValue8 = ref('')
 const outlinedValue9 = ref('')
 const outlinedValue10 = ref('')
+const outlinedValue11 = ref('')
+const outlinedValue12 = ref('')
+const outlinedValue13 = ref('')
+const outlinedValue14 = ref('')
 
 watchLang(use)
-watchDarkMode(Themes.dark)
+onThemeChange()
 </script>
 
 <template>
-  <app-type>{{ pack.standard }}</app-type>
+  <app-type>{{ t('standard') }}</app-type>
   <var-space direction="column" :size="['3vmin', 0]">
-    <var-input :placeholder="pack.placeholder" v-model="standardValue2" />
-    <var-input :placeholder="pack.readonly" readonly v-model="standardValue3" />
-    <var-input :placeholder="pack.disabled" disabled v-model="standardValue4" />
-    <var-input :placeholder="pack.clearable" clearable v-model="standardValue5" />
+    <var-input v-model="standardValue" :placeholder="t('placeholder')" />
+    <var-input v-model="standardValue13" :placeholder="t('numberPlaceholder')" type="number" />
+    <var-input v-model="standardValue2" :placeholder="t('readonly')" readonly />
+    <var-input v-model="standardValue3" :placeholder="t('disabled')" disabled />
+    <var-input v-model="standardValue4" :placeholder="t('clearable')" clearable />
+    <var-input v-model="standardValue5" :placeholder="t('clearIconSlot')" clearable>
+      <template #clear-icon="{ clear }">
+        <var-icon name="error" @click="clear" />
+      </template>
+    </var-input>
+    <var-input v-model="standardValue6" :placeholder="t('validate')" :rules="(v) => v.length > 6 || t('maxMessage')" />
     <var-input
-      :placeholder="pack.validate"
-      :rules="[(v) => v.length > 6 || pack.maxMessage]"
-      v-model="standardValue6"
+      v-model="standardValue14"
+      :placeholder="t('validateWithZod')"
+      :rules="z.string().min(7, t('maxMessage'))"
     />
-    <var-input :placeholder="pack.displayIcon" v-model="standardValue7">
+    <var-input v-model="standardValue7" :placeholder="t('displayIcon')">
       <template #prepend-icon>
         <var-icon class="prepend-icon" name="github" />
       </template>
@@ -51,7 +66,7 @@ watchDarkMode(Themes.dark)
       </template>
     </var-input>
 
-    <var-input :placeholder="pack.customIconSize" v-model="standardValue10">
+    <var-input v-model="standardValue8" :placeholder="t('customIconSize')">
       <template #prepend-icon>
         <var-icon class="prepend-icon" name="github" size="8vmin" />
       </template>
@@ -59,24 +74,37 @@ watchDarkMode(Themes.dark)
         <var-icon class="append-icon" name="github" size="12vmin" />
       </template>
     </var-input>
-    <var-input :placeholder="pack.maxlength" :maxlength="10" v-model="standardValue8" />
-    <var-input :placeholder="pack.textarea" textarea v-model="standardValue9" />
-    <var-input :placeholder="pack.smallSize" size="small" v-model="standardValue" />
+    <var-input v-model="standardValue9" :placeholder="t('maxlength')" :maxlength="10" />
+    <var-input v-model="standardValue10" :placeholder="t('textarea')" textarea />
+    <var-input v-model="standardValue11" :placeholder="t('smallSize')" size="small" />
+    <var-input v-model.trim="standardValue12" :placeholder="t('trim')" />
   </var-space>
 
-  <app-type style="margin-top: 10vmin">{{ pack.outlined }}</app-type>
+  <app-type style="margin-top: 10vmin">{{ t('outlined') }}</app-type>
   <var-space direction="column" :size="['6vmin', 0]">
-    <var-input variant="outlined" :placeholder="pack.placeholder" v-model="outlinedValue2" />
-    <var-input variant="outlined" :placeholder="pack.readonly" readonly v-model="outlinedValue3" />
-    <var-input variant="outlined" :placeholder="pack.disabled" disabled v-model="outlinedValue4" />
-    <var-input variant="outlined" :placeholder="pack.clearable" clearable v-model="outlinedValue5" />
+    <var-input v-model="outlinedValue" variant="outlined" :placeholder="t('placeholder')" />
+    <var-input v-model="outlinedValue13" variant="outlined" :placeholder="t('numberPlaceholder')" type="number" />
+    <var-input v-model="outlinedValue2" variant="outlined" :placeholder="t('readonly')" readonly />
+    <var-input v-model="outlinedValue3" variant="outlined" :placeholder="t('disabled')" disabled />
+    <var-input v-model="outlinedValue4" variant="outlined" :placeholder="t('clearable')" clearable />
+    <var-input v-model="outlinedValue5" variant="outlined" :placeholder="t('clearIconSlot')" clearable>
+      <template #clear-icon="{ clear }">
+        <var-icon name="error" @click="clear" />
+      </template>
+    </var-input>
     <var-input
-      variant="outlined"
-      :placeholder="pack.validate"
-      :rules="[(v) => v.length > 6 || pack.maxMessage]"
       v-model="outlinedValue6"
+      variant="outlined"
+      :placeholder="t('validate')"
+      :rules="(v) => v.length > 6 || t('maxMessage')"
     />
-    <var-input variant="outlined" :placeholder="pack.displayIcon" v-model="outlinedValue7">
+    <var-input
+      v-model="outlinedValue14"
+      variant="outlined"
+      :placeholder="t('validateWithZod')"
+      :rules="z.string().min(7, t('maxMessage'))"
+    />
+    <var-input v-model="outlinedValue7" variant="outlined" :placeholder="t('displayIcon')">
       <template #prepend-icon>
         <var-icon class="prepend-icon" name="github" />
       </template>
@@ -84,7 +112,7 @@ watchDarkMode(Themes.dark)
         <var-icon class="append-icon" name="github" />
       </template>
     </var-input>
-    <var-input variant="outlined" :placeholder="pack.customIconSize" v-model="outlinedValue10">
+    <var-input v-model="outlinedValue8" variant="outlined" :placeholder="t('customIconSize')">
       <template #prepend-icon>
         <var-icon class="prepend-icon" name="github" size="8vmin" />
       </template>
@@ -92,9 +120,10 @@ watchDarkMode(Themes.dark)
         <var-icon class="append-icon" name="github" size="12vmin" />
       </template>
     </var-input>
-    <var-input variant="outlined" :placeholder="pack.maxlength" :maxlength="10" v-model="outlinedValue8" />
-    <var-input variant="outlined" :placeholder="pack.textarea" textarea v-model="outlinedValue9" />
-    <var-input variant="outlined" :placeholder="pack.smallSize" size="small" v-model="outlinedValue" />
+    <var-input v-model="outlinedValue9" variant="outlined" :placeholder="t('maxlength')" :maxlength="10" />
+    <var-input v-model="outlinedValue10" variant="outlined" :placeholder="t('textarea')" textarea />
+    <var-input v-model="outlinedValue11" variant="outlined" :placeholder="t('smallSize')" size="small" />
+    <var-input v-model.trim="outlinedValue12" variant="outlined" :placeholder="t('trim')" />
   </var-space>
 
   <div style="height: 40px"></div>

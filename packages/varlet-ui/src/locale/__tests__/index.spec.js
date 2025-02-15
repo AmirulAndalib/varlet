@@ -1,40 +1,40 @@
-import enUS from '../en-US'
+import { expect, test, vi } from 'vitest'
 import { useLocale } from '..'
 import { mockConsole } from '../../utils/test'
-import { expect, vi } from 'vitest'
+import enUS from '../en-US'
 
-test('test add lang', () => {
-  const { add, use, pack, packs } = useLocale()
+test('add lang', () => {
+  const { add, use, t, messages } = useLocale()
 
-  const LANG = 'custom'
-  const PACK = {
+  const lang = 'custom'
+  const message = {
     dialogTitle: 'Custom Dialog Title',
   }
 
-  add(LANG, PACK)
-  use(LANG)
+  add(lang, message)
+  use(lang)
 
-  expect(pack.value.lang).toBe(LANG)
-  expect(packs[LANG]).toBe(PACK)
+  expect(t('lang')).toBe(lang)
+  expect(messages.value[lang]).toStrictEqual(message)
 })
 
-test('test merge lang', () => {
+test('merge lang', () => {
   const fn = vi.fn()
   const { mockRestore } = mockConsole('warn', fn)
-  const { add, use, merge, pack } = useLocale()
+  const { add, use, merge, t } = useLocale()
 
-  const LANG = 'en-US'
-  const PACK = {
+  const lang = 'en-US'
+  const message = {
     dialogTitle: 'Custom Dialog Title',
   }
 
-  add(LANG, enUS)
+  add(lang, enUS)
   use('zh-HK')
-  use(LANG)
-  merge('zh-HK', PACK)
-  merge(LANG, PACK)
+  use(lang)
+  merge('zh-HK', message)
+  merge(lang, message)
 
-  expect(pack.value.dialogTitle).toBe('Custom Dialog Title')
+  expect(t('dialogTitle')).toBe('Custom Dialog Title')
   expect(fn).toHaveBeenCalledTimes(2)
 
   mockRestore()

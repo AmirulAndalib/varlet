@@ -1,11 +1,13 @@
 import { defineComponent, PropType } from 'vue'
+import { createNamespace } from '../utils/components'
 import './button.less'
-
 // i18n for component's internal
-import { pack } from '../locale'
+import { t } from '../locale'
+
+const { name, n, classes } = createNamespace('button')
 
 export default defineComponent({
-  name: 'VaButton',
+  name,
   props: {
     color: {
       type: String,
@@ -23,8 +25,8 @@ export default defineComponent({
       const { color } = props
 
       return (
-        <button class="va-button" style={{ background: color }} onClick={handleClick}>
-          {pack.value.button}
+        <button class={n()} style={{ background: color }} onClick={handleClick}>
+          {t('button')}
           {slots.default?.()}
         </button>
       )

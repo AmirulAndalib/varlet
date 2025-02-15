@@ -1,8 +1,8 @@
-import globSync from 'glob'
-import fse from 'fs-extra'
 import { extname, resolve } from 'path'
-import { CLI_PACKAGE_JSON, PUBLIC_DIR_INDEXES, SCRIPTS_EXTENSIONS, SRC_DIR, UI_PACKAGE_JSON } from './constant.js'
 import { fileURLToPath } from 'url'
+import fse from 'fs-extra'
+import globSync from 'glob'
+import { CLI_PACKAGE_JSON, PUBLIC_DIR_INDEXES, SCRIPTS_EXTENSIONS, SRC_DIR, UI_PACKAGE_JSON } from './constant.js'
 
 const {
   appendFileSync,
@@ -35,6 +35,8 @@ export const isTsx = (file: string): boolean => pathExistsSync(file) && file.end
 export const isScript = (file: string): boolean => pathExistsSync(file) && SCRIPTS_EXTENSIONS.includes(extname(file))
 
 export const isLess = (file: string): boolean => pathExistsSync(file) && extname(file) === '.less'
+
+export const isScss = (file: string): boolean => pathExistsSync(file) && extname(file) === '.scss'
 
 export const isPublicDir = (dir: string): boolean =>
   PUBLIC_DIR_INDEXES.some((index) => pathExistsSync(resolve(dir, index)))

@@ -1,9 +1,13 @@
-import { Validation } from '../form/provide'
+import { type ComputedRef } from 'vue'
 import { useParent } from '@varlet/use'
+import { Validation } from '../form/provide'
 import { RADIO_GROUP_BIND_RADIO_KEY, RadioGroupProvider } from '../radio-group/provide'
 
 export interface RadioProvider extends Validation {
+  isFocusing: ComputedRef<boolean>
   sync(value: any): void
+  move(): void
+  moveable(): boolean
 }
 
 export function useRadioGroup() {

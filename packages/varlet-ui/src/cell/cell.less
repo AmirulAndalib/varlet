@@ -6,7 +6,7 @@
   --cell-description-margin-top: 4px;
   --cell-padding: 10px 12px;
   --cell-min-height: 40px;
-  --cell-border-color: #bcc2cb;
+  --cell-border-color: var(--color-outline);
   --cell-border-left: 12px;
   --cell-border-right: 12px;
   --cell-icon-right: 8px;
@@ -24,6 +24,7 @@
   box-sizing: border-box;
   font-size: var(--cell-font-size);
   color: var(--cell-color);
+  -webkit-tap-highlight-color: transparent;
 
   &--border {
     &::after {
@@ -36,6 +37,7 @@
       left: var(--cell-border-left);
       border-bottom: 1px solid var(--cell-border-color);
       transform: scaleY(0.5);
+      transition: border 0.25s;
     }
   }
 

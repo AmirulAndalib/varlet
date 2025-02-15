@@ -1,5 +1,5 @@
-import { useChildren } from '@varlet/use'
 import type { ComputedRef } from 'vue'
+import { useChildren } from '@varlet/use'
 
 export interface ButtonGroupProvider {
   elevation: ComputedRef<string | number | boolean>
@@ -7,7 +7,7 @@ export interface ButtonGroupProvider {
   size: ComputedRef<'normal' | 'mini' | 'small' | 'large'>
   color: ComputedRef<string | undefined>
   textColor: ComputedRef<string | undefined>
-  mode: ComputedRef<'text' | 'outline' | 'normal'>
+  mode: ComputedRef<'text' | 'outline' | 'normal' | 'icon-container'>
 }
 
 export const BUTTON_GROUP_BIND_BUTTON_KEY = Symbol('BUTTON_GROUP_BIND_BUTTON_KEY')

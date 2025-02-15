@@ -1,5 +1,5 @@
-import { VarComponent, BasicAttributes, ListenerProp, SetPropsDefaults } from './varComponent'
 import { VNode } from 'vue'
+import { BasicAttributes, ListenerProp, SetPropsDefaults, VarComponent } from './varComponent'
 
 export declare const timePickerProps: Record<keyof TimePickerProps, any>
 
@@ -16,8 +16,6 @@ export interface TimePickerProps extends BasicAttributes {
   elevation?: boolean | string | number
   color?: string
   hint?: string
-  /** @deprecated Use titleColor to instead. */
-  headerColor?: string
   titleColor?: string
   allowedTime?: AllowedTime
   format?: TimePickerFormat

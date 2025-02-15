@@ -27,20 +27,6 @@
 </template>
 ```
 
-### 外边框
-
-```html
-<template>
-  <var-card
-    outline
-    :elevation="0"
-    title="本草纲目"
-    subtitle="我表情悠哉 跳个大概"
-    description="如果华佗再世,崇洋都被医治,外邦来学汉字,激发我民族意识。马钱子、决明子、苍耳子，还有莲子；黄药子、苦豆子、川楝子，我要面子。用我的方式，改写一部历史。没什么别的事，跟着我念几个字。山药当归枸杞 GO，山药 当归 枸杞 GO，看我抓一把中药，服下一帖骄傲~"
-  />
-</template>
-```
-
 ### 显示图片
 
 ```html
@@ -49,7 +35,7 @@
     title="本草纲目"
     subtitle="我表情悠哉 跳个大概"
     description="如果华佗再世,崇洋都被医治,外邦来学汉字,激发我民族意识。马钱子、决明子、苍耳子，还有莲子；黄药子、苦豆子、川楝子，我要面子。用我的方式，改写一部历史。没什么别的事，跟着我念几个字。山药当归枸杞 GO，山药 当归 枸杞 GO，看我抓一把中药，服下一帖骄傲~"
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
   />
 </template>
 ```
@@ -62,12 +48,12 @@
     title="本草纲目"
     subtitle="我表情悠哉 跳个大概"
     description="如果华佗再世,崇洋都被医治,外邦来学汉字,激发我民族意识。马钱子、决明子、苍耳子，还有莲子；黄药子、苦豆子、川楝子，我要面子。用我的方式，改写一部历史。没什么别的事，跟着我念几个字。山药当归枸杞 GO，山药 当归 枸杞 GO，看我抓一把中药，服下一帖骄傲~"
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
   >
     <template #extra>
       <var-space>
-        <var-button text type="warning">操作 1</var-button>
-        <var-button text type="warning">操作 2</var-button>
+        <var-button type="primary">操作 1</var-button>
+        <var-button type="primary">操作 2</var-button>
       </var-space>
     </template>
   </var-card>
@@ -81,7 +67,7 @@
   <var-card 
     title="本草纲目"
     subtitle="如果华佗再世,崇洋都被医治,外邦来学汉字,激发我民族意识。马钱子、决明子、苍耳子，还有莲子；黄药子、苦豆子、川楝子，我要面子。用我的方式，改写一部历史。没什么别的事，跟着我念几个字。山药当归枸杞 GO，山药 当归 枸杞 GO，看我抓一把中药，服下一帖骄傲~"
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
     layout="row"
   >
     <template #extra>
@@ -122,7 +108,7 @@ const floating = ref(false)
   <var-card
     title="本草纲目"
     subtitle="我表情悠哉 跳个大概"
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
     v-model:floating="floating"
   >
     <template #extra>
@@ -148,12 +134,40 @@ const floating = ref(false)
 </style>
 ```
 
+### 外边框
+
+```html
+<template>
+  <var-card
+    variant="outlined"
+    title="本草纲目"
+    subtitle="我表情悠哉 跳个大概"
+    description="如果华佗再世,崇洋都被医治,外邦来学汉字,激发我民族意识。马钱子、决明子、苍耳子，还有莲子；黄药子、苦豆子、川楝子，我要面子。用我的方式，改写一部历史。没什么别的事，跟着我念几个字。山药当归枸杞 GO，山药 当归 枸杞 GO，看我抓一把中药，服下一帖骄傲~"
+  />
+</template>
+```
+
+
+### 填充
+
+```html
+<template>
+  <var-card
+    variant="filled"
+    title="本草纲目"
+    subtitle="我表情悠哉 跳个大概"
+    description="如果华佗再世,崇洋都被医治,外邦来学汉字,激发我民族意识。马钱子、决明子、苍耳子，还有莲子；黄药子、苦豆子、川楝子，我要面子。用我的方式，改写一部历史。没什么别的事，跟着我念几个字。山药当归枸杞 GO，山药 当归 枸杞 GO，看我抓一把中药，服下一帖骄傲~"
+  />
+</template>
+```
+
 ## API
 
 ### 属性
 
 | 参数                  | 说明                                                     | 类型       | 默认值      |
 |---------------------|--------------------------------------------------------|----------|----------|
+| `variant`  ***3.5.4***           | 卡片外观，可选值 `standard` `outlined` `filled`            | _string_ | `standard`      |
 | `title`             | 卡片标题                                                   | _string_ | `-`      |
 | `subtitle`          | 卡片副标题                                                  | _string_ | `-`      |
 | `description`       | 卡片描述                                                   | _string_ | `-`      |
@@ -161,12 +175,11 @@ const floating = ref(false)
 | `src`               | 图片地址                                                   | _string_ | `-`      |
 | `layout`            | 排列方式，可选值为 `row` `column`                               | _string_ | `column` |
 | `fit`               | 填充模式，可选值为 `fill` `contain` `cover` `none` `scale-down` | _string_ | `cover`  |
-| `outline`           | 是否使用外边框                                                | _boolean_ | `false`  |
 | `alt`               | 替代文本，和 img 标签原生属性一致                                                   | _string_ | `-`      |
 | `image-height`      | 图片高度                                                   | _string \| number_  | `-`     |
 | `image-width`       | 图片宽度                                                   | _string \| number_  | `-`     |
 | `ripple`            | 是否开启水波                                                 | _boolean_ | `false`  |
-| `floating`          | 是否开启全屏                                                 | _boolean_ | `false`  |
+| `v-model:floating`          | 是否开启全屏                                                 | _boolean_ | `false`  |
 | `floating-duration` | 开关全屏所需时间（ms）                                           | _number_ | `250`    |
 
 ### 事件
@@ -180,9 +193,10 @@ const floating = ref(false)
 | 插槽名           | 说明      | 参数 |
 |---------------|---------| ---- |
 | `image`       | 自定义图片   | `-`  |
-| `title`       | 自定义标题   | `-`  |
-| `subtitle`    | 自定义副标题  | `-`  |
-| `description` | 自定义描述   | `-`  |
+| `default` ***3.3.7***      | 自定义内容   | `-`  |
+| `title`       | 自定义标题   | `slotClass: string` 标题样式  |
+| `subtitle`    | 自定义副标题  | `slotClass: string` 副标题样式 |
+| `description` | 自定义描述   | `slotClass: string` 描述样式 |
 | `floating-content`     | 漂浮时显示的正文内容 | `-`  |
 | `extra`       | 自定义底部内容 | `-`  |
 | `close-button` | 自定义关闭按钮   | `-`  |
@@ -193,10 +207,11 @@ const floating = ref(false)
 
 | 变量名                                 | 默认值                  |
 |-------------------------------------|----------------------|
-| `--card-background`                 | `#fff`               |
+| `--card-background`                 | `var(--color-surface-container-highest)`               |
+| `--card-filled-background`          | `hsla(0, 0%, 93%, 1)` |
 | `--card-padding`                    | `0px 0 15px 0`       |
 | `--card-border-radius`              | `4px`                |
-| `--card-outline-color`              | `rgba(0, 0, 0, 0.12)` |
+| `--card-outline-color`              | `var(--color-outline)` |
 | `--card-image-width`                | `100%`               |
 | `--card-row-image-width`            | `140px`              |
 | `--card-image-height`               | `200px`              |
@@ -206,6 +221,11 @@ const floating = ref(false)
 | `--card-title-padding`              | `0 12px`             |
 | `--card-title-margin`               | `15px 0 0 0`         |
 | `--card-title-row-margin`           | `12px 0`             |
+| `--card-content-padding`            | `0 16px`             |
+| `--card-content-margin`             | `16px 0 0 0`         |
+| `--card-content-color`              | `var(--color-on-surface-variant)`|
+| `--card-content-font-size`          | `14px`               |
+| `--card-content-row-margin`         | `16px 0 0 0`         |
 | `--card-subtitle-color`             | `rgba(0, 0, 0, 0.6)` |
 | `--card-subtitle-font-size`         | `14px`               |
 | `--card-subtitle-padding`           | `0 13px`             |
@@ -228,3 +248,4 @@ const floating = ref(false)
 | `--card-close-button-size`          | `56px`               |
 | `--card-close-button-primary-color` | `#212121`            |
 | `--card-close-button-text-color` | `#fff`            |
+| `--card-close-button-border-radius` | `50%` |

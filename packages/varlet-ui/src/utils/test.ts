@@ -1,6 +1,6 @@
 import { nextTick, type ComponentPublicInstance } from 'vue'
-import { type VueWrapper, type DOMWrapper, config } from '@vue/test-utils'
-import { isPlainObject, getStyle } from '@varlet/shared'
+import { getStyle, isPlainObject } from '@varlet/shared'
+import { config, type DOMWrapper, type VueWrapper } from '@vue/test-utils'
 
 export const delay = (time: number) =>
   new Promise((resolve) => {
@@ -44,7 +44,7 @@ export function trigger(
   x = 0,
   y = 0,
   offsetX = 0,
-  offsetY = 0
+  offsetY = 0,
 ) {
   const el = 'element' in wrapper ? wrapper.element : wrapper
   const touchList = [getTouch(el, x, y)]
@@ -57,9 +57,22 @@ export function trigger(
     offsetX,
     offsetY,
     touches: touchList,
-    targetTouches: touchList,
-    changedTouches: touchList,
+    targetTouches: eventName.startsWith('touch') ? touchList : undefined,
+    changedTouches: eventName.startsWith('touch') ? touchList : undefined,
   })
+
+  el.dispatchEvent(event)
+
+  return nextTick()
+}
+
+export function triggerKeyboard(
+  wrapper: VueWrapper<ComponentPublicInstance<any, any, any>> | DOMWrapper<Element> | Element | Window,
+  eventName: string,
+  eventInitDict: Record<string, any> = {},
+) {
+  const el = 'element' in wrapper ? wrapper.element : wrapper
+  const event = new KeyboardEvent(eventName, eventInitDict)
 
   el.dispatchEvent(event)
 
@@ -138,7 +151,7 @@ export function mockImageNaturalSize(naturalWidth: number, naturalHeight: number
 export async function triggerDrag(
   el: VueWrapper<ComponentPublicInstance<any, any, any>> | DOMWrapper<Element> | HTMLElement,
   x = 0,
-  y = 0
+  y = 0,
 ) {
   await trigger(el, 'touchstart', 0, 0)
   await trigger(el, 'touchmove', x / 4, y / 4)

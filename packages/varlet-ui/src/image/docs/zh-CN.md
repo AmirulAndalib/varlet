@@ -9,7 +9,7 @@
 
 ```html
 <template>
-  <var-image src="https://varlet.gitee.io/varlet-ui/cat.jpg" />
+  <var-image src="https://varletjs.org/cat.jpg" />
 </template>
 ```
 
@@ -21,35 +21,35 @@
     <var-image 
       width="85px" 
       height="85px" 
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg" 
+      src="https://varletjs.org/cat.jpg" 
     />
 
     <var-image 
       width="85px" 
       height="85px"
       fit="cover" 
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg" 
+      src="https://varletjs.org/cat.jpg" 
     />
 
     <var-image 
       width="85px"
       height="85px"
       fit="none"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+      src="https://varletjs.org/cat.jpg"
     />
 
     <var-image 
       width="85px"
       height="85px" 
       fit="contain"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg" 
+      src="https://varletjs.org/cat.jpg" 
     />
 
     <var-image 
       width="85px"
       height="85px" 
       fit="scale-down"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg" 
+      src="https://varletjs.org/cat.jpg" 
     />
   </var-space>
 </template>
@@ -65,7 +65,7 @@
       height="85px"
       fit="cover"
       :radius="10"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+      src="https://varletjs.org/cat.jpg"
     />
 
     <var-image
@@ -73,7 +73,7 @@
       height="85px"
       fit="cover"
       radius="50%"
-      src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+      src="https://varletjs.org/cat.jpg"
     />
   </var-space>
 </template>
@@ -87,7 +87,7 @@
     width="85px" 
     height="85px"
     ripple
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
   />
 </template>
 ```
@@ -100,7 +100,7 @@
     width="85px"
     height="85px"  
     lazy 
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg" 
+    src="https://varletjs.org/cat.jpg" 
   />
 </template>
 ```
@@ -116,7 +116,7 @@
     height="85px"
     loading="https://xxx.xxx/loading.png"
     error="https://xxx.xxx/error.png"
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
   />
 </template>
 ```
@@ -128,7 +128,7 @@
   <var-image 
     width="22.666vw" 
     height="22.666vw" 
-    src="https://varlet.gitee.io/varlet-ui/ca.jpg"
+    src="https://varletjs.org/ca.jpg"
   >
     <template #error>
       <svg viewBox="0 0 24 24" style="width: 100%; height: 100%;">
@@ -207,11 +207,13 @@ import logo from '../../assets/logo.png'
 |-----------|-------------------------------------------------| --- | --- |
 | `src`     | 图片地址                                            | _string_ | `-` |
 | `fit`     | 填充模式, 可选值为 `fill contain cover none scale-down` | _string_ | `fill` |
+| `position` ***3.2.3***  | 可替换元素的内容在其内容框中的位置，等同于 [object-position](https://developer.mozilla.org/en-US/docs/Web/CSS/object-position)    | _string_ | `50% 50%` |
 | `alt`     | 替代文本，和 `img` 标签原生属性一致                           | _string_ | `-` |
 | `title`   | 图片描述性文字，和 `img` 标签原生属性一致             | _string_ | `-` |
+| `referrerpolicy`   | 指示在获取资源时使用的来源地址。该属性需注意浏览器兼容性，参见 [MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img)            | _string_ | `-` |
 | `width`   | 图片宽度                                            | _string \| number_ | `-` |
 | `height`  | 图片高度                                            | _string \| number_ | `-` |
-| `radius`  | 图片圆角                                            | _string \| number_ | `-` |
+| `radius`  | 图片圆角                                            | _string \| number_ | `0` |
 | `lazy`    | 是否开启懒加载                                         | _boolean_ | `false` |
 | `loading` | 当开启懒加载时, 加载中显示的图片                               | _string_ | `-` |
 | `error`   | 当开启懒加载时, 加载失败显示的图片                              | _string_ | `-` |

@@ -1,11 +1,11 @@
-import BottomNavigation from '..'
-import BottomNavigationItem from '../../bottom-navigation-item'
-import VarBottomNavigation from '../BottomNavigation'
-import VarBottomNavigationItem from '../../bottom-navigation-item/BottomNavigationItem'
 import { createApp } from 'vue'
 import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import BottomNavigation from '..'
+import BottomNavigationItem from '../../bottom-navigation-item'
+import VarBottomNavigationItem from '../../bottom-navigation-item/BottomNavigationItem'
 import { delay, trigger } from '../../utils/test'
-import { expect, vi } from 'vitest'
+import VarBottomNavigation from '../BottomNavigation'
 
 const Wrapper = {
   components: {
@@ -28,14 +28,14 @@ const Wrapper = {
   `,
 }
 
-test('test bottom-navigation plugin', () => {
+test('bottom-navigation plugin', () => {
   const app = createApp({}).use(BottomNavigation).use(BottomNavigationItem)
   expect(app.component(BottomNavigation.name)).toBeTruthy()
   expect(app.component(BottomNavigationItem.name)).toBeTruthy()
 })
 
 describe('test bottom-navigation events', () => {
-  test('test bottom-navigation change event', async () => {
+  test('bottom-navigation change event', async () => {
     let dummy
     const handleChange = vi.fn((active) => {
       dummy = active
@@ -70,7 +70,7 @@ describe('test bottom-navigation events', () => {
     wrapper.unmount()
   })
 
-  test('test bottom-navigation click event', async () => {
+  test('bottom-navigation click event', async () => {
     let dummy
     const handleClick = vi.fn((active) => {
       dummy = active
@@ -101,14 +101,14 @@ describe('test bottom-navigation events', () => {
     wrapper.unmount()
   })
 
-  test('test bottom-navigation before-change event', async () => {
+  test('bottom-navigation before-change event', async () => {
     const handleBeforeChange = vi.fn(
       () =>
         new Promise((resolve) => {
           setTimeout(() => {
             resolve(true)
           }, 200)
-        })
+        }),
     )
     const wrapper = mount({
       components: {
@@ -145,7 +145,7 @@ describe('test bottom-navigation events', () => {
     wrapper.unmount()
   })
 
-  test('test bottom-navigation fab-click event', async () => {
+  test('bottom-navigation fab-click event', async () => {
     const handleFabClick = vi.fn()
     const wrapper = mount({
       components: {
@@ -177,7 +177,7 @@ describe('test bottom-navigation events', () => {
 })
 
 describe('test bottom-navigation component props', () => {
-  test('test bottom-navigation fixed', async () => {
+  test('bottom-navigation fixed', async () => {
     const wrapper = mount(Wrapper, {
       props: {
         fixed: true,
@@ -190,7 +190,7 @@ describe('test bottom-navigation component props', () => {
     wrapper.unmount()
   })
 
-  test('test bottom-navigation border', async () => {
+  test('bottom-navigation border', async () => {
     const wrapper = mount(Wrapper, {
       props: {
         border: true,
@@ -203,7 +203,7 @@ describe('test bottom-navigation component props', () => {
     wrapper.unmount()
   })
 
-  test('test bottom-navigation safe-area', async () => {
+  test('bottom-navigation safe-area', async () => {
     const wrapper = mount(Wrapper, {
       props: {
         safeArea: true,
@@ -216,7 +216,7 @@ describe('test bottom-navigation component props', () => {
     wrapper.unmount()
   })
 
-  test('test bottom-navigation z-index', async () => {
+  test('bottom-navigation z-index', async () => {
     const wrapper = mount(Wrapper, {
       props: {
         zIndex: 2,
@@ -229,7 +229,7 @@ describe('test bottom-navigation component props', () => {
     wrapper.unmount()
   })
 
-  test('test bottom-navigation active-color', async () => {
+  test('bottom-navigation active-color', async () => {
     const wrapper = mount(Wrapper, {
       props: {
         activeColor: 'red',
@@ -240,12 +240,12 @@ describe('test bottom-navigation component props', () => {
     expect(wrapper.find('.var-bottom-navigation-item--active').attributes('style')).toContain('color: red;')
     await wrapper.setProps({ activeColor: '#ffffff' })
     expect(wrapper.find('.var-bottom-navigation-item--active').attributes('style')).toContain(
-      'color: rgb(255, 255, 255);'
+      'color: rgb(255, 255, 255);',
     )
     wrapper.unmount()
   })
 
-  test('test bottom-navigation inactive-color', async () => {
+  test('bottom-navigation inactive-color', async () => {
     const wrapper = mount(Wrapper, {
       props: {
         inactiveColor: 'red',
@@ -262,7 +262,24 @@ describe('test bottom-navigation component props', () => {
     wrapper.unmount()
   })
 
-  test('test bottom-navigation fab-props', async () => {
+  test('bottom-navigation placeholder', async () => {
+    const wrapper = mount(VarBottomNavigation, {
+      props: {
+        placeholder: true,
+        fixed: true,
+      },
+    })
+
+    expect(wrapper.find('.var-bottom-navigation__placeholder').exists()).toBe(true)
+    await wrapper.setProps({ placeholder: false, fixed: false })
+    expect(wrapper.find('.var-bottom-navigation__placeholder').exists()).toBe(false)
+    await wrapper.setProps({ placeholder: true, fixed: false })
+    expect(wrapper.find('.var-bottom-navigation__placeholder').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  test('bottom-navigation fab-props', async () => {
     const wrapper = mount(Wrapper, {
       props: {
         fabProps: { size: 'mini', type: 'danger' },
@@ -274,6 +291,31 @@ describe('test bottom-navigation component props', () => {
     await wrapper.setProps({ fabProps: { size: 'large', type: 'success' } })
     expect(wrapper.find('.var-button').classes()).toContain('var-button--large')
     expect(wrapper.find('.var-button').classes()).toContain('var-button--success')
+    wrapper.unmount()
+  })
+
+  test('variant mode', async () => {
+    const wrapper = mount({
+      components: {
+        [VarBottomNavigation.name]: VarBottomNavigation,
+        [VarBottomNavigationItem.name]: VarBottomNavigationItem,
+      },
+      data: () => ({
+        variant: false,
+      }),
+      template: `
+<var-bottom-navigation :variant="variant">
+  <var-bottom-navigation-item label="tag 1" icon="home" name="home" :badge="{ dot: true, value: 10 }" />
+  <var-bottom-navigation-item label="tag 2" icon="magnify" />
+  <var-bottom-navigation-item label="tag 3" icon="heart" />
+  <var-bottom-navigation-item label="tag 4" icon="account-circle" />
+</var-bottom-navigation>
+      `,
+    })
+
+    expect(wrapper.html()).toMatchSnapshot()
+    await wrapper.setData({ variant: true })
+    expect(wrapper.html()).toMatchSnapshot()
     wrapper.unmount()
   })
 })

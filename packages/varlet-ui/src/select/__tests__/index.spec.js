@@ -1,18 +1,54 @@
+import { createApp, h } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import { z } from 'zod'
 import Select from '..'
-import VarSelect from '../Select'
 import Option from '../../option'
 import VarOption from '../../option/Option'
-import { mount } from '@vue/test-utils'
-import { createApp } from 'vue'
-import { delay, trigger } from '../../utils/test'
-import { expect, vi, describe } from 'vitest'
+import { delay, trigger, triggerKeyboard } from '../../utils/test'
+import VarSelect from '../Select'
 
-test('test select plugin', () => {
+const Wrapper = {
+  components: {
+    [VarSelect.name]: VarSelect,
+    [VarOption.name]: VarOption,
+  },
+}
+
+test('select plugin', () => {
   const app = createApp({}).use(Select)
   expect(app.component(Select.name)).toBeTruthy()
 })
 
-test('test select variant', () => {
+test('option plugin', () => {
+  const app = createApp({}).use(Option)
+  expect(app.component(Option.name)).toBeTruthy()
+})
+
+test('option default slot', () => {
+  const wrapper = mount({
+    ...Wrapper,
+    data: () => ({
+      value: '',
+    }),
+    template: `
+      <var-select v-model="value">
+        <var-option label="eat" />
+        <var-option>
+          <template #default="{ selected }">
+            <span class="test-default-slot">{{ selected }}</span>
+          </template>
+        </var-option>
+      </var-select>
+    `,
+  })
+
+  expect(document.querySelector('.test-default-slot').textContent).toBe('false')
+
+  wrapper.unmount()
+})
+
+test('select variant', () => {
   ;['standard', 'outlined'].forEach((variant) => {
     const wrapper = mount(VarSelect, {
       props: {
@@ -25,7 +61,7 @@ test('test select variant', () => {
     switch (variant) {
       case 'standard': {
         expect(
-          wrapper.find('.var-field-decorator__line').wrapperElement.querySelector('.var-field-decorator__dot')
+          wrapper.find('.var-field-decorator__line').wrapperElement.querySelector('.var-field-decorator__dot'),
         ).toBeTruthy()
         break
       }
@@ -44,7 +80,7 @@ test('test select variant', () => {
   })
 })
 
-test('test select size', () => {
+test('select size', async () => {
   const wrapper = mount(VarSelect, {
     props: {
       value: '',
@@ -52,23 +88,19 @@ test('test select size', () => {
     },
   })
 
-  expect(wrapper.find('.var-field-decorator--small')).toBeTruthy()
+  expect(wrapper.find('.var-field-decorator--small').exists()).toBeTruthy()
   expect(wrapper.html()).toMatchSnapshot()
+
+  await wrapper.setProps({
+    size: 'normal',
+  })
+
+  expect(wrapper.find('.var-field-decorator--small').exists()).toBeFalsy()
+
+  wrapper.unmount()
 })
 
-test('test option plugin', () => {
-  const app = createApp({}).use(Option)
-  expect(app.component(Option.name)).toBeTruthy()
-})
-
-const Wrapper = {
-  components: {
-    [VarSelect.name]: VarSelect,
-    [VarOption.name]: VarOption,
-  },
-}
-
-test('test select by label', async () => {
+test('select by label', async () => {
   const wrapper = mount({
     ...Wrapper,
     data: () => ({
@@ -76,20 +108,20 @@ test('test select by label', async () => {
     }),
     template: `
       <var-select v-model="value">
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
   })
 
   await wrapper.trigger('click')
   await trigger(document.querySelector('.var-option'), 'click')
-  expect(wrapper.vm.value).toBe('吃饭')
+  expect(wrapper.vm.value).toBe('eat')
 
   wrapper.unmount()
 })
 
-test('test select by value', async () => {
+test('select by value', async () => {
   const wrapper = mount({
     ...Wrapper,
     data: () => ({
@@ -97,8 +129,8 @@ test('test select by value', async () => {
     }),
     template: `
       <var-select v-model="value">
-        <var-option label="吃饭" :value="1" />
-        <var-option label="睡觉" :value="2" />
+        <var-option label="eat" :value="1" />
+        <var-option label="sleep" :value="2" />
       </var-select>
     `,
   })
@@ -110,7 +142,7 @@ test('test select by value', async () => {
   wrapper.unmount()
 })
 
-test('test select by disabled', async () => {
+test('select by disabled', async () => {
   const wrapper = mount({
     ...Wrapper,
     data: () => ({
@@ -118,8 +150,8 @@ test('test select by disabled', async () => {
     }),
     template: `
       <var-select v-model="value">
-        <var-option label="吃饭" disabled />
-        <var-option label="睡觉" disabled />
+        <var-option label="eat" disabled />
+        <var-option label="sleep" disabled />
       </var-select>
     `,
   })
@@ -131,16 +163,16 @@ test('test select by disabled', async () => {
   wrapper.unmount()
 })
 
-test('test select hint to be false', () => {
+test('select hint to be false', () => {
   const wrapper = mount({
     ...Wrapper,
     data: () => ({
-      value: '吃饭',
+      value: 'eat',
     }),
     template: `
       <var-select :hint="false" v-model="value">
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
   })
@@ -150,40 +182,32 @@ test('test select hint to be false', () => {
   wrapper.unmount()
 })
 
-test('test select onFocus & onBlur', async () => {
+test('select onFocus', async () => {
   const onFocus = vi.fn()
-  const onBlur = vi.fn()
 
-  const wrapper = mount(
-    {
-      ...Wrapper,
-      data: () => ({
-        value: '',
-      }),
-      methods: {
-        onFocus,
-        onBlur,
-      },
-      template: `
-      <div class="container"></div>
-      <var-select v-model="value" @focus="onFocus" @blur="onBlur">
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+  const wrapper = mount({
+    ...Wrapper,
+    data: () => ({
+      value: '',
+    }),
+    methods: {
+      onFocus,
+    },
+    template: `
+      <var-select v-model="value" @focus="onFocus">
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
-    },
-    { attachTo: document.body }
-  )
+  })
 
-  await wrapper.find('.var-select__menu').trigger('click')
+  await wrapper.trigger('focus')
   expect(onFocus).toHaveBeenCalledTimes(1)
-  await wrapper.find('.container').trigger('click')
-  expect(onBlur).toHaveBeenCalledTimes(1)
 
   wrapper.unmount()
 })
 
-test('test select disabled', async () => {
+test('select disabled', async () => {
   const onFocus = vi.fn()
   const onBlur = vi.fn()
 
@@ -192,7 +216,7 @@ test('test select disabled', async () => {
       ...Wrapper,
       data: () => ({
         disabled: true,
-        value: '睡觉',
+        value: 'sleep',
       }),
       methods: {
         onFocus,
@@ -207,12 +231,12 @@ test('test select disabled', async () => {
         @focus="onFocus"
         @blur="onBlur"
       >
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
     },
-    { attachTo: document.body }
+    { attachTo: document.body },
   )
 
   await trigger(document.querySelector('.var-select__menu'), 'click')
@@ -228,15 +252,16 @@ test('test select disabled', async () => {
   await wrapper.trigger('click')
   await wrapper.setData({ disabled: true })
   await trigger(document.querySelector('.var-option'), 'click')
-  expect(wrapper.vm.value).toBe('睡觉')
+  expect(wrapper.vm.value).toBe('sleep')
 
   await wrapper.find('.var-icon-close-circle').trigger('click')
-  expect(wrapper.vm.value).toBe('睡觉')
+  expect(wrapper.vm.value).toBe('sleep')
 
   wrapper.unmount()
+  document.body.innerHTML = ''
 })
 
-test('test select readonly', async () => {
+test('select readonly', async () => {
   const onFocus = vi.fn()
   const onBlur = vi.fn()
 
@@ -245,7 +270,7 @@ test('test select readonly', async () => {
       ...Wrapper,
       data: () => ({
         readonly: true,
-        value: '睡觉',
+        value: 'sleep',
       }),
       methods: {
         onFocus,
@@ -260,12 +285,12 @@ test('test select readonly', async () => {
         @focus="onFocus"
         @blur="onBlur"
       >
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
     },
-    { attachTo: document.body }
+    { attachTo: document.body },
   )
 
   await wrapper.trigger('click')
@@ -281,29 +306,30 @@ test('test select readonly', async () => {
   await trigger(document.querySelector('.var-select__menu'), 'click')
   await wrapper.setData({ readonly: true })
   await trigger(document.querySelector('.var-option'), 'click')
-  expect(wrapper.vm.value).toBe('睡觉')
+  expect(wrapper.vm.value).toBe('sleep')
 
   await wrapper.find('.var-icon-close-circle').trigger('click')
-  expect(wrapper.vm.value).toBe('睡觉')
+  expect(wrapper.vm.value).toBe('sleep')
 
   wrapper.unmount()
+  document.body.innerHTML = ''
 })
 
-test('test select clear', async () => {
+test('select clear', async () => {
   const wrapper = mount(
     {
       ...Wrapper,
       data: () => ({
-        value: '吃饭',
+        value: 'eat',
       }),
       template: `
       <var-select clearable v-model="value">
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
     },
-    { attachTo: document.body }
+    { attachTo: document.body },
   )
 
   await wrapper.find('.var-icon-close-circle').trigger('click')
@@ -312,7 +338,7 @@ test('test select clear', async () => {
   wrapper.unmount()
 })
 
-test('test select multiple value', async () => {
+test('select multiple value', async () => {
   const wrapper = mount(
     {
       ...Wrapper,
@@ -321,23 +347,24 @@ test('test select multiple value', async () => {
       }),
       template: `
       <var-select multiple v-model="value">
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
     },
-    { attachTo: document.body }
+    { attachTo: document.body },
   )
 
   await wrapper.trigger('click')
 
   Array.from(document.querySelectorAll('.var-option')).forEach((el) => trigger(el, 'click'))
-  expect(wrapper.vm.value).toStrictEqual(['吃饭', '睡觉'])
+  expect(wrapper.vm.value).toStrictEqual(['eat', 'sleep'])
 
   wrapper.unmount()
+  document.body.innerHTML = ''
 })
 
-test('test select multiple value in chips', async () => {
+test('select multiple value in chips', async () => {
   const wrapper = mount(
     {
       ...Wrapper,
@@ -346,27 +373,28 @@ test('test select multiple value in chips', async () => {
       }),
       template: `
       <var-select multiple chip v-model="value">
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
     },
-    { attachTo: document.body }
+    { attachTo: document.body },
   )
 
   await wrapper.trigger('click')
 
   Array.from(document.querySelectorAll('.var-option')).forEach((el) => trigger(el, 'click'))
-  expect(wrapper.vm.value).toStrictEqual(['吃饭', '睡觉'])
+  expect(wrapper.vm.value).toStrictEqual(['eat', 'sleep'])
   await delay(16)
 
   await wrapper.find('.var-chip--close').trigger('click')
-  expect(wrapper.vm.value).toStrictEqual(['睡觉'])
+  expect(wrapper.vm.value).toStrictEqual(['sleep'])
 
   wrapper.unmount()
+  document.body.innerHTML = ''
 })
 
-test('test select validation', async () => {
+test('select validation', async () => {
   const wrapper = mount(
     {
       ...Wrapper,
@@ -374,20 +402,20 @@ test('test select validation', async () => {
         value: '',
       }),
       template: `
-      <var-select ref="select" :rules="[v => !!v || '您必须选择一个']" v-model="value">
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+      <var-select ref="select" :rules="[v => !!v || 'You must choose one option']" v-model="value">
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
     },
-    { attachTo: document.body }
+    { attachTo: document.body },
   )
 
   const { select } = wrapper.vm.$refs
 
   select.validate()
   await delay(16)
-  expect(wrapper.find('.var-form-details__error-message').text()).toBe('您必须选择一个')
+  expect(wrapper.find('.var-form-details__error-message').text()).toBe('You must choose one option')
   expect(wrapper.html()).toMatchSnapshot()
 
   await wrapper.trigger('click')
@@ -399,24 +427,22 @@ test('test select validation', async () => {
   expect(wrapper.vm.value).toBe(undefined)
 
   wrapper.unmount()
+  document.innerHTML = ''
 })
 
-test('test select focus & blur methods', async () => {
-  const wrapper = mount(
-    {
-      ...Wrapper,
-      data: () => ({
-        value: '',
-      }),
-      template: `
-      <var-select ref="select" :rules="[v => !!v || '您必须选择一个']" v-model="value">
-        <var-option label="吃饭" />
-        <var-option label="睡觉" />
+test('select focus & blur methods', async () => {
+  const wrapper = mount({
+    ...Wrapper,
+    data: () => ({
+      value: '',
+    }),
+    template: `
+      <var-select ref="select" v-model="value">
+        <var-option label="eat" />
+        <var-option label="sleep" />
       </var-select>
     `,
-    },
-    { attachTo: document.body }
-  )
+  })
 
   const { select } = wrapper.vm.$refs
 
@@ -431,7 +457,90 @@ test('test select focus & blur methods', async () => {
   wrapper.unmount()
 })
 
-test('test select offset-y', async () => {
+test('select keyboard select option by space', async () => {
+  const wrapper = mount(
+    {
+      ...Wrapper,
+      data: () => ({
+        value: '',
+      }),
+      template: `
+      <var-select v-model="value">
+        <var-option label="eat" />
+        <var-option label="sleep" />
+      </var-select>
+    `,
+    },
+    { attachTo: document.body },
+  )
+
+  await trigger(wrapper, 'focus')
+  await triggerKeyboard(window, 'keyup', { key: ' ' })
+  await triggerKeyboard(window, 'keydown', { key: 'ArrowDown' })
+  await triggerKeyboard(document.querySelector('.var-option'), 'focus')
+  await triggerKeyboard(window, 'keyup', { key: ' ' })
+  expect(wrapper.vm.value).toBe('eat')
+
+  wrapper.unmount()
+  document.body.innerHTML = ''
+})
+
+test('select keyboard select option by enter', async () => {
+  const wrapper = mount(
+    {
+      ...Wrapper,
+      data: () => ({
+        value: '',
+      }),
+      template: `
+      <var-select v-model="value">
+        <var-option label="eat" />
+        <var-option label="sleep" />
+      </var-select>
+    `,
+    },
+    { attachTo: document.body },
+  )
+
+  await trigger(wrapper, 'focus')
+  await triggerKeyboard(window, 'keydown', { key: 'Enter' })
+  await triggerKeyboard(window, 'keydown', { key: 'ArrowDown' })
+  await triggerKeyboard(document.querySelector('.var-option'), 'focus')
+  await triggerKeyboard(window, 'keydown', { key: 'Enter' })
+  expect(wrapper.vm.value).toBe('eat')
+
+  wrapper.unmount()
+  document.body.innerHTML = ''
+})
+
+test('select keyboard close menu by escape', async () => {
+  const wrapper = mount(
+    {
+      ...Wrapper,
+      data: () => ({
+        value: '',
+      }),
+      template: `
+      <var-select v-model="value">
+        <var-option label="eat" />
+        <var-option label="sleep" />
+      </var-select>
+    `,
+    },
+    { attachTo: document.body },
+  )
+
+  await wrapper.trigger('focus')
+  await triggerKeyboard(window, 'keydown', { key: 'Enter' })
+  expect(document.querySelector('.var-menu__menu').style.display).toBe('')
+  await triggerKeyboard(window, 'keydown', { key: 'Escape' })
+  expect(document.querySelector('.var-menu__menu').style.display).toBe('none')
+
+  wrapper.unmount()
+  document.body.innerHTML = ''
+})
+
+test('select offset-y', async () => {
   const wrapper = mount(
     {
       components: {
@@ -443,14 +552,14 @@ test('test select offset-y', async () => {
       }),
       template: `
       <var-select ref="select" offset-y="40">
-        <var-option label="火猫" />
-        <var-option label="土猫" />
-        <var-option label="紫猫" />
-        <var-option label="蓝猫" />
+        <var-option label="eat" />
+        <var-option label="sleep" />
+        <var-option label="read" />
+        <var-option label="game" />
       </var-select>
       `,
     },
-    { attachTo: document.body }
+    { attachTo: document.body },
   )
 
   const { select } = wrapper.vm.$refs
@@ -465,24 +574,152 @@ test('test select offset-y', async () => {
   wrapper.unmount()
 })
 
+test('select options', async () => {
+  const wrapper = mount(
+    {
+      ...Wrapper,
+      data: () => ({
+        value: '',
+        options: [
+          { label: 'eat', value: 1, disabled: true },
+          { label: 'sleep', value: 2 },
+          { label: 'game', value: 3 },
+        ],
+      }),
+      template: `
+      <var-select v-model="value" :options="options">
+      </var-select>
+    `,
+    },
+    { attachTo: document.body },
+  )
+
+  await wrapper.trigger('click')
+  const options = document.querySelectorAll('.var-option')
+  await trigger(options[0], 'click')
+  expect(wrapper.vm.value).toBe('')
+
+  await trigger(options[1], 'click')
+  expect(wrapper.vm.value).toBe(2)
+
+  await trigger(options[2], 'click')
+  expect(wrapper.vm.value).toBe(3)
+
+  wrapper.unmount()
+})
+
+test('select options multiple', async () => {
+  const wrapper = mount({
+    ...Wrapper,
+    data: () => ({
+      value: [],
+      options: [
+        { label: 'eat', value: 0, disabled: true },
+        { label: 'sleep', value: 1 },
+        { label: 'game', value: 2 },
+      ],
+    }),
+    template: `
+      <var-select v-model="value" :options="options" multiple>
+      </var-select>
+    `,
+  })
+
+  await wrapper.trigger('click')
+  const options = document.querySelectorAll('.var-option')
+  await trigger(options[0], 'click')
+  expect(wrapper.vm.value).toStrictEqual([])
+
+  await trigger(options[1], 'click')
+  expect(wrapper.vm.value).toStrictEqual([1])
+
+  await trigger(options[2], 'click')
+  expect(wrapper.vm.value).toStrictEqual([1, 2])
+
+  wrapper.unmount()
+})
+
+test('select label-key', async () => {
+  const wrapper = mount({
+    ...Wrapper,
+    data: () => ({
+      value: '',
+      options: [
+        { name: 'eat', value: 1, disabled: true },
+        { name: 'sleep', value: 2 },
+        { name: 'game', value: 3 },
+      ],
+    }),
+    template: `
+      <var-select v-model="value" :options="options" label-key="name">
+      </var-select>
+    `,
+  })
+
+  await wrapper.trigger('click')
+  const options = document.querySelectorAll('.var-option')
+  await trigger(options[0], 'click')
+  expect(wrapper.vm.value).toBe('')
+
+  await trigger(options[1], 'click')
+  expect(wrapper.vm.value).toBe(2)
+
+  await trigger(options[2], 'click')
+  expect(wrapper.vm.value).toBe(3)
+
+  wrapper.unmount()
+})
+
+test('select value-key', async () => {
+  const wrapper = mount({
+    ...Wrapper,
+    data: () => ({
+      value: '',
+      options: [
+        { label: 'eat', id: 1, disabled: true },
+        { label: 'sleep', id: 2 },
+        { label: 'game', id: 3 },
+      ],
+    }),
+    template: `
+      <var-select v-model="value" :options="options" value-key="id">
+      </var-select>
+    `,
+  })
+
+  await wrapper.trigger('click')
+  const options = document.querySelectorAll('.var-option')
+  await trigger(options[0], 'click')
+  expect(wrapper.vm.value).toBe('')
+
+  await trigger(options[1], 'click')
+  expect(wrapper.vm.value).toBe(2)
+
+  await trigger(options[2], 'click')
+  expect(wrapper.vm.value).toBe(3)
+
+  wrapper.unmount()
+})
+
 describe('test select component slots', () => {
-  test('test select clear icon slot', () => {
+  test('select clear icon slot', async () => {
     const wrapper = mount(VarSelect, {
       props: {
         clearable: true,
         modelValue: 'value',
       },
       slots: {
-        'clear-icon': () => 'clear-icon',
+        'clear-icon': ({ clear }) => h('button', { class: 'custom-clear-icon', onClick: () => clear() }, 'Clear'),
       },
     })
 
+    await wrapper.find('.custom-clear-icon').trigger('click')
     expect(wrapper.html()).toMatchSnapshot()
 
     wrapper.unmount()
   })
 
-  test('test select append icon slot', () => {
+  test('select append icon slot', () => {
     const wrapper = mount(VarSelect, {
       props: {
         clearable: true,
@@ -498,7 +735,7 @@ describe('test select component slots', () => {
     wrapper.unmount()
   })
 
-  test('test select prepend icon slot', () => {
+  test('select prepend icon slot', () => {
     const wrapper = mount(VarSelect, {
       props: {
         clearable: true,
@@ -509,6 +746,39 @@ describe('test select component slots', () => {
       },
     })
 
+    expect(wrapper.html()).toMatchSnapshot()
+
+    wrapper.unmount()
+  })
+})
+
+describe('test select validation with zod', () => {
+  test('string', async () => {
+    const zs = z.string().refine((d) => d === 'varlet', { message: 'Invalid option. expect to be `varlet`' })
+    const wrapper = mount({
+      ...Wrapper,
+      data: () => ({
+        value: '',
+        options: [
+          { label: 'varlet', value: 'varlet' },
+          { label: 'varlet-ui', value: 'varlet-ui' },
+        ],
+        rules: [zs],
+      }),
+      template: `
+      <var-select v-model="value" :options="options" value-key="id" :rules="rules">
+      </var-select>
+    `,
+    })
+
+    await wrapper.trigger('click')
+    const options = document.querySelectorAll('.var-option')
+    await trigger(options[0], 'click')
+    expect(wrapper.vm.value).toBe('varlet')
+
+    await trigger(options[1], 'click')
+    await delay(16)
+    expect(wrapper.find('.var-form-details__error-message').text()).toBe('Invalid option. expect to be `varlet`')
     expect(wrapper.html()).toMatchSnapshot()
 
     wrapper.unmount()

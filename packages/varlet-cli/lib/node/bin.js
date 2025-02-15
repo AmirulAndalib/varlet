@@ -49,17 +49,19 @@ program
 });
 program
     .command('build:icons')
+    .option('-w --watch', 'Watch icons for changes and rebuild')
     .description('Build icons')
-    .action(async () => {
+    .action(async (options) => {
     const { icons } = await import('./commands/icons.js');
-    return icons();
+    return icons(options);
 });
 program
     .command('preview')
     .description('Preview varlet site for production')
-    .action(async () => {
+    .option('-p, --port <port>', 'port number')
+    .action(async (options) => {
     const { preview } = await import('./commands/preview.js');
-    return preview();
+    return preview(options);
 });
 program
     .command('compile')
@@ -69,11 +71,11 @@ program
     return compile();
 });
 program
-    .command('lint')
-    .description('Lint code')
+    .command('compile:style-vars')
+    .description('Compile varlet style vars')
     .action(async () => {
-    const { lint } = await import('./commands/lint.js');
-    return lint();
+    const { styleVars } = await import('./commands/styleVars.js');
+    return styleVars();
 });
 program
     .command('create')

@@ -1,21 +1,40 @@
-import VarStyleProvider from './StyleProvider.vue'
-import { formatStyleVars } from '../utils/elements'
 import { withInstall, withPropsDefaultsSetter } from '../utils/components'
+import { formatStyleVars } from '../utils/elements'
 import { props as styleProviderProps } from './props'
+import VarStyleProvider from './StyleProvider.vue'
 
 export type StyleVars = Record<string, string>
 
-const mountedVarKeys: string[] = []
+const styleId = 'varlet-style-vars'
+
+function removeStyle() {
+  const style = document.head.querySelector(`#${styleId}`)
+  if (style) {
+    document.head.removeChild(style)
+  }
+}
+
+function insertStyle(content: string) {
+  const style = document.createElement('style')
+  style.id = styleId
+  style.innerHTML = content
+  document.head.appendChild(style)
+}
 
 function StyleProvider(styleVars: StyleVars | null) {
-  mountedVarKeys.forEach((key) => document.documentElement.style.removeProperty(key))
-  mountedVarKeys.length = 0
+  if (styleVars == null) {
+    removeStyle()
+    return
+  }
 
   const styles: StyleVars = formatStyleVars(styleVars ?? {})
-  Object.entries(styles).forEach(([key, value]) => {
-    document.documentElement.style.setProperty(key, value)
-    mountedVarKeys.push(key)
-  })
+  const content = Object.entries(styles).reduce((content, [key, value]) => {
+    content += `${key}:${value};`
+    return content
+  }, `:root:root {\n`)
+
+  removeStyle()
+  insertStyle(`${content}\n}`)
 }
 
 StyleProvider.Component = VarStyleProvider

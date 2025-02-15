@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import Header from './Header.vue'
-import { ReplStore } from './store'
 import { ref, watchEffect } from 'vue'
 import { Repl } from '@vue/repl'
-// @ts-ignore
+// @ts-expect-error no types
 import Monaco from '@vue/repl/monaco-editor'
+import Header from './Header.vue'
+import { ReplStore } from './store'
 
 const store = new ReplStore({
   serializedState: location.hash.slice(1),
 })
-const dark = ref(localStorage.getItem('varlet-ui-playground-prefer-dark') !== 'false')
+const theme = ref(localStorage.getItem('varlet-ui-playground-theme') ?? 'md3DarkTheme')
 
 function setVH() {
   document.documentElement.style.setProperty('--vh', window.innerHeight + `px`)
@@ -23,11 +23,11 @@ watchEffect(() => history.replaceState({}, '', store.serialize()))
 </script>
 
 <template>
-  <Header :store="store" v-model:dark="dark" />
+  <Header v-model:theme="theme" :store="store" />
   <Repl
     :editor="Monaco"
     :store="store"
-    :theme="dark ? 'dark' : 'light'"
+    :theme="theme?.toLowerCase().includes('dark') ? 'dark' : 'light'"
     :show-compile-output="true"
     :auto-resize="true"
     :clear-console="false"

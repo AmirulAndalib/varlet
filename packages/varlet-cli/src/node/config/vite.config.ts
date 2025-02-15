@@ -1,25 +1,91 @@
+import { resolve } from 'path'
+import { isArray } from '@varlet/shared'
+import { copy, html, inlineCss, markdown } from '@varlet/vite-plugins'
 import vue from '@vitejs/plugin-vue'
 import jsx from '@vitejs/plugin-vue-jsx'
-import { markdown, html, inlineCss, copy } from '@varlet/vite-plugins'
+import { InlineConfig, Plugin } from 'vite'
 import {
   ES_DIR,
+  EXTENSION_ENTRY,
   SITE_CONFIG,
   SITE_DIR,
   SITE_MOBILE_ROUTES,
   SITE_OUTPUT_PATH,
   SITE_PC_ROUTES,
   SITE_PUBLIC_PATH,
+  SRC_DIR,
   VITE_RESOLVE_EXTENSIONS,
-  EXTENSION_ENTRY,
 } from '../shared/constant.js'
-import { InlineConfig } from 'vite'
-import { get } from 'lodash-es'
-import { resolve } from 'path'
-import { VarletConfig } from './varlet.config.js'
+import { VarletConfig, type VarletConfigHtmlInject, type VarletConfigHtmlInjectPoint } from './varlet.config.js'
+
+export function getHtmlInject(inject: VarletConfigHtmlInject) {
+  const getContent = (injectKey: keyof VarletConfigHtmlInject, position: VarletConfigHtmlInjectPoint['position']) =>
+    inject[injectKey]?.filter((point) => point.position === position).map((point) => point.content) ?? []
+
+  return {
+    head: {
+      start: getContent('head', 'start'),
+      end: getContent('head', 'end'),
+      scriptStart: getContent('head', 'script-start'),
+    },
+    body: {
+      start: getContent('body', 'start'),
+      end: getContent('body', 'end'),
+      scriptStart: getContent('body', 'script-start'),
+    },
+  }
+}
+
+export function getPlugins(varletConfig: Required<VarletConfig>): Plugin[] {
+  const { vitePlugins = [] } = varletConfig
+
+  const plugins = [
+    vue({
+      include: [/\.vue$/, /\.md$/],
+    }),
+
+    jsx(),
+
+    markdown({ style: varletConfig?.highlight?.style }),
+
+    copy({ paths: varletConfig?.copy || [] }),
+
+    html({
+      data: {
+        logo: varletConfig?.logo,
+        baidu: varletConfig?.analysis?.baidu,
+
+        pcTitle: varletConfig?.seo?.title ?? '',
+        pcDescription: varletConfig?.seo?.description ?? '',
+        pcKeywords: varletConfig?.seo?.keywords ?? '',
+        pcHtmlInject: getHtmlInject(varletConfig?.pc?.htmlInject || {}),
+
+        mobileTitle: varletConfig?.seo?.title ?? '',
+        mobileDescription: varletConfig?.seo?.description ?? '',
+        mobileKeywords: varletConfig?.seo?.keywords ?? '',
+        mobileHtmlInject: getHtmlInject(varletConfig?.mobile?.htmlInject || {}),
+      },
+    }),
+  ]
+
+  if (isArray(vitePlugins)) {
+    return [...plugins, ...vitePlugins]
+  }
+
+  return vitePlugins(plugins)
+}
 
 export function getDevConfig(varletConfig: Required<VarletConfig>): InlineConfig {
-  const defaultLanguage = get(varletConfig, 'defaultLanguage')
-  const host = get(varletConfig, 'host')
+  const { alias = {}, host } = varletConfig
+
+  const resolveAlias = Object.entries(alias).reduce(
+    (resolveAlias, [key, value]) => {
+      const isRelative = value.startsWith('.')
+      resolveAlias[key] = isRelative ? resolve(SRC_DIR, value) : value
+      return resolveAlias
+    },
+    {} as Record<string, string>,
+  )
 
   return {
     root: SITE_DIR,
@@ -28,6 +94,7 @@ export function getDevConfig(varletConfig: Required<VarletConfig>): InlineConfig
       extensions: VITE_RESOLVE_EXTENSIONS,
 
       alias: {
+        ...resolveAlias,
         '@config': SITE_CONFIG,
         '@pc-routes': SITE_PC_ROUTES,
         '@mobile-routes': SITE_MOBILE_ROUTES,
@@ -35,36 +102,14 @@ export function getDevConfig(varletConfig: Required<VarletConfig>): InlineConfig
     },
 
     server: {
-      port: get(varletConfig, 'port'),
+      port: varletConfig?.port,
       host: host === 'localhost' ? '0.0.0.0' : host,
+      proxy: varletConfig?.proxy || {},
     },
 
     publicDir: SITE_PUBLIC_PATH,
 
-    plugins: [
-      vue({
-        include: [/\.vue$/, /\.md$/],
-      }),
-
-      jsx(),
-
-      markdown({ style: get(varletConfig, 'highlight.style') }),
-
-      copy({ paths: get(varletConfig, 'copy', []) }),
-
-      html({
-        data: {
-          logo: get(varletConfig, `logo`),
-          baidu: get(varletConfig, `analysis.baidu`, ''),
-          pcTitle: get(varletConfig, `pc.title['${defaultLanguage}']`),
-          pcDescription: get(varletConfig, `pc.description['${defaultLanguage}']`),
-          pcKeywords: get(varletConfig, `pc.keywords['${defaultLanguage}']`),
-          mobileTitle: get(varletConfig, `mobile.title['${defaultLanguage}']`),
-          mobileDescription: get(varletConfig, `mobile.description['${defaultLanguage}']`),
-          mobileKeywords: get(varletConfig, `mobile.keywords['${defaultLanguage}']`),
-        },
-      }),
-    ],
+    plugins: getPlugins(varletConfig),
   }
 }
 
@@ -101,7 +146,8 @@ export interface BundleBuildOptions {
 
 export function getBundleConfig(varletConfig: Required<VarletConfig>, buildOptions: BundleBuildOptions): InlineConfig {
   const plugins = []
-  const name = get(varletConfig, 'name')
+  const name = varletConfig?.name
+  const { external = [], globals = {} } = varletConfig?.bundle || {}
   const { fileName, output, format, emptyOutDir, removeEnv } = buildOptions
 
   if (format === 'umd') {
@@ -109,7 +155,7 @@ export function getBundleConfig(varletConfig: Required<VarletConfig>, buildOptio
       inlineCss({
         jsFile: resolve(output, fileName),
         cssFile: resolve(output, 'style.css'),
-      })
+      }),
     )
   }
 
@@ -135,12 +181,13 @@ export function getBundleConfig(varletConfig: Required<VarletConfig>, buildOptio
         entry: resolve(ES_DIR, 'index.bundle.mjs'),
       },
       rollupOptions: {
-        external: ['vue'],
+        external: ['vue', ...external],
         output: {
           dir: output,
           exports: 'named',
           globals: {
             vue: 'Vue',
+            ...globals,
           },
         },
       },

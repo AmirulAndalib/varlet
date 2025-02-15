@@ -1,23 +1,38 @@
+import { VNode, VNodeChild } from 'vue'
 import {
-  VarComponent,
   BasicAttributes,
-  Direction as RadioGroupDirection,
   ListenerProp,
+  Direction as RadioGroupDirection,
+  Rules as RadioGroupRules,
   SetPropsDefaults,
+  VarComponent,
 } from './varComponent'
-import { VNode } from 'vue'
 
 export declare const radioGroupProps: Record<keyof RadioGroupProps, any>
 
 export type RadioGroupValidateTrigger = 'onChange'
+
+export type RadioGroupOptionLabelRender = (option: RadioGroupOption, checked: boolean) => VNodeChild
+
+export interface RadioGroupOption {
+  label?: string | VNode | RadioGroupOptionLabelRender
+  value?: any
+  disabled?: boolean
+
+  [key: PropertyKey]: any
+}
 
 export { RadioGroupDirection }
 
 export interface RadioGroupProps extends BasicAttributes {
   modelValue?: any
   direction?: RadioGroupDirection
-  validateTrigger?: Array<RadioGroupValidateTrigger>
-  rules?: Array<(value: any) => any>
+  options?: RadioGroupOption[]
+  ariaLabel?: string
+  labelKey?: string
+  valueKey?: string
+  validateTrigger?: RadioGroupValidateTrigger[]
+  rules?: RadioGroupRules
   onChange?: ListenerProp<(value: any) => void>
   'onUpdate:modelValue'?: ListenerProp<(value: any) => void>
 }

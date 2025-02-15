@@ -3,6 +3,7 @@
   --date-picker-font-size: var(--font-size-md);
   --date-picker-min-width: 290px;
   --date-picker-main-color: rgba(0, 0, 0, 0.87);
+  --date-picker-title-hint-color: #fff;
   --date-picker-title-hint-font-size: var(--font-size-md);
   --date-picker-title-height: 105px;
   --date-picker-title-padding: 16px;
@@ -11,15 +12,19 @@
   --date-picker-title-year-font-size: var(--font-size-md);
   --date-picker-title-year-font-weight: 500;
   --date-picker-title-year-margin-bottom: 8px;
+  --date-picker-title-year-min-height: 21px;
   --date-picker-title-date-height: 48px;
   --date-picker-title-date-font-size: 34px;
   --date-picker-title-date-font-weight: 500;
   --date-picker-title-date-range-font-size: 20px;
+  --date-picker-title-date-justify-content: normal;
   --date-picker-body-background-color: #fff;
   --date-picker-body-height: 280px;
-  --picker-header-padding: 4px 16px;
-  --picker-header-color: #555;
-  --picker-actions-padding: 0 8px 12px 8px;
+  --date-picker-body-padding: 0;
+  --date-picker-header-padding: 4px 16px;
+  --date-picker-header-color: #555;
+  --date-picker-actions-padding: 0 8px 12px 8px;
+  --date-picker-header-arrow-filter: opacity(0.54);
   --month-picker-padding: 0 12px;
   --month-picker-item-width: 33%;
   --month-picker-item-height: 56px;
@@ -29,6 +34,7 @@
   --year-picker-item-height: 56px;
   --year-picker-item-button-max-width: 140px;
   --day-picker-content-item-width: 14.28%;
+  --day-picker-content-item-min-height: 21px;
   --day-picker-content-item-font-size: var(--font-size-sm);
   --day-picker-content-item-padding: 2px 0;
   --day-picker-content-item-button-width: 32px;
@@ -40,7 +46,7 @@
 }
 
 .var-date-picker {
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
   border-radius: var(--date-picker-border-radius);
   contain: layout style;
   display: flex;
@@ -72,16 +78,17 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: var(--date-picker-title-year-margin-bottom);
+      min-height: var(--date-picker-title-year-min-height);
     }
 
     &-hint {
+      color: var(--date-picker-title-hint-color);
       font-size: var(--date-picker-title-hint-font-size);
     }
 
     &-year {
-      opacity: 0.6;
       cursor: pointer;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      -webkit-tap-highlight-color: transparent;
       font-size: var(--date-picker-title-year-font-size);
       font-weight: var(--date-picker-title-year-font-weight);
       transition: 0.3s var(--cubic-bezier);
@@ -100,9 +107,10 @@
       font-weight: var(--date-picker-title-date-font-weight);
       position: relative;
       cursor: pointer;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      -webkit-tap-highlight-color: transparent;
       display: flex;
       align-items: center;
+      justify-content: var(--date-picker-title-date-justify-content);
       opacity: 0.6;
       transition: 0.3s var(--cubic-bezier);
 
@@ -121,6 +129,7 @@
     overflow: auto;
     height: var(--date-picker-body-height);
     background-color: var(--date-picker-body-background-color);
+    padding: var(--date-picker-body-padding);
 
     &::-webkit-scrollbar {
       display: none;
@@ -131,18 +140,18 @@
 
   &__actions {
     background-color: var(--date-picker-body-background-color);
-    padding: var(--picker-actions-padding);
+    padding: var(--date-picker-actions-padding);
     display: flex;
     justify-content: flex-end;
   }
 
-  .var-picker-header {
-    padding: var(--picker-header-padding);
+  &-header {
+    padding: var(--date-picker-header-padding);
     align-items: center;
     display: flex;
     justify-content: space-between;
     position: relative;
-    color: var(--picker-header-color);
+    color: var(--date-picker-header-color);
     background-color: var(--date-picker-body-background-color);
 
     &__value {
@@ -157,6 +166,10 @@
       div {
         width: 100%;
       }
+    }
+
+    &__arrow[var-date-picker-header-cover] {
+      filter: var(--date-picker-header-arrow-filter);
     }
   }
 
@@ -236,6 +249,7 @@
           width: var(--day-picker-content-item-width);
           font-size: var(--day-picker-content-item-font-size);
           padding: var(--day-picker-content-item-padding);
+          min-height: var(--day-picker-content-item-min-height);
         }
       }
     }

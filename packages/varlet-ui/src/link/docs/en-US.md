@@ -26,7 +26,7 @@ Link component for hyperlink to web pages.
   <var-space :size="[10, 10]">
     <var-link 
       type="primary"
-      href="https://varlet.gitee.io/varlet-ui/#/en-US/home"
+      href="https://varletjs.org/#/en-US/home"
       target="_blank"
     >
       Href
@@ -72,7 +72,7 @@ Link component for hyperlink to web pages.
 ```html
 <template>
   <var-link 
-    href="https://varlet.gitee.io/varlet-ui/#/en-US/home" 
+    href="https://varletjs.org/#/en-US/home" 
     target="_blank" 
     underline="none"
   >
@@ -124,3 +124,4 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--link-info-color` | `var(--color-info)`          |
 | `--link-disabled-color` | `var(--color-text-disabled)` |
 | `--link-font-size` | `var(--font-size-md)` |
+| `--link-focus-opacity` | `0.8` |

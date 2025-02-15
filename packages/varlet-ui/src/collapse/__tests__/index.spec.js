@@ -1,14 +1,14 @@
+import { createApp, ref } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
 import Collapse from '..'
 import CollapseItem from '../../collapse-item'
-import VarCollapse from '../Collapse'
 import VarCollapseItem from '../../collapse-item/CollapseItem'
-import { mount } from '@vue/test-utils'
-import { createApp, ref } from 'vue'
 import { delay } from '../../utils/test'
-import { expect, vi, describe, test } from 'vitest'
+import VarCollapse from '../Collapse'
 
 describe('test collapse and collapseItem render', () => {
-  test('test collapse and collapseItem use', () => {
+  test('collapse and collapseItem use', () => {
     const app = createApp({}).use(Collapse).use(CollapseItem)
 
     expect(app.component(Collapse.name)).toBeTruthy()
@@ -17,7 +17,7 @@ describe('test collapse and collapseItem render', () => {
 })
 
 describe('test collapse and collapseItem props', () => {
-  test('test collapse accordion', async () => {
+  test('collapse accordion', async () => {
     const template = `
      <var-collapse v-model="value" accordion>
       <var-collapse-item title="test1" name="1">test1</var-collapse-item>
@@ -43,7 +43,7 @@ describe('test collapse and collapseItem props', () => {
     expect(wrapper.vm.value).toBe('1')
   })
 
-  test('test collapse elevation', async () => {
+  test('collapse elevation', async () => {
     const elevation = ref(false)
 
     const template = `
@@ -83,7 +83,7 @@ describe('test collapse and collapseItem props', () => {
     expect(wrapper.find('.var-collapse-item__shadow').classes()).toContain('var-elevation--24')
   })
 
-  test('test collapse offset', async () => {
+  test('collapse offset', async () => {
     const offset = ref(false)
 
     const template = `
@@ -124,7 +124,7 @@ describe('test collapse and collapseItem props', () => {
     expect(collapseItemList[0].classes()).toContain('var-collapse-item--active')
   })
 
-  test('test collapse divider', async () => {
+  test('collapse divider', async () => {
     const template = `
      <var-collapse v-model="value" :divider="divider">
       <var-collapse-item title="test1" name="1">test1</var-collapse-item>
@@ -148,7 +148,7 @@ describe('test collapse and collapseItem props', () => {
     await delay(100)
 
     expect(wrapper.find('.var-collapse-item').attributes('style')).toBe(
-      '--collapse-divider-top: var(--collapse-border-top);'
+      '--collapse-divider-top: var(--collapse-border-top);',
     )
 
     await wrapper.setData({ divider: false })
@@ -158,7 +158,7 @@ describe('test collapse and collapseItem props', () => {
     wrapper.unmount()
   })
 
-  test('test collapseItem title and name', async () => {
+  test('collapseItem title and name', async () => {
     const title = ref('test1')
     const name = ref('1')
     const template = `
@@ -186,7 +186,7 @@ describe('test collapse and collapseItem props', () => {
           }
         },
       },
-      { attachTo: document.body }
+      { attachTo: document.body },
     )
 
     await delay(100)
@@ -205,7 +205,7 @@ describe('test collapse and collapseItem props', () => {
     expect(wrapper.find('.var-collapse-item__header').text()).toBe('test2')
   })
 
-  test('test collapseItem icon', async () => {
+  test('collapseItem icon', async () => {
     const template = `
       <var-collapse v-model="value">
         <var-collapse-item title="test1" name="1" icon="checkbox-marked-circle" />
@@ -225,14 +225,14 @@ describe('test collapse and collapseItem props', () => {
         },
         template,
       },
-      { attachTo: document.body }
+      { attachTo: document.body },
     )
 
     await delay(100)
     expect(wrapper.find('.var-icon-checkbox-marked-circle').exists()).toBe(true)
   })
 
-  test('test collapseItem disabled', async () => {
+  test('collapseItem disabled', async () => {
     const template = `
       <var-collapse v-model="value">
         <var-collapse-item title="test1" disabled name="1">test1</var-collapse-item>
@@ -254,7 +254,7 @@ describe('test collapse and collapseItem props', () => {
         },
         template,
       },
-      { attachTo: document.body }
+      { attachTo: document.body },
     )
 
     await delay(100)
@@ -268,7 +268,7 @@ describe('test collapse and collapseItem props', () => {
 })
 
 describe('test collapse Events', () => {
-  test('test collapse and collapseItem onChange', async () => {
+  test('collapse and collapseItem onChange', async () => {
     const template = `
     <var-collapse v-model="value" @change="handleChange">
       <var-collapse-item title="test1" name="1">test1</var-collapse-item>
@@ -295,7 +295,7 @@ describe('test collapse Events', () => {
         },
         template,
       },
-      { attachTo: document.body }
+      { attachTo: document.body },
     )
 
     await delay(100)
@@ -321,8 +321,8 @@ describe('test collapse Events', () => {
     expect(handleChange).toHaveBeenCalledTimes(2)
   })
 
-  describe('test collapse Methods', async () => {
-    test('test collapse toggleAll', async () => {
+  describe('test collapse Methods', () => {
+    test('collapse toggleAll', async () => {
       const collapseRef = ref(null)
 
       const template = `
@@ -379,7 +379,7 @@ describe('test collapse Events', () => {
   })
 
   describe('test collapse slot', () => {
-    test('test collapse slot default', async () => {
+    test('collapse slot default', async () => {
       const template = `
       <var-collapse v-model="value">
         <var-collapse-item title="test1" name="1">test1</var-collapse-item>
@@ -407,7 +407,7 @@ describe('test collapse Events', () => {
       expect(wrapper.findAll('.var-collapse-item__content')[2].text()).toBe('test3')
     })
 
-    test('test collapse slot title ', async () => {
+    test('collapse slot title', async () => {
       const template = `
       <var-collapse v-model="value">
         <var-collapse-item name="1">
@@ -443,7 +443,7 @@ describe('test collapse Events', () => {
       expect(wrapper.findAll('.var-collapse-item__header')[2].text()).toBe('title slot3')
     })
 
-    test('test collapse slot title ', async () => {
+    test('collapse slot icon', async () => {
       const template = `
       <var-collapse v-model="value">
         <var-collapse-item name="1">

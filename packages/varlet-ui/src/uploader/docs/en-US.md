@@ -33,12 +33,12 @@ import { ref } from 'vue'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg'
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg'
   },
   {
     url: 'https://www.runoob.com/try/demo_source/mov_bbb.mp4',
-    cover: 'https://varlet.gitee.io/varlet-ui/cover.jpg'
+    cover: 'https://varletjs.org/cover.jpg'
   }
 ])
 </script>
@@ -57,8 +57,8 @@ import { Dialog } from '@varlet/ui'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg'
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg'
   }
 ])
 
@@ -85,18 +85,18 @@ import { ref } from 'vue'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'loading'
   },
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'success'
   },
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'error'
   }
 ])
@@ -292,8 +292,8 @@ import { Dialog } from '@varlet/ui'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg'
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg'
   }
 ])
 
@@ -340,8 +340,8 @@ import { ref } from 'vue'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'error',
   },
 ])
@@ -349,7 +349,33 @@ const files = ref([
 
 <template>
   <var-uploader
-    :rules="[(v, u) => u.getError().length === 0 || 'There is a file that failed to upload']"
+    :rules="(v, u) => u.getError().length === 0 || 'There is a file that failed to upload'"
+    v-model="files"
+  />
+</template>
+```
+
+### Validate with Zod
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { z } from 'zod'
+
+const files = ref([
+  {
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
+    state: 'error',
+  },
+])
+</script>
+
+<template>
+  <var-uploader
+    :rules="
+      z.array(z.any()).refine(v => v.filter(file => file.state === 'error').length === 0, 'There is a file that failed to upload')
+    "
     v-model="files"
   />
 </template>
@@ -365,18 +391,18 @@ import { ref } from 'vue'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'loading',
   },
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'success',
   },
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'error',
   },
 ])
@@ -409,6 +435,43 @@ const files = ref([
 </style>
 ```
 
+### Custom Remove Button
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const files = ref([
+  {
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg'
+  },
+  {
+    url: 'https://www.runoob.com/try/demo_source/mov_bbb.mp4',
+    cover: 'https://varletjs.org/cover.jpg'
+  }
+])
+</script>
+
+<template>
+  <var-uploader v-model="files">
+    <template #remove-button="{ remove }">
+      <div class="custom-remove-button">
+        <var-icon color="#fff" name="window-close" @click.stop="remove"></var-icon>
+      </div>
+    </template>
+  </var-uploader>
+</template>
+
+<style>
+.custom-remove-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+}
+</style>
+```
 
 ## API
 
@@ -425,15 +488,14 @@ const files = ref([
 | `elevation`| Elevation level, options `true` `false` and level of `0-24`, not in simple mode | _string \| number \| boolean_|  `true` |
 | `removable` | Whether the removable | _boolean_ | `true` |
 | `maxlength` | Maximum number of files | _string \| number_ | `-` |
-| `maxsize`   | Maximum file size | _string \| number_ | `-` |
+| `maxsize`   | Maximum file size, the unit is `byte` | _string \| number_ | `-` |
 | `previewed` | Whether to allow preview | _boolean_ | `true` |
 | `prevent-default-preview` | Prevent default preview behavior | _boolean_ | `false` |
 | `ripple`    | Whether to open ripple | _boolean_ | `true` |
 | `hide-list` | Whether to hide the file list | _boolean_ | `false` |
 | `resolve-type` | The file preprocessing type, can be set to `default` `file` `data-url` (`default`, the image type contains dataURL and File object, other types contain only File object. `file`, which contains only File object. `data-url`, all file types contain dataURL and File object) | _string_ | `default` |
-| `validate-trigger` | Timing to trigger validation. The optional value is `onChange` `onRemove` | _ValidateTriggers[]_ | `['onChange', 'onRemove']` |
-| `rules` | The validation rules, return `true` to indicate that the validation passed. The remaining values are converted to text as user prompts | _Array<(v: VarFile, u: VarFileUtils) => any>_ | `-` |
-
+| `validate-trigger` | Timing to trigger validation. The optional value is `onChange` `onRemove` | _UploaderValidateTrigger[]_ | `['onChange', 'onRemove']` |
+| `rules` | Validation rules, return `true` to indicate verification passes, other types of values ​​will be converted into text as user prompts. [Zod validation](#/en-US/zodValidation) is supported since `3.5.0` | _((v: VarFile[]) => any) \| ZodType \| Array<((v: VarFile[]) => any) \| ZodType>_ | `-` |
 
 ### VarFile
 
@@ -487,6 +549,7 @@ const files = ref([
 | --- | --- | --- |
 | `default` | Upload action content | `-` |
 | `extra-message` | Extra message | `-` |
+| `remove-button` ***3.8.0*** | Remove button | `remove: () => void` |
 
 ### Style Variables
 
@@ -504,6 +567,7 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--uploader-file-name-color`              | `#888`                                                                                       |
 | `--uploader-file-name-font-size`          | `12px`                                                                                       |
 | `--uploader-file-name-padding`            | `10px`                                                                                       |
+| `--uploader-file-border-radius`            | `0`                                                                                       |
 | `--uploader-file-text-align`              | `center`                                                                                     |
 | `--uploader-file-close-background`        | `rgba(0, 0, 0, 0.3)`                                                                         |
 | `--uploader-file-close-size`              | `24px`                                                                                       |
