@@ -1,6 +1,11 @@
 <template>
   <transition :name="n('$-fade')">
-    <span :class="classes(n(), n('$--box'), ...contentClass)" :style="chipStyle" v-bind="$attrs">
+    <!-- eslint-disable-next-line vue/require-toggle-inside-transition -->
+    <span
+      :class="classes(n(), n('$--box'), formatElevation(elevation, 1), ...contentClass)"
+      :style="chipStyle"
+      v-bind="$attrs"
+    >
       <slot name="left" />
 
       <span :class="n(`text-${size}`)">
@@ -9,7 +14,7 @@
 
       <slot name="right" />
 
-      <span v-if="closeable || closable" :class="n('--close')" @click="handleClose">
+      <span v-if="closeable" :class="n('--close')" @click="handleClose">
         <var-icon :name="`${iconName ? iconName : 'close-circle'}`" :namespace="namespace" />
       </span>
     </span>
@@ -17,11 +22,11 @@
 </template>
 
 <script lang="ts">
-import VarIcon from '../icon'
-import { defineComponent, computed, CSSProperties } from 'vue'
-import { props } from './props'
-import { createNamespace } from '../utils/components'
+import { computed, CSSProperties, defineComponent } from 'vue'
 import { call } from '@varlet/shared'
+import VarIcon from '../icon'
+import { createNamespace, formatElevation } from '../utils/components'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('chip')
 
@@ -67,6 +72,7 @@ export default defineComponent({
       contentClass,
       n,
       classes,
+      formatElevation,
       handleClose,
     }
   },
@@ -75,6 +81,7 @@ export default defineComponent({
 
 <style lang="less">
 @import '../styles/common';
+@import '../styles/elevation';
 @import '../icon/icon';
 @import './chip';
 </style>

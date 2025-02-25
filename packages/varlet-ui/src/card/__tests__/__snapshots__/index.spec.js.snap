@@ -1,12 +1,13 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`test card component slots > test card description slot 1`] = `
+exports[`test card component slots > card description slot 1`] = `
 "<div class="var-card var-elevation--1">
   <div class="var-card__floater" style="width: 100%; height: 100%; overflow: hidden;">
     <!--v-if-->
     <div class="var-card__container">
       <!--v-if-->
-      <!--v-if--><span>description</span>
+      <!--v-if-->
+      <!--v-if--><span class="var-card__description">description</span>
       <!--v-if-->
       <!--v-if-->
     </div>
@@ -16,11 +17,12 @@ exports[`test card component slots > test card description slot 1`] = `
 </div>"
 `;
 
-exports[`test card component slots > test card extra slot 1`] = `
+exports[`test card component slots > card extra slot 1`] = `
 "<div class="var-card var-elevation--1">
   <div class="var-card__floater" style="width: 100%; height: 100%; overflow: hidden;">
     <!--v-if-->
     <div class="var-card__container">
+      <!--v-if-->
       <!--v-if-->
       <!--v-if-->
       <!--v-if-->
@@ -33,11 +35,12 @@ exports[`test card component slots > test card extra slot 1`] = `
 </div>"
 `;
 
-exports[`test card component slots > test card floating-content slot 1`] = `
+exports[`test card component slots > card floating-content slot 1`] = `
 "<div class="var-card var-elevation--1">
   <div class="var-card__floater" style="width: 100%; height: 100%; overflow: hidden;">
     <!--v-if-->
     <div class="var-card__container">
+      <!--v-if-->
       <!--v-if-->
       <!--v-if-->
       <!--v-if-->
@@ -50,7 +53,7 @@ exports[`test card component slots > test card floating-content slot 1`] = `
 </div>"
 `;
 
-exports[`test card component slots > test card floating-content slot 2`] = `
+exports[`test card component slots > card floating-content slot 2`] = `
 "<div class="var-card var-card--layout-row var-elevation--1">
   <div class="var-card__floater" style="width: auto; height: auto; overflow: hidden;">
     <!--v-if-->
@@ -60,6 +63,7 @@ exports[`test card component slots > test card floating-content slot 2`] = `
       <!--v-if-->
       <!--v-if-->
       <!--v-if-->
+      <!--v-if-->
     </div>
     <!--v-if-->
   </div>
@@ -67,15 +71,16 @@ exports[`test card component slots > test card floating-content slot 2`] = `
 </div>"
 `;
 
-exports[`test card component slots > test card image slot 1`] = `
+exports[`test card component slots > card image slot 1`] = `
 "<div class="var-card var-elevation--1">
-  <div class="var-card__floater" style="width: 100%; height: 100%; overflow: hidden;"><img src="https://varlet.gitee.io/varlet-ui/cat.jpg" alt="cat">
+  <div class="var-card__floater" style="width: 100%; height: 100%; overflow: hidden;"><img src="https://varletjs.org/varlet/cat.jpg" alt="cat">
     <div class="var-card__container">
       <!--v-if-->
       <!--v-if-->
       <!--v-if-->
       <!--v-if-->
       <!--v-if-->
+      <!--v-if-->
     </div>
     <!--v-if-->
   </div>
@@ -83,12 +88,13 @@ exports[`test card component slots > test card image slot 1`] = `
 </div>"
 `;
 
-exports[`test card component slots > test card subtitle slot 1`] = `
+exports[`test card component slots > card subtitle slot 1`] = `
 "<div class="var-card var-elevation--1">
   <div class="var-card__floater" style="width: 100%; height: 100%; overflow: hidden;">
     <!--v-if-->
     <div class="var-card__container">
-      <!--v-if--><span>subtitle</span>
+      <!--v-if--><span class="var-card__subtitle">subtitle</span>
+      <!--v-if-->
       <!--v-if-->
       <!--v-if-->
       <!--v-if-->
@@ -99,11 +105,12 @@ exports[`test card component slots > test card subtitle slot 1`] = `
 </div>"
 `;
 
-exports[`test card component slots > test card title slot 1`] = `
+exports[`test card component slots > card title slot 1`] = `
 "<div class="var-card var-elevation--1">
   <div class="var-card__floater" style="width: 100%; height: 100%; overflow: hidden;">
     <!--v-if-->
-    <div class="var-card__container"><span>title</span>
+    <div class="var-card__container"><span class="var-card__title">title</span>
+      <!--v-if-->
       <!--v-if-->
       <!--v-if-->
       <!--v-if-->

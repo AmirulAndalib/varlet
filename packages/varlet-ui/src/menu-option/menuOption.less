@@ -11,6 +11,8 @@
   --menu-option-selected-background: var(--color-primary);
   --menu-option-text-color: #555;
   --menu-option-disabled-color: var(--color-text-disabled);
+  --menu-option-arrow-padding: 0 6px 0 8px;
+  --menu-option-arrow-icon-size: 18px;
 }
 
 .var-menu-option {
@@ -19,8 +21,9 @@
   align-items: center;
   padding: var(--menu-option-padding);
   cursor: pointer;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
   color: var(--menu-option-text-color);
+  outline: none;
 
   &__cover {
     position: absolute;
@@ -35,6 +38,19 @@
   &__text {
     display: flex;
     align-items: center;
+    overflow-x: hidden;
+  }
+
+  &__arrow {
+    padding: var(--menu-option-arrow-padding);
+  }
+
+  &__arrow-icon[var-menu-option-cover] {
+    font-size: var(--menu-option-arrow-icon-size);
+  }
+
+  &--children-trigger {
+    padding-right: 0;
   }
 
   &--normal {

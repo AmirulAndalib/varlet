@@ -1,18 +1,18 @@
+import { ComputedRef } from 'vue'
 import { useChildren } from '@varlet/use'
-import { type ColProvider } from '../col/provide'
 
 export interface RowProvider {
-  computePadding: () => void
+  average: ComputedRef<number[]>
 }
 
 export const ROW_BIND_COL_KEY = Symbol('ROW_BIND_COL_KEY')
 
 export function useCols() {
-  const { bindChildren, childProviders, length } = useChildren<RowProvider, ColProvider>(ROW_BIND_COL_KEY)
+  const { length, childProviders: cols, bindChildren } = useChildren<RowProvider, null>(ROW_BIND_COL_KEY)
 
   return {
     length,
-    cols: childProviders,
+    cols,
     bindCols: bindChildren,
   }
 }

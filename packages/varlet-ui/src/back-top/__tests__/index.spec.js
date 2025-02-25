@@ -1,9 +1,9 @@
-import BackTop from '..'
-import VarBackTop from '../BackTop'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import BackTop from '..'
 import { delay, mockScrollTo } from '../../utils/test'
-import { describe, expect, vi } from 'vitest'
+import VarBackTop from '../BackTop'
 
 mockScrollTo()
 
@@ -30,13 +30,13 @@ const Wrapper = {
   `,
 }
 
-test('test backTop plugin', () => {
+test('backTop plugin', () => {
   const app = createApp({}).use(BackTop)
   expect(app.component(BackTop.name)).toBeTruthy()
 })
 
 describe('test backTop props', () => {
-  test('test backTop visibilityHeight', async () => {
+  test('backTop visibilityHeight', async () => {
     const wrapper = mount(Wrapper, { attachTo: document.body })
 
     const backTopEl = document.querySelector('.var-back-top')
@@ -49,7 +49,7 @@ describe('test backTop props', () => {
     wrapper.unmount()
   })
 
-  test('test backTop position', () => {
+  test('backTop position', () => {
     const wrapper = mount(Wrapper, { attachTo: document.body })
     const backTopEl = document.querySelector('.var-back-top')
 
@@ -59,7 +59,7 @@ describe('test backTop props', () => {
     wrapper.unmount()
   })
 
-  test('test backTop elevation', () => {
+  test('backTop elevation', () => {
     const wrapper = mount(VarBackTop, { attachTo: document.body })
 
     expect(wrapper.find('.var-elevation--2').exists()).toBe(true)
@@ -68,7 +68,7 @@ describe('test backTop props', () => {
 })
 
 describe('test backTop events', () => {
-  test('test backTop onClick', async () => {
+  test('backTop onClick', async () => {
     const wrapper = mount(Wrapper, { attachTo: document.body })
     const backTopEl = document.querySelector('.var-back-top')
 

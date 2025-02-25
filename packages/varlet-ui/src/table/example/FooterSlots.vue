@@ -1,8 +1,7 @@
 <script setup>
-import { Themes } from '@varlet/ui'
-import { watchLang, watchDarkMode } from '@varlet/cli/client'
-import { use, pack } from './locale'
 import { ref } from 'vue'
+import { onThemeChange, watchLang } from '@varlet/cli/client'
+import { t, use } from './locale'
 
 const list = ref(gen(1, 10))
 
@@ -23,16 +22,16 @@ function get(current, size) {
 }
 
 watchLang(use, 'pc')
-watchDarkMode(Themes.dark)
+onThemeChange()
 </script>
 
 <template>
   <var-table class="reset">
     <thead>
       <tr>
-        <th>{{ pack.name }}</th>
-        <th>{{ pack.math }}</th>
-        <th>{{ pack.english }}</th>
+        <th>{{ t('name') }}</th>
+        <th>{{ t('math') }}</th>
+        <th>{{ t('english') }}</th>
       </tr>
     </thead>
     <tbody>

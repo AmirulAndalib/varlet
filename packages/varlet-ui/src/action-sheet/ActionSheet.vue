@@ -1,63 +1,57 @@
 <template>
   <var-popup
-    :class="n('popup-radius')"
+    v-model:show="show"
     position="bottom"
-    :show="popupShow"
+    :class="n('popup-radius')"
     :overlay="overlay"
     :overlay-class="overlayClass"
     :overlay-style="overlayStyle"
     :lock-scroll="lockScroll"
     :close-on-click-overlay="closeOnClickOverlay"
+    :close-on-key-escape="closeOnKeyEscape"
     :teleport="teleport"
     :safe-area="safeArea"
-    v-bind="{
-      'onUpdate:show': handlePopupUpdateShow,
-    }"
     @open="onOpen"
     @close="onClose"
     @closed="onClosed"
     @opened="onOpened"
     @route-change="onRouteChange"
+    @key-escape="onKeyEscape"
   >
     <div :class="classes(n(), n('$--box'))" v-bind="$attrs">
       <slot name="title">
-        <div :class="n('title')">{{ title ?? pack.actionSheetTitle }}</div>
+        <div :class="n('title')">{{ title ?? (pt ? pt : t)('actionSheetTitle') }}</div>
       </slot>
 
       <slot name="actions">
-        <div
-          :class="classes(n('action-item'), action.className, [action.disabled, n('--disabled')])"
-          v-ripple="{ disabled: action.disabled }"
+        <var-action-item
           v-for="action in actions"
           :key="action.name"
-          :style="{ color: action.color }"
+          :name="action.name"
+          :namespace="action.namespace"
+          :icon="action.icon"
+          :icon-size="action.iconSize"
+          :class-name="action.className"
+          :color="action.color"
           @click="handleSelect(action)"
-        >
-          <var-icon
-            :class="n('action-icon')"
-            var-action-sheet-cover
-            :namespace="action.namespace"
-            :name="action.icon"
-            :size="action.iconSize"
-            v-if="action.icon"
-          />
-          <div :class="n('action-name')">{{ action.name }}</div>
-        </div>
+        />
       </slot>
     </div>
   </var-popup>
 </template>
 
 <script lang="ts">
-import Ripple from '../ripple'
-import VarPopup from '../popup'
-import VarIcon from '../icon'
-import { defineComponent, ref, watch } from 'vue'
-import { props } from './props'
-import { pack } from '../locale'
-import { createNamespace } from '../utils/components'
-import { type ActionItem } from './index'
+import { defineComponent } from 'vue'
 import { call } from '@varlet/shared'
+import { useVModel } from '@varlet/use'
+import { t } from '../locale'
+import { injectLocaleProvider } from '../locale-provider/provide'
+import VarPopup from '../popup'
+import Ripple from '../ripple'
+import { createNamespace } from '../utils/components'
+import VarActionItem from './ActionItem.vue'
+import { type ActionItem } from './index'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('action-sheet')
 
@@ -66,20 +60,13 @@ export default defineComponent({
   directives: { Ripple },
   components: {
     VarPopup,
-    VarIcon,
+    VarActionItem,
   },
   inheritAttrs: false,
   props,
   setup(props) {
-    const popupShow = ref(false)
-
-    watch(
-      () => props.show,
-      (newValue) => {
-        popupShow.value = newValue
-      },
-      { immediate: true }
-    )
+    const show = useVModel(props, 'show')
+    const { t: pt } = injectLocaleProvider()
 
     function handleSelect(action: ActionItem) {
       if (action.disabled) {
@@ -88,19 +75,18 @@ export default defineComponent({
 
       const { closeOnClickAction, onSelect } = props
       call(onSelect, action)
-      closeOnClickAction && call(props['onUpdate:show'], false)
-    }
 
-    function handlePopupUpdateShow(value: boolean) {
-      call(props['onUpdate:show'], value)
+      if (closeOnClickAction) {
+        show.value = false
+      }
     }
 
     return {
-      popupShow,
-      pack,
+      show,
+      pt,
+      t,
       n,
       classes,
-      handlePopupUpdateShow,
       handleSelect,
     }
   },

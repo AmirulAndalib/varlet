@@ -13,7 +13,7 @@
     </var-sticky>
 
     <transition :name="`${nDate()}${reverse ? '-reverse' : ''}-translatex`">
-      <ul ref="panel" :class="n()" :key="panelKey">
+      <ul ref="panel" :key="panelKey" :class="n()">
         <li v-for="year in yearList" :key="year">
           <var-button
             type="primary"
@@ -34,13 +34,12 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs/esm'
 import {
-  defineComponent,
   computed,
+  defineComponent,
+  reactive,
   ref,
   watch,
-  reactive,
   type ComputedRef,
   type PropType,
   type Ref,
@@ -48,12 +47,13 @@ import {
   type UnwrapRef,
 } from 'vue'
 import { toNumber } from '@varlet/shared'
+import { onSmartMounted } from '@varlet/use'
+import dayjs from 'dayjs/esm/index.js'
 import VarButton from '../../button'
 import VarSticky from '../../sticky'
-import PanelHeader from './panel-header.vue'
 import { createNamespace } from '../../utils/components'
-import { onSmartMounted } from '@varlet/use'
-import { type ComponentProps, type Choose, type PanelBtnDisabled } from '../props'
+import { type Choose, type ComponentProps, type PanelBtnDisabled } from '../props'
+import PanelHeader from './panel-header.vue'
 
 const { n, classes } = createNamespace('year-picker')
 const { n: nDate } = createNamespace('date-picker')
@@ -97,18 +97,12 @@ export default defineComponent({
     })
 
     const yearList: ComputedRef<Array<number>> = computed(() => {
-      const list: Array<number> = []
-      if (!props.preview) return list
-
-      let startYear = Math.floor(toNumber(props.preview) / 100 + page.value) * 100
-      startYear = startYear < 0 ? 0 : startYear
-
-      const yearRange = [startYear, startYear + 100]
-
-      for (let i = yearRange[0]; i < yearRange[1]; i++) {
-        list.push(i)
+      if (!props.preview) {
+        return []
       }
-      return list
+
+      const startYear = Math.floor(toNumber(props.preview) / 100 + page.value) * 100
+      return Array.from(Array(100), (_v, k) => Math.max(0, startYear) + k)
     })
 
     const shouldChoose = (val: string): boolean => {
@@ -118,7 +112,9 @@ export default defineComponent({
       }: { choose: Choose; componentProps: ComponentProps } = props
 
       if (range) {
-        if (!chooseRangeYear.length) return false
+        if (!chooseRangeYear.length) {
+          return false
+        }
 
         const isBeforeMax = dayjs(val).isSameOrBefore(dayjs(chooseRangeYear[1]), 'year')
         const isAfterMin = dayjs(val).isSameOrAfter(dayjs(chooseRangeYear[0]), 'year')
@@ -126,8 +122,12 @@ export default defineComponent({
         return isBeforeMax && isAfterMin
       }
 
-      if (type === 'year') return chooseYears.includes(val)
-      if (type === 'month') return chooseMonths.some((value) => value.includes(val))
+      if (type === 'year') {
+        return chooseYears.includes(val)
+      }
+      if (type === 'month') {
+        return chooseMonths.some((value) => value.includes(val))
+      }
 
       return chooseDays.some((value) => value.includes(val))
     }
@@ -137,11 +137,8 @@ export default defineComponent({
         componentProps: { min, max },
       }: { componentProps: ComponentProps } = props
 
-      let isBeforeMax = true
-      let isAfterMin = true
-
-      if (max) isBeforeMax = dayjs(year).isSameOrBefore(dayjs(max), 'year')
-      if (min) isAfterMin = dayjs(year).isSameOrAfter(dayjs(min), 'year')
+      const isBeforeMax = max ? dayjs(year).isSameOrBefore(dayjs(max), 'year') : true
+      const isAfterMin = min ? dayjs(year).isSameOrAfter(dayjs(min), 'year') : true
 
       return isBeforeMax && isAfterMin
     }
@@ -153,42 +150,63 @@ export default defineComponent({
       }: { choose: Choose; componentProps: ComponentProps } = props
 
       const yearExist = (): boolean => {
-        if (range || multiple) return shouldChoose(year)
+        if (range || multiple) {
+          return shouldChoose(year)
+        }
 
         return chooseYear === year
       }
 
       const computeDisabled = (): boolean => {
-        if (!inRange(year)) return true
-        if (!allowedDates) return false
+        if (!inRange(year)) {
+          return true
+        }
+        if (!allowedDates) {
+          return false
+        }
 
         return !allowedDates(year)
       }
       const disabled = computeDisabled()
 
       const computeText = (): boolean => {
-        if (disabled) return true
-        if (range || multiple) return !shouldChoose(year)
+        if (disabled) {
+          return true
+        }
+        if (range || multiple) {
+          return !shouldChoose(year)
+        }
 
         return chooseYear !== year
       }
 
       const computeOutline = (): boolean => {
-        if (!(currentYear === year && props.componentProps.showCurrent)) return false
+        if (!(currentYear === year && props.componentProps.showCurrent)) {
+          return false
+        }
 
-        // 存在着 disabled
-        if ((range || multiple) && disabled) return true
+        if ((range || multiple) && disabled) {
+          return true
+        }
 
-        // 在选择范围之外
-        if (range || multiple) return !shouldChoose(year)
+        // Outside the selection range
+        if (range || multiple) {
+          return !shouldChoose(year)
+        }
 
         return chooseYear !== currentYear
       }
 
       const textColorOrCover = (): string => {
-        if (disabled) return ''
-        if (computeOutline()) return color ?? ''
-        if (yearExist()) return ''
+        if (disabled) {
+          return ''
+        }
+        if (computeOutline()) {
+          return color ?? ''
+        }
+        if (yearExist()) {
+          return ''
+        }
 
         return `${nDate()}-color-cover`
       }
@@ -208,7 +226,9 @@ export default defineComponent({
 
     const chooseYear = (year: number, event: Event) => {
       const buttonEl = event.currentTarget as HTMLButtonElement
-      if (buttonEl.classList.contains(n('button--disabled'))) return
+      if (buttonEl.classList.contains(n('button--disabled'))) {
+        return
+      }
 
       emit('choose-year', year)
     }
@@ -223,9 +243,11 @@ export default defineComponent({
     }
 
     const checkDate = (checkType: string) => {
-      reverse.value = checkType === 'prev'
-      panelKey.value += checkType === 'prev' ? -1 : 1
-      page.value += checkType === 'prev' ? -1 : 1
+      const isPrevType = checkType === 'prev'
+
+      reverse.value = isPrevType
+      panelKey.value += isPrevType ? -1 : 1
+      page.value += isPrevType ? -1 : 1
     }
 
     // expose for internal
@@ -239,24 +261,28 @@ export default defineComponent({
       () => props.preview,
       () => {
         page.value = 0
-      }
+      },
     )
 
     watch(
-      yearList,
-      (list) => {
-        const {
-          componentProps: { min, max },
-        } = props
-        if (max)
+      () => [yearList.value, props.componentProps.max, props.componentProps.min],
+      (newVal) => {
+        const [list, max, min] = newVal as [number[], string, string]
+        if (max) {
           panelBtnDisabled.right = !dayjs(`${toNumber(list[list.length - 1])}`).isSameOrBefore(dayjs(max), 'year')
-        if (min) panelBtnDisabled.left = !dayjs(`${toNumber(list[0])}`).isSameOrAfter(dayjs(min), 'year')
+        }
 
-        if (toNumber(list[0] <= 0)) panelBtnDisabled.left = false
+        if (min) {
+          panelBtnDisabled.left = !dayjs(`${toNumber(list[0])}`).isSameOrAfter(dayjs(min), 'year')
+        }
+
+        if (toNumber(list[0] <= 0)) {
+          panelBtnDisabled.left = false
+        }
       },
       {
         immediate: true,
-      }
+      },
     )
 
     return {

@@ -1,9 +1,8 @@
-import context from '../context'
 import { defineComponent } from 'vue'
+import context from '../context'
 import { createNamespace } from '../utils/components'
 import { toSizeUnit } from '../utils/elements'
 import { props } from './props'
-
 import '../styles/common.less'
 import './loadingBar.less'
 
@@ -23,6 +22,7 @@ export default defineComponent({
           height: toSizeUnit(props.height),
           backgroundColor: props.error ? props.errorColor : props.color,
           top: toSizeUnit(props.top),
+          transitionDuration: props.transitionDuration == null ? undefined : `${props.transitionDuration}ms`,
         }}
       ></div>
     )

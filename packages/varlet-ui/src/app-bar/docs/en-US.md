@@ -94,7 +94,7 @@ const active = ref(0)
 <template>
   <var-app-bar
     round
-    image="https://varlet.gitee.io/varlet-ui/tree.jpeg"
+    image="https://varletjs.org/tree.jpeg"
     image-linear-gradient="to right top, rgba(29, 68, 147, 0.5) 0%, rgba(74, 198, 170, 0.9) 100%"
   >
     Title
@@ -143,8 +143,12 @@ const active = ref(0)
 | `text-color`     | Text color                                           | _string_ | `-`     |
 | `title`          | Title                                                | _string_ | -       |
 | `title-position` | Title location, can be set to `left`, `center`, `right` | _string_ | `left`  |
- | `elevation` | Elevation level, options `true` `false` and level of `0-24` | _string \| number \| boolean_|   `true`    |
+| `elevation` | Elevation level, options `true` `false` and level of `0-24` | _string \| number \| boolean_|   `true`    |
+| `fixed`          | Whether to fixed to the top     | _boolean_ | `false` |
+| `placeholder` ***3.2.14***  | Whether to generate placeholder elements of the same height at the top (`fixed` required)  | _boolean_ | `false` |
+| `z-index`          | AppBar element z-index                            | _number \| string_ | `1` |
 | `round`          | Whether to use rounded border                        | _boolean_ | `false` |
+| `border` ***3.3.2***          | Whether to use bottom border                            | _boolean_ | `false` |
 | `image`          | Background image                            | _string_ | `-` |
 | `image-linear-gradient` | Background image linear gradient | _string_ | `-` |
 | `safe-area-top` | Whether to enable top safe area adaptation | _boolean_ | `false` |
@@ -172,3 +176,4 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--app-bar-left-gap` | `6px` |
 | `--app-bar-right-gap` | `6px` |
 | `--app-bar-border-radius` | `4px` |
+| `--app-bar-border-bottom` | `thin solid var(--color-outline)` |

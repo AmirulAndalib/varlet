@@ -1,8 +1,8 @@
 <script setup>
-import { Themes, Snackbar, ImagePreview, ActionSheet } from '@varlet/ui'
-import { AppType, watchDarkMode, watchLang } from '@varlet/cli/client'
-import { ref, computed } from 'vue'
-import { pack, use } from './locale'
+import { computed, ref } from 'vue'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { ActionSheet, ImagePreview, Snackbar } from '@varlet/ui'
+import { t, use } from './locale'
 
 const VarImagePreview = ImagePreview.Component
 const VarActionSheet = ActionSheet.Component
@@ -15,29 +15,32 @@ const preventEventShow = ref(false)
 const imagePreventDefault = ref(true)
 const extraSlotsShow = ref(false)
 const menuShow = ref(false)
-const images = ref(['https://varlet.gitee.io/varlet-ui/cat.jpg', 'https://varlet.gitee.io/varlet-ui/cat2.jpg'])
-const image = ref(['https://varlet.gitee.io/varlet-ui/cat.jpg'])
+const images = ref(['cat.jpg', 'cat2.jpg'])
+const image = ref(['cat.jpg'])
 const actions = computed(() => [
   {
-    name: pack.value.operate,
+    name: t('operate'),
     icon: 'wrench',
   },
   {
-    name: pack.value.operate,
+    name: t('operate'),
     icon: 'wrench',
   },
 ])
 
+watchLang(use)
+onThemeChange()
+
 function handleCloseEvent() {
   Snackbar({
-    content: pack.value.shutdownEvent,
+    content: t('shutdownEvent'),
     duration: 1000,
   })
 }
 
 function handleLongPressEvent() {
   Snackbar({
-    content: pack.value.preventDefaultEvent,
+    content: t('preventDefaultEvent'),
     duration: 1000,
   })
 }
@@ -50,49 +53,46 @@ function previewCallback() {
   ImagePreview({
     images,
     onChange: (index) => {
-      console.log('index', index)
+      Snackbar(String(index))
     },
   })
 }
-
-watchLang(use)
-watchDarkMode(Themes.dark)
 </script>
 
 <template>
   <div class="image-preview-demo">
-    <app-type>{{ pack.functionCall }}</app-type>
-    <var-button type="primary" block @click="preview">{{ pack.preview }}</var-button>
-    <var-button type="primary" block @click="previewCallback">{{ pack.callBack }}</var-button>
+    <app-type>{{ t('functionCall') }}</app-type>
+    <var-button type="primary" block @click="preview">{{ t('preview') }}</var-button>
+    <var-button type="primary" block @click="previewCallback">{{ t('callBack') }}</var-button>
   </div>
 
   <div class="image-preview-demo">
-    <app-type>{{ pack.componentCall }}</app-type>
-    <var-button type="warning" block @click="show = true">{{ pack.basicUse }}</var-button>
-    <var-image-preview :images="image" v-model:show="show" />
+    <app-type>{{ t('componentCall') }}</app-type>
+    <var-button type="warning" block @click="show = true">{{ t('basicUse') }}</var-button>
+    <var-image-preview v-model:show="show" :images="image" />
 
-    <var-button type="warning" block @click="currentShow = true">{{ pack.specifyInitialPosition }}</var-button>
-    <var-image-preview :images="images" v-model:show="currentShow" :initial-index="1" />
+    <var-button type="warning" block @click="currentShow = true">{{ t('specifyInitialPosition') }}</var-button>
+    <var-image-preview v-model:show="currentShow" :images="images" :initial-index="1" />
 
-    <var-button type="warning" block @click="closeShow = true">{{ pack.displayCloseButton }}</var-button>
-    <var-image-preview :images="images" v-model:show="closeShow" :closeable="true" />
+    <var-button type="warning" block @click="closeShow = true">{{ t('displayCloseButton') }}</var-button>
+    <var-image-preview v-model:show="closeShow" :images="images" :closeable="true" />
 
-    <var-button type="warning" block @click="closeEventShow = true">{{ pack.listenCloseEvents }}</var-button>
-    <var-image-preview :images="images" v-model:show="closeEventShow" @close="handleCloseEvent" />
+    <var-button type="warning" block @click="closeEventShow = true">{{ t('listenCloseEvents') }}</var-button>
+    <var-image-preview v-model:show="closeEventShow" :images="images" @close="handleCloseEvent" />
 
-    <var-button type="warning" block @click="preventEventShow = true">{{ pack.preventLongTapDefault }}</var-button>
+    <var-button type="warning" block @click="preventEventShow = true">{{ t('preventLongTapDefault') }}</var-button>
     <var-image-preview
-      :images="images"
       v-model:show="preventEventShow"
+      :images="images"
       :image-prevent-default="imagePreventDefault"
       @long-press="handleLongPressEvent"
     ></var-image-preview>
 
-    <var-button type="warning" block @click="extraSlotsShow = true">{{ pack.showExtraSlots }}</var-button>
-    <var-image-preview :images="images" v-model:show="extraSlotsShow">
+    <var-button type="warning" block @click="extraSlotsShow = true">{{ t('showExtraSlots') }}</var-button>
+    <var-image-preview v-model:show="extraSlotsShow" :images="images">
       <template #extra>
         <var-icon name="menu" :size="22" color="#fff" @click="menuShow = true" />
-        <var-action-sheet :actions="actions" v-model:show="menuShow" />
+        <var-action-sheet v-model:show="menuShow" :actions="actions" />
       </template>
     </var-image-preview>
   </div>

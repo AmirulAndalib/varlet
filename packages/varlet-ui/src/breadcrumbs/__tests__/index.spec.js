@@ -1,28 +1,28 @@
-import Breadcrumbs from '..'
-import VarBreadcrumbs from '../Breadcrumbs.vue'
-import VarBreadcrumb from '../../breadcrumb/Breadcrumb.vue'
 import { createApp, Fragment, h } from 'vue'
 import { mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
+import Breadcrumbs from '..'
+import VarBreadcrumb from '../../breadcrumb/Breadcrumb.vue'
 import { delay } from '../../utils/test'
-import { expect, vi } from 'vitest'
+import VarBreadcrumbs from '../Breadcrumbs.vue'
 
 function renderBasicUsage(props) {
   return h(
     Fragment,
-    ['HOME', 'LINK 1', 'LINK 2'].map((text) => {
-      return h(VarBreadcrumb, props, {
+    ['HOME', 'LINK 1', 'LINK 2'].map((text) =>
+      h(VarBreadcrumb, props, {
         default: () => text,
-      })
-    })
+      }),
+    ),
   )
 }
 
-test('test breadcrumbs plugin', () => {
+test('breadcrumbs plugin', () => {
   const app = createApp({}).use(Breadcrumbs)
   expect(app.component(Breadcrumbs.name)).toBeTruthy()
 })
 
-test('test breadcrumbs basic usage', async () => {
+test('breadcrumbs basic usage', async () => {
   const wrapper = mount(VarBreadcrumbs, {
     slots: {
       default: () => renderBasicUsage(),
@@ -34,7 +34,7 @@ test('test breadcrumbs basic usage', async () => {
   wrapper.unmount()
 })
 
-test('test breadcrumbs parent separator', async () => {
+test('breadcrumbs parent separator', async () => {
   const wrapper = mount(VarBreadcrumbs, {
     props: {
       separator: '+',
@@ -49,7 +49,7 @@ test('test breadcrumbs parent separator', async () => {
   wrapper.unmount()
 })
 
-test('test breadcrumbs parent and child separator', async () => {
+test('breadcrumbs parent and child separator', async () => {
   const wrapper = mount(VarBreadcrumbs, {
     props: {
       separator: '+',
@@ -64,7 +64,7 @@ test('test breadcrumbs parent and child separator', async () => {
   wrapper.unmount()
 })
 
-test('test breadcrumbs events', async () => {
+test('breadcrumbs events', async () => {
   const onClick = vi.fn()
 
   const wrapper = mount(VarBreadcrumbs, {
@@ -83,18 +83,18 @@ test('test breadcrumbs events', async () => {
   wrapper.unmount()
 })
 
-test('test breadcrumbs slots', async () => {
+test('breadcrumbs slots', async () => {
   const wrapper = mount(VarBreadcrumbs, {
     slots: {
       default: () =>
         h(
           Fragment,
-          ['HOME', 'LINK 1', 'LINK 2'].map((text) => {
-            return h(VarBreadcrumb, null, {
+          ['HOME', 'LINK 1', 'LINK 2'].map((text) =>
+            h(VarBreadcrumb, null, {
               default: () => text,
               separator: () => h('span', '*'),
-            })
-          })
+            }),
+          ),
         ),
     },
   })

@@ -4,7 +4,9 @@ export const version: string
 export const install: (app: App) => void
 
 export * from './actionSheet'
+export * from './alert'
 export * from './appBar'
+export * from './autoComplete'
 export * from './avatar'
 export * from './avatarGroup'
 export * from './backTop'
@@ -20,11 +22,13 @@ export * from './cell'
 export * from './checkbox'
 export * from './checkboxGroup'
 export * from './chip'
+export * from './code'
 export * from './col'
 export * from './collapse'
 export * from './collapseItem'
 export * from './collapseTransition'
 export * from './context'
+export * from './countTo'
 export * from './countdown'
 export * from './counter'
 export * from './datePicker'
@@ -36,6 +40,7 @@ export * from './fab'
 export * from './floatingPanel'
 export * from './form'
 export * from './formDetails'
+export * from './highlighterProvider'
 export * from './hover'
 export * from './hoverOverlay'
 export * from './icon'
@@ -50,6 +55,7 @@ export * from './list'
 export * from './loading'
 export * from './loadingBar'
 export * from './locale'
+export * from './localeProvider'
 export * from './menu'
 export * from './menuOption'
 export * from './menuSelect'
@@ -96,7 +102,9 @@ export * from './watermark'
 declare module 'vue' {
   export interface GlobalComponents {
     VarActionSheet: typeof import('@varlet/ui')['_ActionSheetComponent']
+    VarAlert: typeof import('@varlet/ui')['_AlertComponent']
     VarAppBar: typeof import('@varlet/ui')['_AppBarComponent']
+    VarAutoComplete: typeof import('@varlet/ui')['_AutoCompleteComponent']
     VarAvatar: typeof import('@varlet/ui')['_AvatarComponent']
     VarAvatarGroup: typeof import('@varlet/ui')['_AvatarGroupComponent']
     VarBackTop: typeof import('@varlet/ui')['_BackTopComponent']
@@ -112,11 +120,13 @@ declare module 'vue' {
     VarCheckbox: typeof import('@varlet/ui')['_CheckboxComponent']
     VarCheckboxGroup: typeof import('@varlet/ui')['_CheckboxGroupComponent']
     VarChip: typeof import('@varlet/ui')['_ChipComponent']
+    VarCode: typeof import('@varlet/ui')['_CodeComponent']
     VarCol: typeof import('@varlet/ui')['_ColComponent']
     VarCollapse: typeof import('@varlet/ui')['_CollapseComponent']
     VarCollapseItem: typeof import('@varlet/ui')['_CollapseItemComponent']
     VarCollapseTransition: typeof import('@varlet/ui')['_CollapseTransitionComponent']
     VarContext: typeof import('@varlet/ui')['_ContextComponent']
+    VarCountTo: typeof import('@varlet/ui')['_CountToComponent']
     VarCountdown: typeof import('@varlet/ui')['_CountdownComponent']
     VarCounter: typeof import('@varlet/ui')['_CounterComponent']
     VarDatePicker: typeof import('@varlet/ui')['_DatePickerComponent']
@@ -128,6 +138,7 @@ declare module 'vue' {
     VarFloatingPanel: typeof import('@varlet/ui')['_FloatingPanelComponent']
     VarForm: typeof import('@varlet/ui')['_FormComponent']
     VarFormDetails: typeof import('@varlet/ui')['_FormDetailsComponent']
+    VarHighlighterProvider: typeof import('@varlet/ui')['_HighlighterProviderComponent']
     VarHoverOverlay: typeof import('@varlet/ui')['_HoverOverlayComponent']
     VarIcon: typeof import('@varlet/ui')['_IconComponent']
     VarImage: typeof import('@varlet/ui')['_ImageComponent']
@@ -140,6 +151,7 @@ declare module 'vue' {
     VarLoading: typeof import('@varlet/ui')['_LoadingComponent']
     VarLoadingBar: typeof import('@varlet/ui')['_LoadingBarComponent']
     VarLocale: typeof import('@varlet/ui')['_LocaleComponent']
+    VarLocaleProvider: typeof import('@varlet/ui')['_LocaleProviderComponent']
     VarMenu: typeof import('@varlet/ui')['_MenuComponent']
     VarMenuOption: typeof import('@varlet/ui')['_MenuOptionComponent']
     VarMenuSelect: typeof import('@varlet/ui')['_MenuSelectComponent']

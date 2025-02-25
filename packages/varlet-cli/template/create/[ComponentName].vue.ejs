@@ -1,17 +1,25 @@
 <template>
-  <div class="<%- namespace %>-<%- kebabCaseName %>"></div>
+  <div :class="n()"></div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { props } from './props'
+  import { defineComponent } from 'vue'
+  import { props } from './props'
+  import { createNamespace } from '../utils/components'
 
-export default defineComponent({
-  name: '<%- bigCamelizeNamespace + bigCamelizeName %>',
-  props
-})
+  const { name, n, classes } = createNamespace('<%- kebabCaseName %>')
+
+  export default defineComponent({
+    name,
+    props,
+    setup(props) {
+      return {
+        n,
+      }
+    },
+  })
 </script>
 
 <style lang="less">
-@import './<%- camelizeName %>.less';
+  @import './<%- camelizeName %>';
 </style>

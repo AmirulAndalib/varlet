@@ -1,5 +1,6 @@
-import slash from 'slash'
+import { slash } from '@varlet/shared'
 import fse from 'fs-extra'
+import { getVarletConfig } from '../config/varlet.config.js'
 import {
   DOCS_DIR_NAME,
   EXAMPLE_DIR_NAME,
@@ -14,8 +15,6 @@ import {
   SRC_DIR,
 } from '../shared/constant.js'
 import { glob, isDir, outputFileSyncOnChange } from '../shared/fsUtils.js'
-import { getVarletConfig } from '../config/varlet.config.js'
-import { get } from 'lodash-es'
 
 const { copy } = fse
 
@@ -25,7 +24,7 @@ const EXAMPLE_INDEX_RE = /\/([-\w]+)\/example\/index(?:.draft)?\.vue/
 const COMPONENT_DOCS_RE = /\/([-\w]+)\/docs\/([-\w]+)(?:.draft)?\.md/
 
 export function getExampleRoutePath(examplePath: string): string {
-  return '/' + examplePath.match(EXAMPLE_INDEX_RE)?.[1] // eslint-disable-line
+  return '/' + examplePath.match(EXAMPLE_INDEX_RE)?.[1]
 }
 
 export function getComponentDocRoutePath(componentDocsPath: string): string {
@@ -74,7 +73,7 @@ export async function findExamples(draftMode: boolean): Promise<string[]> {
   const mergedExamples = [...examples, ...draftExamples]
 
   return mergedExamples.filter((example) =>
-    draftMode ? isDraftExample(example) || !hasDraftExample(mergedExamples, example) : !isDraftExample(example)
+    draftMode ? isDraftExample(example) || !hasDraftExample(mergedExamples, example) : !isDraftExample(example),
   )
 }
 
@@ -95,7 +94,7 @@ export async function findRootDocs(draftMode: boolean): Promise<string[]> {
 }
 
 export async function findPageLocales(): Promise<string[]> {
-  const defaultLanguage = get(await getVarletConfig(), 'defaultLanguage')
+  const { defaultLanguage } = await getVarletConfig()
   const userPages = await glob(`${ROOT_PAGES_DIR}/*`)
   const baseLocales = await glob(`${SITE}/pc/pages/**/${LOCALE_DIR_NAME}/*.ts`)
 
@@ -104,13 +103,15 @@ export async function findPageLocales(): Promise<string[]> {
       if (isDir(page)) {
         const locales = await glob(`${page}/${LOCALE_DIR_NAME}/*.ts`)
 
-        if (!locales.length) locales.push(`${page}/${LOCALE_DIR_NAME}/${defaultLanguage}.ts`)
+        if (!locales.length) {
+          locales.push(`${page}/${LOCALE_DIR_NAME}/${defaultLanguage}.ts`)
+        }
         ;(await userLocales).push(...locales)
       }
 
       return userLocales
     },
-    Promise.resolve([])
+    Promise.resolve([]),
   )
 
   // filter
@@ -136,7 +137,7 @@ export async function buildMobileSiteRoutes(draftMode: boolean) {
     path: '${getExampleRoutePath(example)}',
     // @ts-ignore
     component: () => import('${example}')
-  }`
+  }`,
   )
   const source = `export default [\
     ${routes.join(',')}
@@ -159,7 +160,7 @@ export async function buildPcSiteRoutes(draftMode: boolean) {
     // @ts-ignore
     component: () => import('${getPageFilePath(locale)}')
   }\
-`
+`,
   )
 
   const componentDocsRoutes = componentDocs.map(
@@ -168,7 +169,7 @@ export async function buildPcSiteRoutes(draftMode: boolean) {
         path: '${getComponentDocRoutePath(componentDoc)}',
         // @ts-ignore
         component: () => import('${componentDoc}')
-      }`
+      }`,
   )
 
   const rootDocsRoutes = rootDocs.map(
@@ -177,7 +178,7 @@ export async function buildPcSiteRoutes(draftMode: boolean) {
         path: '${getRootDocRoutePath(rootDoc)}',
         // @ts-ignore
         component: () => import('${rootDoc}')
-      }`
+      }`,
   )
 
   const layoutRoutes = `{
@@ -196,7 +197,7 @@ export async function buildPcSiteRoutes(draftMode: boolean) {
   outputFileSyncOnChange(SITE_PC_ROUTES, source)
 }
 
-export async function buildSiteSource() {
+export function buildSiteSource() {
   return copy(SITE, SITE_DIR)
 }
 

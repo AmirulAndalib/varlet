@@ -36,7 +36,7 @@ const show = ref(false)
   <var-snackbar v-model:show="show" :vertical="true">
     Hello, I'm a snackbar
     <template #action>
-      <var-button type="primary" size="small" @click="show = !show">Close</var-button>
+      <var-button type="primary" :elevation="false" size="small" @click="show = !show">Close</var-button>
     </template>
   </var-snackbar>
   <var-button type="primary" block @click="show = !show">Multi-Line</var-button>
@@ -58,7 +58,7 @@ const show = ref(false)
   <var-snackbar v-model:show="show" position="bottom">
     Hello, I'm a snackbar
     <template #action>
-      <var-button type="primary" size="small" @click="show = false">Close</var-button>
+      <var-button type="primary" :elevation="false" size="small" @click="show = false">Close</var-button>
     </template>
   </var-snackbar>
   <var-button type="primary" block @click="show = !show">Bottom Display</var-button>
@@ -309,6 +309,7 @@ function openMultiple() {
 | `type`| `Snackbar` type, Optional value is one of `success, warning, info, error, loading` | _string_ | `-` |
 | `position`| `Snackbar` position, Optional value is one of `top, center, bottom`                | _string_ | `top` |
 | `duration`| Display duration                                                                   | _number_ | `3000` |
+| `elevation` ***3.3.0***  | Elevation level, options `true` `false` and level of `0-24` | _string \| number \| boolean_|   `true`    |
 | `content` | Custom content                                                                     | _string_ | `-` |
 | `content-class` | Class of custom content                                                            | _string_ | `-` |
 | `vertical` | Whether to use multi-line                                                          | _boolean_ | `false` |
@@ -363,6 +364,7 @@ The `clear` method on the instance can close the current instance, and the `clea
 | `type`          | `Snackbar` type, Optional value is one of `success, warning, info, error, loading`              | _string_ | `-` |
 | `position`      | `Snackbar` position, Optional value is one of `top, center, bottom`                             | _string_ | `top` |
 | `duration`      | Display duration (Need to be closed manually when the `type` prop is `loading`)                 | _number_ | `3000` |
+| `elevation` ***3.3.0*** | Elevation level, options `true` `false` and level of `0-24` | _string \| number \| boolean_|   `true`    |
 | `content`       | Custom content                                                                                  | _string \| VNode \| (() => VNode)_ | `-` |
 | `icon`          | Custom icon                                                                                     | _string \| VNode \| (() => VNode)_ | `-`               |
 | `action`        | Custom action of right                                                                          | _string \| VNode \| (() => VNode)_ | `-`               |
@@ -397,5 +399,6 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--snackbar-error-background` | `var(--color-danger)` |
 | `--snackbar-warning-background` | `var(--color-warning)` |
 | `--snackbar-content-padding` | `14px 16px` |
-| `--snackbar-action-margin` | `0 8px 0` |
+| `--snackbar-action-margin` | `0 8px` |
+| `--snackbar-icon-margin` | `0 8px` |
 | `--snackbar-vertical-action-margin` | `0 8px 8px 0` |

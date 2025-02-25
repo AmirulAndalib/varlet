@@ -1,14 +1,14 @@
-import { removeItem } from '@varlet/shared'
 import {
-  getCurrentInstance,
   computed,
+  getCurrentInstance,
+  isVNode,
   provide,
   reactive,
-  isVNode,
-  type VNode,
   type ComponentInternalInstance,
   type ComputedRef,
+  type VNode,
 } from 'vue'
+import { isArray, removeItem } from '@varlet/shared'
 
 function flatVNodes(subTree: any) {
   const vNodes: VNode[] = []
@@ -19,7 +19,7 @@ function flatVNodes(subTree: any) {
       return
     }
 
-    if (Array.isArray(subTree?.children)) {
+    if (isArray(subTree?.children)) {
       subTree.children.forEach((child: any) => {
         if (isVNode(child)) {
           vNodes.push(child)

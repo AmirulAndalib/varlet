@@ -1,5 +1,12 @@
-import { VarComponent, BasicAttributes, ListenerProp, Variant as InputVariant, SetPropsDefaults } from './varComponent'
-import { VNode } from 'vue'
+import { InputHTMLAttributes, VNode } from 'vue'
+import {
+  BasicAttributes,
+  Rules as InputRules,
+  Variant as InputVariant,
+  ListenerProp,
+  SetPropsDefaults,
+  VarComponent,
+} from './varComponent'
 
 export declare const inputProps: Record<keyof InputProps, any>
 
@@ -15,9 +22,11 @@ export interface InputProps extends BasicAttributes {
   size?: InputSize
   variant?: InputVariant
   textarea?: boolean
+  ariaLabel?: string
   rows?: string | number
   placeholder?: string
   hint?: boolean
+  line?: boolean
   textColor?: string
   focusColor?: string
   blurColor?: string
@@ -28,8 +37,8 @@ export interface InputProps extends BasicAttributes {
   resize?: boolean
   autofocus?: boolean
   validateTrigger?: InputValidateTrigger[]
-  rules?: Array<(v: string) => any>
-  enterkeyhint?: string
+  rules?: InputRules
+  enterkeyhint?: InputHTMLAttributes['enterKeyHint']
   onFocus?: ListenerProp<(e: Event) => void>
   onBlur?: ListenerProp<(e: Event) => void>
   onClick?: ListenerProp<(e: Event) => void>
@@ -37,6 +46,10 @@ export interface InputProps extends BasicAttributes {
   onInput?: ListenerProp<(value: string, e: Event) => void>
   onChange?: ListenerProp<(value: string, e: Event) => void>
   'onUpdate:modelValue'?: ListenerProp<(value: string) => void>
+}
+
+export interface InputClearIconData {
+  clear: (e: Event) => void
 }
 
 export class Input extends VarComponent {
@@ -47,7 +60,7 @@ export class Input extends VarComponent {
   $slots: {
     'prepend-icon'(): VNode[]
     'append-icon'(): VNode[]
-    'clear-icon'(): VNode[]
+    'clear-icon'(data: InputClearIconData): VNode[]
     'extra-message'(): VNode[]
   }
 

@@ -1,15 +1,15 @@
-import Drag from '..'
 import { createApp } from 'vue'
 import { mount } from '@vue/test-utils'
-import { triggerDrag, trigger, delay } from '../../utils/test'
-import { expect, vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
+import Drag from '..'
+import { delay, trigger, triggerDrag } from '../../utils/test'
 
-test('test drag plugin', () => {
+test('drag plugin', () => {
   const app = createApp({}).use(Drag)
   expect(app.component(Drag.name)).toBeTruthy()
 })
 
-test('test drag direction', async () => {
+test('drag direction', async () => {
   const container = document.createElement('div')
   const wrapper = mount(Drag, {
     props: {
@@ -17,21 +17,21 @@ test('test drag direction', async () => {
     },
   })
 
-  await triggerDrag(container.childNodes[0], 10, 10)
+  await triggerDrag(container.childNodes[1], 10, 10)
   expect(container.innerHTML).toMatchSnapshot()
 
   wrapper.setProps({ direction: 'x' })
-  await triggerDrag(container.childNodes[0], 10, 10)
+  await triggerDrag(container.childNodes[1], 10, 10)
   expect(container.innerHTML).toMatchSnapshot()
 
   wrapper.setProps({ direction: 'y' })
-  await triggerDrag(container.childNodes[0], 10, 10)
+  await triggerDrag(container.childNodes[1], 10, 10)
   expect(container.innerHTML).toMatchSnapshot()
 
   wrapper.unmount()
 })
 
-test('test drag attraction', async () => {
+test('drag attraction', async () => {
   const container = document.createElement('div')
   const wrapper = mount(Drag, {
     props: {
@@ -39,21 +39,21 @@ test('test drag attraction', async () => {
       attraction: 'x',
     },
   })
-  await triggerDrag(container.childNodes[0], 10, 10)
+  await triggerDrag(container.childNodes[1], 10, 10)
   expect(container.innerHTML).toMatchSnapshot()
 
   wrapper.setProps({ attraction: 'y' })
-  await triggerDrag(container.childNodes[0], 10, 10)
+  await triggerDrag(container.childNodes[1], 10, 10)
   expect(container.innerHTML).toMatchSnapshot()
 
   wrapper.setProps({ attraction: 'xy' })
-  await triggerDrag(container.childNodes[0], 10, 10)
+  await triggerDrag(container.childNodes[1], 10, 10)
   expect(container.innerHTML).toMatchSnapshot()
 
   wrapper.unmount()
 })
 
-test('test drag disabled', async () => {
+test('drag disabled', async () => {
   const container = document.createElement('div')
   const wrapper = mount(Drag, {
     props: {
@@ -62,13 +62,13 @@ test('test drag disabled', async () => {
     },
   })
 
-  await triggerDrag(container.childNodes[0], 10, 10)
+  await triggerDrag(container.childNodes[1], 10, 10)
   expect(container.innerHTML).toMatchSnapshot()
 
   wrapper.unmount()
 })
 
-test('test drag boundary', async () => {
+test('drag boundary', async () => {
   const container = document.createElement('div')
   const wrapper = mount(Drag, {
     props: {
@@ -80,7 +80,7 @@ test('test drag boundary', async () => {
     },
   })
 
-  const el = container.childNodes[0]
+  const el = container.childNodes[1]
   await trigger(el, 'touchstart', 0, 0)
   await trigger(el, 'touchmove', 1, 1)
   await trigger(el, 'touchend', 1, 1)
@@ -89,7 +89,7 @@ test('test drag boundary', async () => {
   wrapper.unmount()
 })
 
-test('test drag reset', async () => {
+test('drag reset', async () => {
   const container = document.createElement('div')
   const wrapper = mount(Drag, {
     props: {
@@ -97,7 +97,7 @@ test('test drag reset', async () => {
     },
   })
 
-  await triggerDrag(container.childNodes[0], 10, 10)
+  await triggerDrag(container.childNodes[1], 10, 10)
   expect(container.innerHTML).toMatchSnapshot()
 
   wrapper.vm.reset()
@@ -107,7 +107,7 @@ test('test drag reset', async () => {
   wrapper.unmount()
 })
 
-test('test drag click method', async () => {
+test('drag click method', async () => {
   const container = document.createElement('div')
   const onClick = vi.fn()
 
@@ -118,7 +118,7 @@ test('test drag click method', async () => {
     },
   })
 
-  await trigger(container.childNodes[0], 'click')
+  await trigger(container.childNodes[1], 'click')
   expect(onClick).toHaveBeenCalledTimes(1)
 
   wrapper.unmount()

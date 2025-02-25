@@ -1,14 +1,39 @@
-import { type PropType } from 'vue'
-import { defineListenerProp, pickProps } from '../utils/components'
+import { VNode, VNodeChild, type PropType } from 'vue'
 import { fieldDecoratorProps } from '../field-decorator'
+import { defineListenerProp, pickProps } from '../utils/components'
 
 export type SelectValidateTrigger = 'onFocus' | 'onBlur' | 'onChange' | 'onClick' | 'onClear' | 'onClose'
 
 export type SelectTextAlign = 'left' | 'right' | 'center'
 
+export type SelectOptionLabelRender = (option: SelectOption, checked: boolean) => VNodeChild
+
+export type SelectOptionLabel = string | VNode | SelectOptionLabelRender
+
+export interface SelectOption {
+  label?: SelectOptionLabel
+  value?: any
+  disabled?: boolean
+
+  [key: PropertyKey]: any
+}
+
 export const props = {
   modelValue: {
+    type: [String, Number, Boolean, Array] as PropType<any>,
     default: undefined,
+  },
+  options: {
+    type: Array as PropType<SelectOption[]>,
+    default: () => [],
+  },
+  labelKey: {
+    type: String,
+    default: 'label',
+  },
+  valueKey: {
+    type: String,
+    default: 'value',
   },
   multiple: Boolean,
   offsetY: {
@@ -29,14 +54,13 @@ export const props = {
     type: Array as PropType<Array<SelectValidateTrigger>>,
     default: () => ['onChange', 'onClear', 'onClose'],
   },
-  rules: Array as PropType<Array<(v: any) => any>>,
+  rules: [Array, Function, Object] as PropType<any>,
   onFocus: defineListenerProp<() => void>(),
   onBlur: defineListenerProp<() => void>(),
   onClose: defineListenerProp<(value: any) => void>(),
   onChange: defineListenerProp<(value: any) => void>(),
   onClear: defineListenerProp<(value: any) => void>(),
   'onUpdate:modelValue': defineListenerProp<(value: any) => void>(),
-  // dynamic internal
   ...pickProps(fieldDecoratorProps, [
     'size',
     'variant',

@@ -1,24 +1,24 @@
 :root {
   --table-background: #fff;
   --table-border-radius: 2px;
-  --table-thead-border-bottom: thin solid rgba(0, 0, 0, 0.12);
+  --table-thead-border-bottom: thin solid var(--color-outline);
   --table-thead-th-text-color: rgba(0, 0, 0, 0.6);
+  --table-thead-th-text-align: left;
   --table-thead-th-font-size: 14px;
-  --table-thead-tr-border-bottom: thin solid rgba(0, 0, 0, 0.12);
+  --table-thead-tr-border-bottom: thin solid var(--color-outline);
   --table-tbody-tr-hover-background: #eee;
-  --table-tbody-tr-border-bottom: thin solid rgba(0, 0, 0, 0.12);
+  --table-tbody-tr-border-bottom: thin solid var(--color-outline);
   --table-tbody-td-text-color: #555;
   --table-tbody-td-font-size: 16px;
+  --table-tbody-td-text-align: left;
   --table-row-height: 46px;
   --table-row-padding: 0 16px;
-  --table-footer-border-top: thin solid rgba(0, 0, 0, 0.12);
+  --table-footer-border-top: thin solid var(--color-outline);
 }
 
 .var-table {
   width: 100%;
-  background: var(--table-background);
   border-radius: var(--table-border-radius);
-  transition: 0.25s background-color;
 
   * {
     box-sizing: border-box;
@@ -26,7 +26,7 @@
 
   &__main {
     width: 100%;
-    overflow-x: auto;
+    overflow: auto;
 
     > table {
       min-width: 100%;
@@ -40,6 +40,8 @@
         border-bottom: var(--table-thead-border-bottom);
 
         tr {
+          background: var(--table-background);
+
           th {
             color: var(--table-thead-th-text-color);
             font-size: var(--table-thead-th-font-size);
@@ -58,6 +60,7 @@
           display: table-row;
           outline: 0;
           vertical-align: middle;
+          background: var(--table-background);
 
           &:hover {
             background: var(--table-tbody-tr-hover-background);
@@ -80,14 +83,14 @@
         height: var(--table-row-height);
         padding: var(--table-row-padding);
         font-weight: 500;
-        text-align: left;
+        text-align: var(--table-thead-th-text-align);
       }
 
       td {
         display: table-cell;
         padding: var(--table-row-padding);
         height: var(--table-row-height);
-        text-align: left;
+        text-align: var(--table-tbody-td-text-align);
       }
     }
   }
@@ -96,5 +99,6 @@
     width: 100%;
     min-height: var(--table-row-height);
     border-top: var(--table-footer-border-top);
+    background: var(--table-background);
   }
 }

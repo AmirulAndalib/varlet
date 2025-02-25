@@ -1,6 +1,4 @@
 packages/varlet-cli/lib/**
-packages/varlet-cli/site/**
-packages/varlet-cli/template/**
 
 packages/varlet-vite-plugins/lib/**
 
@@ -18,15 +16,16 @@ packages/varlet-ui/highlight/**
 packages/varlet-ui/types/index.d.ts
 packages/varlet-ui/types/styleVars.d.ts
 
-packages/varlet-ui-playground/dist/**
+packages/varlet-ui-playground/site/**
 packages/varlet-ui-playground/public/**
 packages/varlet-ui-playground/*.d.ts
+packages/varlet-preset-tailwindcss/lib/**
+packages/varlet-preset-unocss/lib/**
 packages/varlet-shared/lib/**
-packages/varlet-shared/es/**
+packages/varlet-import-resolver/lib/**
 packages/varlet-use/lib/**
 packages/varlet-touch-emulator/iife.js
 
-**/package.json
 *.md
 .github/**
 .history/**

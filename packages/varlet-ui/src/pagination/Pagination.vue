@@ -7,7 +7,7 @@
           n('item'),
           n('prev'),
           [current <= 1 || disabled, n('item--disabled')],
-          [simple, n('item--simple'), formatElevation(elevation, 2)]
+          [simple, n('item--simple'), formatElevation(elevation, 2)],
         )
       "
       @click="clickItem('prev')"
@@ -18,10 +18,11 @@
     </li>
     <li v-if="simple" :class="classes(n('simple'), [disabled, n('item--disabled')])">
       <var-input
+        v-model="simpleCurrentValue"
         var-pagination-cover
+        variant="standard"
         :hint="false"
         :disabled="disabled"
-        v-model="simpleCurrentValue"
         @blur="setPage('simple', simpleCurrentValue, $event)"
         @keydown.enter="setPage('simple', simpleCurrentValue, $event)"
       />
@@ -31,10 +32,10 @@
       </span>
     </li>
     <li
-      v-else
-      v-ripple="{ disabled }"
       v-for="(item, index) in pageList"
+      v-else
       :key="index"
+      v-ripple="{ disabled }"
       :item-mode="getMode(item, index)"
       :class="
         classes(
@@ -43,7 +44,7 @@
           [item === current && !disabled, n('item--active')],
           [isHideEllipsis(item, index), n('item--hide')],
           [disabled, n('item--disabled')],
-          [item === current && disabled, n('item--disabled--active')]
+          [item === current && disabled, n('item--disabled--active')],
         )
       "
       @click="clickItem(item, index)"
@@ -57,7 +58,7 @@
           n('item'),
           n('next'),
           [current >= pageCount || disabled, n('item--disabled')],
-          [simple, n('item--simple'), formatElevation(elevation, 2)]
+          [simple, n('item--simple'), formatElevation(elevation, 2)],
         )
       "
       @click="clickItem('next')"
@@ -67,34 +68,28 @@
       </slot>
     </li>
 
-    <li v-if="showSizeChanger" :class="classes(n('size'), [disabled, n('item--disabled')])">
-      <var-menu placement="cover-top" :disabled="disabled" v-model:show="menuVisible">
-        <div
-          :class="classes(n('size--open'), [current <= 1 || disabled, n('size--open--disabled')])"
-          @click.stop="showMenu"
-        >
-          <span>{{ size }}{{ pack.paginationItem }} / {{ pack.paginationPage }}</span>
+    <var-menu-select v-if="showSizeChanger" v-model="size" placement="cover-top" :disabled="disabled">
+      <li :class="classes(n('size'), [disabled, n('item--disabled')])">
+        <div :class="classes(n('size--open'), [current <= 1 || disabled, n('size--open--disabled')])">
+          <span>{{ size }}{{ (pt ? pt : t)('paginationItem') }} / {{ (pt ? pt : t)('paginationPage') }}</span>
           <var-icon :class="n('size--open-icon')" var-pagination-cover name="menu-down" />
         </div>
+      </li>
 
-        <template #menu>
-          <var-cell
-            :class="classes(n('list'), [size === option, n('list--active')])"
-            v-ripple
-            v-for="(option, index) in sizeOption"
-            :key="index"
-            @click="clickSize(option)"
-          >
-            {{ option }}{{ pack.paginationItem }} / {{ pack.paginationPage }}
-          </var-cell>
-        </template>
-      </var-menu>
-    </li>
+      <template #options>
+        <var-menu-option v-for="(option, index) in sizeOption" :key="index" :value="option" @click="clickSize">
+          {{ option }}{{ (pt ? pt : t)('paginationItem') }} / {{ (pt ? pt : t)('paginationPage') }}
+        </var-menu-option>
+      </template>
+    </var-menu-select>
+
     <li v-if="showQuickJumper && !simple" :class="classes(n('quickly'), [disabled, n('item--disabled')])">
-      {{ pack.paginationJump }}
+      {{ (pt ? pt : t)('paginationJump') }}
       <var-input
         v-model="quickJumperValue"
         :disabled="disabled"
+        :hint="false"
+        variant="standard"
         var-pagination-cover
         @blur="setPage('quick', quickJumperValue, $event)"
         @keydown.enter="setPage('quick', quickJumperValue, $event)"
@@ -108,31 +103,31 @@
 </template>
 
 <script lang="ts">
-import VarMenu from '../menu'
-import Ripple from '../ripple'
+import { computed, defineComponent, ref, watch } from 'vue'
+import { call, isNumber, toNumber } from '@varlet/shared'
 import VarIcon from '../icon'
-import VarCell from '../cell'
 import VarInput from '../input'
-import { defineComponent, ref, computed, watch } from 'vue'
-import { props, type Range } from './props'
-import { isNumber, toNumber, call } from '@varlet/shared'
-import { pack } from '../locale'
+import { t } from '../locale'
+import { injectLocaleProvider } from '../locale-provider/provide'
+import VarMenuOption from '../menu-option'
+import VarMenuSelect from '../menu-select'
+import Ripple from '../ripple'
 import { createNamespace, formatElevation } from '../utils/components'
+import { props, type Range } from './props'
 
 const { name, n, classes } = createNamespace('pagination')
 
 export default defineComponent({
   name,
   components: {
-    VarMenu,
+    VarMenuSelect,
+    VarMenuOption,
     VarIcon,
-    VarCell,
     VarInput,
   },
   directives: { Ripple },
   props,
   setup(props) {
-    const menuVisible = ref(false)
     const quickJumperValue = ref('')
     const simpleCurrentValue = ref('1')
     const isHideEllipsisHead = ref(false)
@@ -156,6 +151,8 @@ export default defineComponent({
       return props.showTotal(toNumber(props.total), range.value)
     })
 
+    const { t: pt } = injectLocaleProvider()
+
     watch([() => props.current, () => props.size], ([newCurrent, newSize]) => {
       current.value = toNumber(newCurrent) || 1
       size.value = toNumber(newSize || 10)
@@ -172,10 +169,11 @@ export default defineComponent({
 
         if (newCount - 2 > maxPagerCount) {
           if (oldCurrent === undefined || newCount !== oldCount) {
-            for (let i = 2; i < maxPagerCount + 2; i++) list.push(i)
+            for (let i = 2; i < maxPagerCount + 2; i++) {
+              list.push(i)
+            }
           }
 
-          // 左边不需要出现省略符号占位
           if (newCurrent <= maxPagerCount && newCurrent < rEllipseSign) {
             list = []
 
@@ -186,7 +184,7 @@ export default defineComponent({
             isHideEllipsisHead.value = true
             isHideEllipsisTail.value = false
           }
-          // 两边都需要出现省略符号占位
+
           if (newCurrent > maxPagerCount && newCurrent < rEllipseSign) {
             list = []
 
@@ -194,11 +192,10 @@ export default defineComponent({
               list.push(newCurrent + i - activePosition.value)
             }
 
-            // 针对 maxPagerCount===1 的特殊处理
             isHideEllipsisHead.value = newCurrent === 2 && maxPagerCount === 1
             isHideEllipsisTail.value = false
           }
-          // 右边不需要出现省略符号占位
+
           if (newCurrent >= rEllipseSign) {
             list = []
 
@@ -212,7 +209,9 @@ export default defineComponent({
 
           list = [1, '...', ...list, '...', newCount]
         } else {
-          for (let i = 1; i <= newCount; i++) list.push(i)
+          for (let i = 1; i <= newCount; i++) {
+            list.push(i)
+          }
         }
 
         pageList.value = list
@@ -226,17 +225,21 @@ export default defineComponent({
       },
       {
         immediate: true,
-      }
+      },
     )
 
     function isHideEllipsis(item: string | number, index: number): boolean {
-      if (isNumber(item)) return false
+      if (isNumber(item)) {
+        return false
+      }
 
       return index === 1 ? isHideEllipsisHead.value : isHideEllipsisTail.value
     }
 
     function getMode(item: string | number, index: number) {
-      if (isNumber(item)) return 'basic'
+      if (isNumber(item)) {
+        return 'basic'
+      }
 
       return index === 1 ? 'head' : 'tail'
     }
@@ -269,18 +272,7 @@ export default defineComponent({
       }
     }
 
-    function showMenu() {
-      if (props.disabled) {
-        return
-      }
-
-      menuVisible.value = true
-    }
-
-    function clickSize(option: number) {
-      size.value = option
-      menuVisible.value = false
-
+    function clickSize() {
       const targetCurrent = ensureCurrentBoundary(current.value)
       simpleCurrentValue.value = String(targetCurrent)
       current.value = targetCurrent
@@ -311,21 +303,20 @@ export default defineComponent({
     }
 
     return {
-      pack,
       current,
-      menuVisible,
       size,
       pageCount,
       pageList,
       quickJumperValue,
       simpleCurrentValue,
       totalText,
+      pt,
+      t,
       n,
       classes,
       getMode,
       isHideEllipsis,
       clickItem,
-      showMenu,
       clickSize,
       setPage,
       toNumber,
@@ -338,6 +329,8 @@ export default defineComponent({
 <style lang="less">
 @import '../styles/common';
 @import '../menu/menu';
+@import '../menu-select/menuSelect';
+@import '../menu-option/menuOption';
 @import '../cell/cell';
 @import '../ripple/ripple';
 @import '../icon/icon';

@@ -1,19 +1,19 @@
-import Picker from '..'
-import VarPicker from '../Picker'
 import { createApp } from 'vue'
-import { delay, trigger, mockTranslate } from '../../utils/test'
-import { expect, vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
+import Picker from '..'
+import { delay, mockTranslate, trigger } from '../../utils/test'
+import VarPicker from '../Picker'
 
 mockTranslate()
 
-test('test picker plugin', () => {
+test('picker plugin', () => {
   const app = createApp({}).use(Picker)
   expect(app.component(VarPicker.name)).toBeTruthy()
 })
 
 const columns = [[{ text: 'A' }, { text: 'B' }, { text: 'C' }]]
 
-test('test picker functional show & close', async () => {
+test('picker functional show & close', async () => {
   const onOpen = vi.fn()
   const onOpened = vi.fn()
   const onClose = vi.fn()
@@ -43,7 +43,7 @@ test('test picker functional show & close', async () => {
   expect(onClosed).toHaveBeenCalledTimes(1)
 })
 
-test('test picker functional confirm', async () => {
+test('picker functional confirm', async () => {
   const onConfirm = vi.fn()
 
   Picker({
@@ -60,7 +60,7 @@ test('test picker functional confirm', async () => {
   await delay(300)
 })
 
-test('test picker functional cancel', async () => {
+test('picker functional cancel', async () => {
   const onCancel = vi.fn()
 
   Picker({
@@ -78,7 +78,7 @@ test('test picker functional cancel', async () => {
   await delay(300)
 })
 
-test('test safe area', async () => {
+test('safe area', async () => {
   Picker({
     columns,
     safeArea: true,

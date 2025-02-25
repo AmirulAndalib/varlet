@@ -1,15 +1,16 @@
-import flip from '@popperjs/core/lib/modifiers/flip'
-import offset from '@popperjs/core/lib/modifiers/offset'
-import computeStyles from '@popperjs/core/lib/modifiers/computeStyles'
-import { useClickOutside, useVModel } from '@varlet/use'
-import { doubleRaf, getStyle, call } from '@varlet/shared'
-import { toPxNum } from '../utils/elements'
-import { type ListenerProp } from '../utils/components'
 import { onMounted, onUnmounted, ref, watch, type Ref } from 'vue'
-import { createPopper } from '@popperjs/core/lib/popper-lite'
-import { useZIndex } from '../context/zIndex'
-import { type Instance, type Modifier } from '@popperjs/core/lib/types'
 import { type Placement as PopperPlacement, type PositioningStrategy } from '@popperjs/core'
+import computeStyles from '@popperjs/core/lib/modifiers/computeStyles.js'
+import flip from '@popperjs/core/lib/modifiers/flip.js'
+import offset from '@popperjs/core/lib/modifiers/offset.js'
+import { createPopper } from '@popperjs/core/lib/popper-lite.js'
+import { type Instance, type Modifier } from '@popperjs/core/lib/types'
+import { call, doubleRaf, getStyle, isString, preventDefault } from '@varlet/shared'
+import { onWindowResize, useEventListener, useVModel } from '@varlet/use'
+import { useStack } from '../context/stack'
+import { useZIndex } from '../context/zIndex'
+import { type ListenerProp } from '../utils/components'
+import { toPxNum } from '../utils/elements'
 
 export type NeededPopperPlacement = Exclude<PopperPlacement, 'auto' | 'auto-start' | 'auto-end'>
 
@@ -19,10 +20,12 @@ export interface Position {
   distance: number
 }
 
-export interface HostSize {
+export interface ReferenceSize {
   width: number
   height: number
 }
+
+export type Reference = string | HTMLElement
 
 export type Placement =
   | NeededPopperPlacement
@@ -35,55 +38,106 @@ export type Placement =
   | 'cover-left'
   | 'cover-right'
 
+export type Trigger = 'hover' | 'click' | 'manual'
+
 export interface UsePopoverOptions {
   show: boolean
-  trigger: 'hover' | 'click'
+  trigger: Trigger
   placement: Placement
   strategy: PositioningStrategy
   disabled: boolean
   offsetX: string | number
   offsetY: string | number
-  reference?: string
+  reference?: string | HTMLElement
   closeOnClickReference?: boolean
+  closeOnKeyEscape?: boolean
   onOpen?: ListenerProp<() => void>
   onClose?: ListenerProp<() => void>
   onClosed?: ListenerProp<() => void>
   onClickOutside?: ListenerProp<(event: Event) => void>
+  cascadeOptimization?: boolean
   'onUpdate:show'?: ListenerProp<(show: boolean) => void>
 }
 
 export function usePopover(options: UsePopoverOptions) {
   const host: Ref<null | HTMLElement> = ref(null)
   const popover: Ref<null | HTMLElement> = ref(null)
-  const hostSize: Ref<HostSize> = ref({ width: 0, height: 0 })
+  const referenceSize: Ref<ReferenceSize> = ref({ width: 0, height: 0 })
   const show = useVModel(options, 'show', {
     passive: true,
     defaultValue: false,
-    emit(event, value) {
+    emit(_event, value) {
       if (value) {
-        resize()
         call(options.onOpen)
       } else {
         call(options.onClose)
       }
     },
   })
+
   const { zIndex } = useZIndex(() => show.value, 1)
+  useStack(() => show.value, zIndex)
 
   let popoverInstance: Instance | null = null
+  let reference: Reference | undefined = undefined
   let enterPopover = false
-  let enterHost = false
+  let enterReference = false
+  let allowClose = true
 
-  const computeHostSize = () => {
-    const { width, height } = getStyle(host.value!)
+  useEventListener(() => window, 'keydown', handleKeydown)
+  watch(() => [options.offsetX, options.offsetY, options.placement, options.strategy], resize)
+  watch(() => options.disabled, close)
+  watch(
+    () => show.value,
+    (newValue) => {
+      if (newValue) {
+        resize()
+      }
+    },
+  )
 
-    hostSize.value = {
+  onWindowResize(resize)
+  onMounted(createPopperInstance)
+  onUnmounted(destroyPopperInstance)
+
+  function createPopperInstance() {
+    const reference = getReference()!
+
+    popoverInstance = createPopper(reference, popover.value!, getPopperOptions())
+    reference.addEventListener('mouseenter', handleReferenceMouseenter)
+    reference.addEventListener('mouseleave', handleReferenceMouseleave)
+    reference.addEventListener('click', handleReferenceClick)
+    document.addEventListener('click', handleClickOutside)
+  }
+
+  function destroyPopperInstance() {
+    const reference = getReference()
+
+    if (reference) {
+      reference.removeEventListener('mouseenter', handleReferenceMouseenter)
+      reference.removeEventListener('mouseleave', handleReferenceMouseleave)
+      reference.removeEventListener('click', handleReferenceClick)
+    }
+
+    popoverInstance!.destroy()
+    document.removeEventListener('click', handleClickOutside)
+  }
+
+  function computeReferenceSize() {
+    const reference = getReference()
+    if (!reference) {
+      return
+    }
+
+    const { width, height } = getStyle(reference)
+
+    referenceSize.value = {
       width: toPxNum(width),
       height: toPxNum(height),
     }
   }
 
-  const getTransformOrigin = () => {
+  function getTransformOrigin() {
     switch (options.placement) {
       case 'top':
       case 'cover-bottom':
@@ -123,22 +177,22 @@ export function usePopover(options: UsePopoverOptions) {
     }
   }
 
-  const handleHostMouseenter = () => {
+  function handleReferenceMouseenter() {
     if (options.trigger !== 'hover') {
       return
     }
 
-    enterHost = true
+    enterReference = true
 
     open()
   }
 
-  const handleHostMouseleave = async () => {
+  async function handleReferenceMouseleave() {
     if (options.trigger !== 'hover') {
       return
     }
 
-    enterHost = false
+    enterReference = false
 
     await doubleRaf()
 
@@ -149,15 +203,19 @@ export function usePopover(options: UsePopoverOptions) {
     close()
   }
 
-  const handlePopoverMouseenter = () => {
+  function handlePopoverMouseenter() {
     if (options.trigger !== 'hover') {
       return
     }
 
     enterPopover = true
+
+    if (options.cascadeOptimization) {
+      allowClose = false
+    }
   }
 
-  const handlePopoverMouseleave = async () => {
+  async function handlePopoverMouseleave() {
     if (options.trigger !== 'hover') {
       return
     }
@@ -166,43 +224,52 @@ export function usePopover(options: UsePopoverOptions) {
 
     await doubleRaf()
 
-    if (enterHost) {
+    if (enterReference) {
       return
     }
 
     close()
   }
 
-  const handleHostClick = () => {
-    if (options.closeOnClickReference && show.value) {
-      close()
-    } else {
-      open()
-    }
-  }
-
-  const handlePopoverClose = () => {
-    close()
-  }
-
-  const handleClickOutside = (e: Event) => {
+  function handleReferenceClick() {
     if (options.trigger !== 'click') {
       return
     }
 
-    handlePopoverClose()
-    call(options.onClickOutside, e)
+    if (options.closeOnClickReference && show.value) {
+      close()
+      return
+    }
+
+    open()
   }
 
-  const handleClosed = () => {
+  function handleClickOutside(e: Event) {
+    const reference = getReference()
+
+    if (reference && !reference.contains(e.target as Node)) {
+      if (options.trigger !== 'click') {
+        return
+      }
+
+      handlePopoverClose()
+      call(options.onClickOutside, e)
+    }
+  }
+
+  function handlePopoverClose() {
+    close()
+  }
+
+  function handleClosed() {
     resize()
     call(options.onClosed)
   }
 
-  const getPosition = (): Position => {
+  function getPosition(): Position {
     const { offsetX, offsetY, placement } = options
 
-    computeHostSize()
+    computeReferenceSize()
 
     const offset = {
       x: toPxNum(offsetX),
@@ -214,56 +281,56 @@ export function usePopover(options: UsePopoverOptions) {
         return {
           placement: 'bottom',
           skidding: offset.x,
-          distance: offset.y - hostSize.value.height,
+          distance: offset.y - referenceSize.value.height,
         }
 
       case 'cover-top-start':
         return {
           placement: 'bottom-start',
           skidding: offset.x,
-          distance: offset.y - hostSize.value.height,
+          distance: offset.y - referenceSize.value.height,
         }
 
       case 'cover-top-end':
         return {
           placement: 'bottom-end',
           skidding: offset.x,
-          distance: offset.y - hostSize.value.height,
+          distance: offset.y - referenceSize.value.height,
         }
 
       case 'cover-bottom':
         return {
           placement: 'top',
           skidding: offset.x,
-          distance: -offset.y - hostSize.value.height,
+          distance: -offset.y - referenceSize.value.height,
         }
 
       case 'cover-bottom-start':
         return {
           placement: 'top-start',
           skidding: offset.x,
-          distance: -offset.y - hostSize.value.height,
+          distance: -offset.y - referenceSize.value.height,
         }
 
       case 'cover-bottom-end':
         return {
           placement: 'top-end',
           skidding: offset.x,
-          distance: -offset.y - hostSize.value.height,
+          distance: -offset.y - referenceSize.value.height,
         }
 
       case 'cover-left':
         return {
           placement: 'right',
           skidding: offset.y,
-          distance: offset.x - hostSize.value.width,
+          distance: offset.x - referenceSize.value.width,
         }
 
       case 'cover-right':
         return {
           placement: 'left',
           skidding: offset.y,
-          distance: -offset.x - hostSize.value.width,
+          distance: -offset.x - referenceSize.value.width,
         }
 
       case 'left':
@@ -304,7 +371,7 @@ export function usePopover(options: UsePopoverOptions) {
     }
   }
 
-  const getPopperOptions = () => {
+  function getPopperOptions() {
     const { placement, skidding, distance } = getPosition()
     const modifiers: Modifier<any, any>[] = [
       {
@@ -342,18 +409,42 @@ export function usePopover(options: UsePopoverOptions) {
     }
   }
 
-  const getReference = () => (options.reference ? host.value!.querySelector(options.reference)! : host.value!)
+  function getReference() {
+    const targetReference = reference ?? options.reference ?? host.value
+
+    if (isString(targetReference)) {
+      return host.value?.querySelector(targetReference)
+    }
+
+    return targetReference
+  }
+
+  function setAllowClose(value: boolean) {
+    allowClose = value
+  }
+
+  function setReference(newReference: Reference) {
+    destroyPopperInstance()
+    reference = newReference
+    createPopperInstance()
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    const { closeOnKeyEscape = false } = options
+    if (event.key === 'Escape' && closeOnKeyEscape && show.value) {
+      preventDefault(event)
+      close()
+    }
+  }
 
   // expose
-  const resize = () => {
+  function resize() {
     popoverInstance!.setOptions(getPopperOptions())
   }
 
   // expose
-  const open = () => {
-    const { disabled } = options
-
-    if (disabled) {
+  function open() {
+    if (options.disabled) {
       return
     }
 
@@ -362,36 +453,27 @@ export function usePopover(options: UsePopoverOptions) {
   }
 
   // expose
-  const close = () => {
+  function close() {
+    if (!allowClose) {
+      return
+    }
+
     show.value = false
     call(options['onUpdate:show'], false)
   }
-
-  useClickOutside(getReference, 'click', handleClickOutside)
-
-  watch(() => [options.offsetX, options.offsetY, options.placement, options.strategy], resize)
-  watch(() => options.disabled, close)
-
-  onMounted(() => {
-    popoverInstance = createPopper(getReference() ?? host.value!, popover.value!, getPopperOptions())
-  })
-  onUnmounted(() => {
-    popoverInstance!.destroy()
-  })
 
   return {
     show,
     popover,
     zIndex,
     host,
-    hostSize,
-    handleHostClick,
-    handleHostMouseenter,
-    handleHostMouseleave,
+    referenceSize,
     handlePopoverClose,
     handlePopoverMouseenter,
     handlePopoverMouseleave,
     handleClosed,
+    setReference,
+    setAllowClose,
     resize,
     open,
     close,

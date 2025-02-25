@@ -1,6 +1,6 @@
+import { type ButtonHTMLAttributes, type PropType } from 'vue'
 import { loadingProps } from '../loading'
 import { defineListenerProp, pickProps } from '../utils/components'
-import { type ButtonHTMLAttributes, type PropType } from 'vue'
 
 export type ButtonType = 'default' | 'primary' | 'info' | 'success' | 'warning' | 'danger'
 
@@ -20,7 +20,12 @@ export const props = {
   outline: Boolean,
   disabled: Boolean,
   autoLoading: Boolean,
+  iconContainer: Boolean,
   ripple: {
+    type: Boolean,
+    default: true,
+  },
+  focusable: {
     type: Boolean,
     default: true,
   },
@@ -32,7 +37,10 @@ export const props = {
   },
   loadingRadius: [Number, String],
   loadingType: pickProps(loadingProps, 'type'),
-  loadingSize: pickProps(loadingProps, 'size'),
+  loadingSize: {
+    ...pickProps(loadingProps, 'size'),
+    default: undefined,
+  },
   loadingColor: {
     ...pickProps(loadingProps, 'color'),
     default: 'currentColor',

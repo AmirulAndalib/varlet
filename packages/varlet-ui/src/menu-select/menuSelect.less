@@ -2,7 +2,7 @@
   --menu-select-menu-max-height: 278px;
   --menu-select-menu-padding: 0;
   --menu-select-menu-border-radius: 2px;
-  --menu-select-menu-background-color: #fff;
+  --menu-select-menu-background-color: var(--color-surface-container-high);
 }
 
 .var-menu-select {
@@ -16,4 +16,9 @@
     overflow-y: auto;
     max-height: var(--menu-select-menu-max-height);
   }
+}
+
+.var-menu-children[var-menu-children-cover] {
+  width: 100%;
+  display: block;
 }

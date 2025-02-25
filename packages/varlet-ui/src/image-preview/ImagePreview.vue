@@ -1,17 +1,19 @@
 <template>
   <var-popup
-    :class="n('popup')"
+    v-model:show="show"
     var-image-preview-cover
+    :class="n('popup')"
     :transition="n('$-fade')"
-    :show="popupShow"
     :overlay="false"
     :close-on-click-overlay="false"
+    :close-on-key-escape="closeOnKeyEscape"
     :lock-scroll="lockScroll"
     :teleport="teleport"
     @open="onOpen"
     @close="onClose"
     @closed="onClosed"
     @opened="onOpened"
+    @key-escape="onKeyEscape"
     @route-change="onRouteChange"
   >
     <var-swipe
@@ -20,13 +22,13 @@
       var-image-preview-cover
       :touchable="canSwipe"
       :indicator="indicator && images.length > 1"
-      :initial-index="initialIndex"
+      :initial-index="toNumber(initialIndex)"
       :loop="loop"
-      @change="onChange"
       v-bind="$attrs"
+      @change="onChange"
     >
       <template #default>
-        <var-swipe-item :class="n('swipe-item')" var-image-preview-cover v-for="(image, idx) in images" :key="image">
+        <var-swipe-item v-for="(image, idx) in images" :key="image" :class="n('swipe-item')" var-image-preview-cover>
           <div
             :class="n('zoom-container')"
             :style="{
@@ -39,39 +41,44 @@
             @touchend="handleTouchend"
             @touchcancel="handleTouchcancel"
           >
-            <img :class="classes(n('image'), [isPreventDefault, n('--prevent')])" :src="image" :alt="image" />
+            <img
+              role="img"
+              :class="classes(n('image'), [isPreventDefault, n('--prevent')])"
+              :src="image"
+              :alt="image"
+            />
           </div>
         </var-swipe-item>
       </template>
 
       <template #indicator="{ index, length }">
         <slot name="indicator" :index="index" :length="length">
-          <div :class="n('indicators')" v-if="indicator && images.length > 1">{{ index + 1 }} / {{ length }}</div>
+          <div v-if="indicator && images.length > 1" :class="n('indicators')">{{ index + 1 }} / {{ length }}</div>
         </slot>
       </template>
     </var-swipe>
 
     <slot name="close-icon">
-      <var-icon :class="n('close-icon')" name="close-circle" var-image-preview-cover v-if="closeable" @click="close" />
+      <var-icon v-if="closeable" :class="n('close-icon')" name="close-circle" var-image-preview-cover @click="close" />
     </slot>
 
-    <div :class="n('extra')" v-if="$slots.extra">
+    <div v-if="$slots.extra" :class="n('extra')">
       <slot name="extra" />
     </div>
   </var-popup>
 </template>
 
 <script lang="ts">
-import VarSwipe from '../swipe'
-import VarSwipeItem from '../swipe-item'
+import { computed, defineComponent, ref } from 'vue'
+import { call, clamp, preventDefault, toNumber } from '@varlet/shared'
+import { useEventListener, useTouch, useVModel } from '@varlet/use'
 import VarIcon from '../icon'
 import VarPopup from '../popup'
-import { defineComponent, ref, computed, watch } from 'vue'
-import { toNumber, clamp, preventDefault, call } from '@varlet/shared'
-import { useEventListener, useTouch } from '@varlet/use'
-import { props } from './props'
-import { createNamespace } from '../utils/components'
+import VarSwipe from '../swipe'
+import VarSwipeItem from '../swipe-item'
 import { type SwipeToOptions } from '../swipe/props'
+import { createNamespace } from '../utils/components'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('image-preview')
 
@@ -93,7 +100,7 @@ export default defineComponent({
   inheritAttrs: false,
   props,
   setup(props) {
-    const popupShow = ref(false)
+    const show = useVModel(props, 'show')
     const scale = ref(1)
     const translateX = ref(0)
     const translateY = ref(0)
@@ -102,19 +109,6 @@ export default defineComponent({
     const canSwipe = ref(true)
     const swipeRef = ref<InstanceType<typeof VarSwipe> | null>(null)
     const { moveX, moveY, distance, startTime, startTouch, moveTouch, endTouch } = useTouch()
-    const initialIndex = computed(() => {
-      // For compatibility with current, temporarily keep this computed method
-      // Current will be replaced by initialIndex in the future
-      const { images, current, initialIndex } = props
-
-      if (initialIndex != null) {
-        return toNumber(initialIndex)
-      }
-
-      const index = images.findIndex((image: string) => image === current)
-
-      return Math.max(index, 0)
-    })
     const isPreventDefault = computed(() => {
       const { imagePreventDefault, show } = props
       return show && imagePreventDefault
@@ -129,14 +123,6 @@ export default defineComponent({
     }
 
     useEventListener(() => document, 'contextmenu', preventImageDefault)
-
-    watch(
-      () => props.show,
-      (newShow) => {
-        popupShow.value = newShow
-      },
-      { immediate: true }
-    )
 
     function zoomIn(ratio: number | string) {
       scale.value = toNumber(ratio)
@@ -330,8 +316,7 @@ export default defineComponent({
     return {
       swipeRef,
       isPreventDefault,
-      initialIndex,
-      popupShow,
+      show,
       scale,
       translateX,
       translateY,
@@ -340,6 +325,7 @@ export default defineComponent({
       transitionDuration,
       n,
       classes,
+      toNumber,
       handleTouchstart,
       handleTouchmove,
       handleTouchend,

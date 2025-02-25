@@ -10,13 +10,13 @@
 <template>
   <var-swipe class="swipe-example">
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat2.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat2.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat3.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat3.jpg">
     </var-swipe-item>
   </var-swipe>
 </template>
@@ -41,13 +41,13 @@
 <template>
   <var-swipe class="swipe-example" :loop="false">
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat2.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat2.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat3.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat3.jpg">
     </var-swipe-item>
   </var-swipe>
 </template>
@@ -72,13 +72,13 @@
 <template>
   <var-swipe class="swipe-example" :autoplay="2000">
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat2.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat2.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat3.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat3.jpg">
     </var-swipe-item>
   </var-swipe>
 </template>
@@ -103,13 +103,13 @@
 <template>
   <var-swipe class="swipe-example" vertical>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat2.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat2.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat3.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat3.jpg">
     </var-swipe-item>
   </var-swipe>
 </template>
@@ -136,25 +136,25 @@
 <template>
   <var-swipe class="swipe-example" navigation>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat2.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat2.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat3.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat3.jpg">
     </var-swipe-item>
   </var-swipe>
 
   <var-swipe class="swipe-example" navigation="hover">
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat2.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat2.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat3.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat3.jpg">
     </var-swipe-item>
   </var-swipe>
 </template>
@@ -184,13 +184,13 @@ import { Snackbar } from '@varlet/ui'
 <template>
   <var-swipe class="swipe-example" @change="(index) => Snackbar(String(index))">
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat2.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat2.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat3.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat3.jpg">
     </var-swipe-item>
   </var-swipe>
 </template>
@@ -215,13 +215,13 @@ import { Snackbar } from '@varlet/ui'
 <template>
   <var-swipe class="swipe-example">
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat2.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat2.jpg">
     </var-swipe-item>
     <var-swipe-item>
-      <img class="swipe-example-image" src="https://varlet.gitee.io/varlet-ui/cat3.jpg">
+      <img class="swipe-example-image" src="https://varletjs.org/cat3.jpg">
     </var-swipe-item>
 
     <template #indicator="{ index, length, to }">
@@ -288,7 +288,7 @@ import { Snackbar } from '@varlet/ui'
 | `indicator-color` | 指示器颜色 | _string_ | `-` |
 | `vertical` | 是否开启垂直轮播 | _boolean_ | `false` |
 | `touchable` | 是否可以拖动 | _boolean_ | `true` |
-| `navigation` | 是否显示导航箭头 | _boolean \| string_ | `false` |
+| `navigation` | 是否显示导航箭头。设置为 `hover` 时，指针悬浮会显示导航按钮 | _boolean \| string_ | `false` |
 
 ### 方法
 

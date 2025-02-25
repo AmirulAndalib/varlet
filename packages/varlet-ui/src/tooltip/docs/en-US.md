@@ -1,6 +1,7 @@
 # Tooltip
 
 ### Intro
+
 Displays a tooltip when the element is clicked or hovered, 
 and changes the display position of the tooltip by controlling the placement and offset.
 
@@ -109,7 +110,7 @@ const placementOptions = [
 
 ```html
 <template>
-  <var-tooltip content="Tooltip" color="#d81b60">
+  <var-tooltip content="Tooltip" color="#d81b60" text-color="#fff">
     <var-button type="primary">Custom Color</var-button>
   </var-tooltip>
 </template>
@@ -167,7 +168,7 @@ In the `disabled` state, the tooltip will not be opened.
 ```html
 <template>
   <var-tooltip content="Tooltip" disabled>
-    <var-button type="primary" disabled>Disabled</var-button>
+    <var-button type="primary">Disabled</var-button>
   </var-tooltip>
 </template>
 ```
@@ -181,17 +182,19 @@ In the `disabled` state, the tooltip will not be opened.
 | `v-model:show` | Whether to show the tooltip                                    | _boolean_             | `false`   |
 | `content` | Display content | _string_              | `-`       |
 | `color`          | Tooltip background color                                                            | _string_  | `-`       |
+| `text-color`  ***3.5.0***   | Tooltip text color                                                                  | _string_  | `-`       |
 | `type`           | Tooltip type, can be set to `default` `primary` `info` `success` `warning` `danger` | _string_  | `default` |
-| `placement` | Tooltip popup placement                                        | _Placement_          | `top`     |
+| `placement` | Tooltip popup placement                                        | _Placement_          | `bottom`     |
 | `strategy`       | Tooltip position strategy, optional value is `absolute` `fixed` | _string_              | `absolute`           |
 | `offset-x` | The x-axis offset, relative to the tooltip-aligned position    | _number \| string_   | `0` |
 | `offset-y` | The y-axis offset, relative to the tooltip-aligned position    | _number \| string_   | `0` |
 | `teleport` | The location of the tooltip mount                                                     | _TeleportProps['to'] \| false_ | `body`    |
 | `same-width`    | Whether to same width as trigger element                   | _boolean_ | `false`           |
 | `disabled` | Whether to disable the tooltip                                                      | _boolean_            | `false`   |
-| `trigger` | Tooltip trigger method, optional value is `click` `hover`, `click` is triggered when clicked, `hover` is triggered when hovered | _string_  | `hover`   |
-| `reference`       | The associated trigger element selector is used to specify specific child elements as trigger elements | _string_              | `-`           |
+| `trigger` | Tooltip trigger method, optional value is `click` `hover` `manual` | _string_  | `hover`   |
+| `reference` | The trigger element associated with the tooltip, the `string` type is the descendant element selector of the menu component, the `HTMLElement` type is any specified element node | _string \| HTMLElement_ | `-` |
 | `close-on-click-reference` | Whether to close the menu when clicking the reference element | _boolean_ | `false` |
+| `close-on-key-escape` | Whether to support keyboard ESC to close the tooltip | _boolean_ | `true`  |
 
 ### Placement
 
@@ -211,11 +214,13 @@ In the `disabled` state, the tooltip will not be opened.
 | `left-end` | Bottom left position                    |
 
 ### Methods
-| Method   | Description                     | Arguments | Return |
+
+| Method   | Description     | Arguments | Return |
 | --- |---------------------------------| --- | --- |
 | `open` | Open `Tooltip`                       | `-` | `-` |
 | `close` | Close `Tooltip`                      | `-` | `-` |
 | `resize` | This method can be called to redraw when the default slot element of `Tooltip` changes its position and size | `-` | `-` |
+| `setReference` ***3.7.2*** | Set the trigger element associated with the `Tooltip` | `reference: consistent with the reference of the component attribute` | `-` |
 
 ### Events
 
@@ -225,7 +230,7 @@ In the `disabled` state, the tooltip will not be opened.
 | `opened` | Triggered when the open `Tooltip` animation ends    | `-` |
 | `close` | Triggered when the `Tooltip` is closed              | `-` |
 | `closed` | Triggered when the closing `Tooltip` animation ends | `-` |
-| `click-outside` | Triggered when clicking outside the menu | `event: Event` |
+| `click-outside` | Triggered when clicking outside the tooltip | `event: Event` |
 
 ### Slots
 
@@ -233,6 +238,7 @@ In the `disabled` state, the tooltip will not be opened.
 | --- |----------------------| --- |
 | `default` | Tooltip trigger element | `-` |
 | `content` | Tooltip content         | `-` |
+| `click-outside` | Triggered when clicking outside the menu | `event: Event` |
 
 ### Style Variables
 
@@ -244,10 +250,16 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--tooltip-border-radius` | `4px` |
 | `--tooltip-font-size` | `14px` |
 | `--tooltip-padding` | `8px 16px` |
-| `--tooltip-default-color` | `#616161` |
 | `--tooltip-offset` | `10px` |
+| `--tooltip-default-color` | `#616161` |
 | `--tooltip-primary-color` | `var(--color-primary)` |
 | `--tooltip-info-color` | `var(--color-info)` |
 | `--tooltip-success-color` | `var(--color-success)` |
 | `--tooltip-warning-color` | `var(--color-warning)` |
 | `--tooltip-danger-color` | `var(--color-danger)` |
+| `--tooltip-default-text-color` | `#fff` |
+| `--tooltip-primary-text-color` | `var(--color-on-primary)` |
+| `--tooltip-info-text-color` | `var(--color-on-info)` |
+| `--tooltip-success-text-color` | `var(--color-on-success)` |
+| `--tooltip-warning-text-color` | `var(--color-on-warning)` |
+| `--tooltip-danger-text-color` | `var(--color-on-danger)` |

@@ -1,5 +1,5 @@
 :root {
-  --popup-content-background-color: #fff;
+  --popup-content-background-color: var(--color-surface-container-low);
   --popup-overlay-background-color: rgba(0, 0, 0, 0.6);
 }
 
@@ -69,11 +69,9 @@
   bottom: 0;
   left: 0;
   overflow: auto;
+  scrollbar-width: none;
 
   &__overlay {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     position: fixed;
     top: 0;
     right: 0;
@@ -86,6 +84,7 @@
   &__content {
     overflow: auto;
     transition: all 0.25s;
+    pointer-events: auto;
   }
 
   &--content-background-color {
@@ -132,5 +131,9 @@
   &--safe-area-top {
     padding-top: constant(safe-area-inset-top);
     padding-top: env(safe-area-inset-top);
+  }
+
+  &--pointer-events-none {
+    pointer-events: none;
   }
 }

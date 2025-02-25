@@ -19,11 +19,13 @@ export type ThumbsProps = {
 }
 
 export interface ThumbsListProps {
-  value: number | number[]
+  value: number
   enumValue: Thumbs
   text: number
   hovering: boolean
+  focusing: boolean
   handleHovering: (value: boolean) => void
+  handleFocusing: (value: boolean) => void
 }
 
 export type SliderLabel = 'always' | 'normal' | 'never'
@@ -65,7 +67,7 @@ export const props = {
     type: String as PropType<SliderDirection>,
     default: 'horizontal',
   },
-  rules: Array as PropType<Array<(v: any) => any>>,
+  rules: [Array, Function, Object] as PropType<any>,
   onChange: defineListenerProp<(value: number | Array<number>) => void>(),
   onStart: defineListenerProp<() => void>(),
   onEnd: defineListenerProp<(value: number | Array<number>) => void>(),

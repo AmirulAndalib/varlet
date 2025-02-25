@@ -7,6 +7,7 @@ export interface UseSelectControllerOptions {
   multiple: () => boolean
   optionProviders: () => OptionProvider[]
   optionProvidersLength: () => number
+  optionIsIndeterminate?: (option: OptionProvider) => boolean
 }
 
 export function useSelectController(options: UseSelectControllerOptions) {
@@ -15,9 +16,10 @@ export function useSelectController(options: UseSelectControllerOptions) {
     modelValue: modelValueGetter,
     optionProviders: optionProvidersGetter,
     optionProvidersLength: optionProvidersLengthGetter,
+    optionIsIndeterminate,
   } = options
-  const label = ref<string | number>('')
-  const labels = ref<(string | number)[]>([])
+  const label = ref<any>('')
+  const labels = ref<any[]>([])
 
   watch(modelValueGetter, syncOptions, { deep: true })
   watch(optionProvidersLengthGetter, syncOptions)
@@ -51,19 +53,17 @@ export function useSelectController(options: UseSelectControllerOptions) {
     return option?.label.value ?? ''
   }
 
-  function findValueOrLabel({ value, label }: OptionProvider) {
-    if (value.value != null) {
-      return value.value
-    }
-
-    return label.value
+  function getOptionProviderKey({ value, label }: OptionProvider) {
+    return value.value ?? label.value
   }
 
   function getSelectedValue(option: OptionProvider) {
     const multiple = multipleGetter()
     const options = optionProvidersGetter()
 
-    return multiple ? options.filter(({ selected }) => selected.value).map(findValueOrLabel) : findValueOrLabel(option)
+    return multiple
+      ? options.filter(({ selected }) => selected.value).map(getOptionProviderKey)
+      : getOptionProviderKey(option)
   }
 
   function syncOptions() {
@@ -72,9 +72,14 @@ export function useSelectController(options: UseSelectControllerOptions) {
     const options = optionProvidersGetter()
 
     if (multiple) {
-      options.forEach((option) => option.sync(modelValue.includes(findValueOrLabel(option))))
+      options.forEach((option) =>
+        option.sync(
+          modelValue.includes(getOptionProviderKey(option)),
+          optionIsIndeterminate ? optionIsIndeterminate(option) : undefined,
+        ),
+      )
     } else {
-      options.forEach((option) => option.sync(modelValue === findValueOrLabel(option)))
+      options.forEach((option) => option.sync(modelValue === getOptionProviderKey(option)))
     }
 
     computeLabel()
@@ -83,6 +88,7 @@ export function useSelectController(options: UseSelectControllerOptions) {
   return {
     label,
     labels,
+    getOptionProviderKey,
     computeLabel,
     getSelectedValue,
   }

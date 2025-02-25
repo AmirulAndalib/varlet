@@ -1,5 +1,5 @@
-import type { Plugin } from 'vite'
 import fse from 'fs-extra'
+import type { Plugin } from 'vite'
 
 const { pathExistsSync, writeFileSync, readFileSync, removeSync } = fse
 
@@ -20,13 +20,11 @@ export function inlineCss(options: InlineCssOptions): Plugin {
 
       if (!pathExistsSync(cssFile)) {
         this.warn('css file cannot found')
-        onEnd?.()
         return
       }
 
       if (!pathExistsSync(jsFile)) {
-        this.error('js file cannot found')
-        onEnd?.()
+        this.warn('js file cannot found')
         return
       }
 

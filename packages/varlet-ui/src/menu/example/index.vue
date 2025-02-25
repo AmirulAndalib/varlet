@@ -1,8 +1,8 @@
 <script setup>
-import { Themes, Snackbar } from '@varlet/ui'
-import { AppType, watchLang, watchDarkMode } from '@varlet/cli/client'
 import { ref } from 'vue'
-import { pack, use } from './locale/index'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { Snackbar } from '@varlet/ui'
+import { t, use } from './locale/index'
 
 const show = ref(false)
 const trigger = ref('click')
@@ -30,27 +30,27 @@ const placementOptions = ref([
   'cover-right',
 ])
 
+watchLang(use)
+onThemeChange()
+
 function closeMenu() {
   show.value = false
 }
-
-watchLang(use)
-watchDarkMode(Themes.dark)
 </script>
 
 <template>
-  <app-type>{{ pack.basicUsage }}</app-type>
+  <app-type>{{ t('basicUsage') }}</app-type>
   <var-menu>
-    <var-button type="primary">{{ pack.basicUsage }}</var-button>
+    <var-button type="primary">{{ t('basicUsage') }}</var-button>
     <template #menu>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
     </template>
   </var-menu>
 
-  <app-type>{{ pack.placement }}</app-type>
-  <var-select :hint="false" v-model="placementValue">
+  <app-type>{{ t('placement') }}</app-type>
+  <var-select v-model="placementValue" :hint="false">
     <var-option v-for="(item, index) in placementOptions" :key="index" :label="item" />
   </var-select>
   <div class="placement-container">
@@ -59,86 +59,84 @@ watchDarkMode(Themes.dark)
         <var-icon name="star" />
       </var-button>
       <template #menu>
-        <var-cell>{{ pack.menuOption }}</var-cell>
-        <var-cell>{{ pack.menuOption }}</var-cell>
-        <var-cell>{{ pack.menuOption }}</var-cell>
+        <var-cell>{{ t('menuOption') }}</var-cell>
+        <var-cell>{{ t('menuOption') }}</var-cell>
+        <var-cell>{{ t('menuOption') }}</var-cell>
       </template>
     </var-menu>
   </div>
 
-  <app-type>{{ pack.offset }}</app-type>
+  <app-type>{{ t('offset') }}</app-type>
   <var-menu offset-x="36px" offset-y="18px">
-    <var-button type="primary">{{ pack.offset }}</var-button>
+    <var-button type="primary">{{ t('offset') }}</var-button>
     <template #menu>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
     </template>
   </var-menu>
 
-  <app-type>{{ pack.sameWidth }}</app-type>
+  <app-type>{{ t('sameWidth') }}</app-type>
   <var-menu same-width>
-    <var-button type="primary">{{ pack.sameWidth }}</var-button>
+    <var-button type="primary">{{ t('sameWidth') }}</var-button>
 
     <template #menu>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
     </template>
   </var-menu>
 
-  <app-type>{{ pack.trigger }}</app-type>
-  <var-select :hint="false" v-model="trigger">
+  <app-type>{{ t('trigger') }}</app-type>
+  <var-select v-model="trigger" :hint="false">
     <var-option label="click" />
     <var-option label="hover" />
   </var-select>
   <var-menu style="margin-top: 15px" :trigger="trigger">
-    <var-button type="primary">{{ pack.trigger }}</var-button>
+    <var-button type="primary">{{ t('trigger') }}</var-button>
 
     <template #menu>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
     </template>
   </var-menu>
 
-  <app-type>{{ pack.events }}</app-type>
+  <app-type>{{ t('events') }}</app-type>
   <var-menu
-    @open="() => Snackbar.info('open')"
-    @opened="() => Snackbar.success('opened')"
-    @close="() => Snackbar.warning('close')"
-    @closed="() => Snackbar.error('closed')"
+    @open="Snackbar.info('open')"
+    @opened="Snackbar.success('opened')"
+    @close="Snackbar.warning('close')"
+    @closed="Snackbar.error('closed')"
   >
-    <var-button type="primary">{{ pack.events }}</var-button>
+    <var-button type="primary">{{ t('events') }}</var-button>
 
     <template #menu>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
-      <var-cell>{{ pack.menuOption }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
     </template>
   </var-menu>
 
-  <app-type>{{ pack.disabled }}</app-type>
-  <var-space justify="space-between">
-    <var-menu disabled>
-      <var-button type="primary" disabled>{{ pack.disabled }}</var-button>
-
-      <template #menu>
-        <var-cell>{{ pack.menuOption }}</var-cell>
-        <var-cell>{{ pack.menuOption }}</var-cell>
-        <var-cell>{{ pack.menuOption }}</var-cell>
-      </template>
-    </var-menu>
-  </var-space>
-
-  <app-type>{{ pack.twoWayBinding }}</app-type>
-  <var-menu v-model:show="show">
-    <var-button type="primary">{{ pack.twoWayBinding }}</var-button>
+  <app-type>{{ t('disabled') }}</app-type>
+  <var-menu disabled>
+    <var-button type="primary" disabled>{{ t('disabled') }}</var-button>
 
     <template #menu>
-      <var-cell @click="closeMenu">{{ pack.menuOption }}</var-cell>
-      <var-cell @click="closeMenu">{{ pack.menuOption }}</var-cell>
-      <var-cell @click="closeMenu">{{ pack.menuOption }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+    </template>
+  </var-menu>
+
+  <app-type>{{ t('twoWayBinding') }}</app-type>
+  <var-menu v-model:show="show">
+    <var-button type="primary">{{ t('twoWayBinding') }}</var-button>
+
+    <template #menu>
+      <var-cell @click="closeMenu">{{ t('menuOption') }}</var-cell>
+      <var-cell @click="closeMenu">{{ t('menuOption') }}</var-cell>
+      <var-cell @click="closeMenu">{{ t('menuOption') }}</var-cell>
     </template>
   </var-menu>
 

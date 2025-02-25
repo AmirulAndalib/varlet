@@ -9,11 +9,11 @@
 | `unchecked-value` | 未选中状态的值 | _any_ | `false` |
 | `checked-color` | 选中状态的颜色 | _string_ | `-` |
 | `unchecked-color` | 未选中状态的颜色 | _string_ | `-` |
-| `icon-size` | 图标尺寸 | _string |\ number_ | `-` |
+| `icon-size` | 图标尺寸 | _string \| number_ | `-` |
 | `disabled` | 是否禁用 | _boolean_ | `false` |
 | `readonly` | 是否只读 | _boolean_ | `false` |
 | `ripple` | 是否开启水波纹 | _boolean_ | `true` |
-| `rules` | 验证规则，返回 `true` 表示验证通过，其余的值则转换为文本作为用户提示 | _Array<(value: any) => any>_ | `-` |
+| `rules` | 验证规则，返回 `true` 表示验证通过，其它类型的值将转换为文本作为用户提示。自 `3.5.0` 开始支持 [Zod 验证](#/zh-CN/zodValidation)  | _((v: any) => any) \| ZodType \| Array<((v: any) => any) \| ZodType>_ | `-` |
 
 ### 事件
 
@@ -28,4 +28,4 @@
 | --- | --- | --- |
 | `checked-icon` | 选中图标 | `-` |
 | `unchecked-icon` | 未选中图标 | `-` |
-| `default` | 显示的文本 | `-` |
+| `default` | 显示的文本 | `checked: boolean` 是否选中 |

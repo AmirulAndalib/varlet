@@ -1,7 +1,7 @@
 {
   "name": "@varlet/ui-playground",
+  "version": "3.9.0",
   "private": true,
-  "version": "2.21.0",
   "description": "varlet ui playground",
   "keywords": [
     "varlet ui",
@@ -9,30 +9,26 @@
     "repl"
   ],
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "dev": "varlet-cli dev:vite",
     "build": "varlet-cli build:vite",
+    "dev": "varlet-cli dev:vite",
     "preview": "varlet-cli preview"
   },
   "dependencies": {
-    "@varlet/ui": "workspace: *",
     "@varlet/touch-emulator": "workspace: *",
+    "@varlet/ui": "workspace: *",
     "@vue/repl": "^2.4.0",
     "file-saver": "^2.0.5",
     "jszip": "^3.6.0",
-    "vue": "3.4.3"
-  },
-  "eslintConfig": {
-    "rules": {
-      "no-undef": "off"
-    }
+    "vue": "3.5.13"
   },
   "devDependencies": {
-    "@varlet/cli": "workspace: *",
     "@types/file-saver": "^2.0.5",
     "@types/node": "*",
-    "vite": "5.0.10",
+    "@varlet/cli": "workspace: *",
     "live-server": "^1.2.1",
-    "typescript": "^5.1.5"
+    "typescript": "5.3.3",
+    "vite": "6.1.1"
   }
 }

@@ -71,7 +71,7 @@ const divider = ref(false)
 
 ### 手风琴模式
 
-使用 `accordion` 属性开启手风琴模式，此时 `value` 为字符串。
+使用 `accordion` 属性开启手风琴模式，此时 `value` 为字符串或者数字。
 
 ```html
 <script setup>
@@ -262,7 +262,7 @@ function closeAllSkipDisabled() {
 
 | 变量名                         | 默认值                           |
 | ------------------------------ | -------------------------------- |
-| `--collapse-background`        | `#fff`                           |
+| `--collapse-background`        | `var(--color-surface-container-highest)`                           |
 | `--collapse-text-color`        | `#232222`                        |
 | `--collapse-header-font-size`  | `var(--font-size-lg)`            |
 | `--collapse-header-padding`    | `10px 12px`                      |
@@ -270,4 +270,4 @@ function closeAllSkipDisabled() {
 | `--collapse-content-padding`   | `0 12px 10px`                    |
 | `--collapse-item-margin-top`   | `16px`                           |
 | `--collapse-disable-color`     | `#bdbdbd`                        |
-| `--collapse-border-top`        | `thin solid rgba(0, 0, 0, 0.12)` |
+| `--collapse-border-top`        | `thin solid var(--color-outline)` |

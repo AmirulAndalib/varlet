@@ -31,8 +31,8 @@
 </template>
 
 <script setup lang="ts">
-import { MenuTypes, type Menu } from '../../utils'
 import { reactive } from 'vue'
+import { MenuTypes, type Menu } from '../../utils'
 
 const props = defineProps<{ menu: Menu[]; menuName: string; language: string }>()
 const emit = defineEmits(['change'])
@@ -62,15 +62,15 @@ const changeRoute = (item: Menu) => {
 
 .varlet-site-sidebar {
   padding: 0 0 15px;
-  position: fixed;
+  position: sticky;
   width: 246px;
+  height: calc(100vh - 60px - 15px);
   top: 60px;
-  bottom: 0;
-  left: 0;
   z-index: 6;
   overflow-y: scroll;
   box-shadow: 0 8px 12px var(--site-config-color-shadow);
   background: var(--site-config-color-bar);
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
     display: none;

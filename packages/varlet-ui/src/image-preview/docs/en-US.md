@@ -13,7 +13,7 @@ Image-Preview, Support double-click magnification, Support function call and com
 import { ImagePreview } from '@varlet/ui'
 
 function preview() {
-  ImagePreview('https://varlet.gitee.io/varlet-ui/cat.jpg')
+  ImagePreview('https://varletjs.org/cat.jpg')
 }
 </script>
 
@@ -25,16 +25,16 @@ function preview() {
 #### Call Back
 ```html
 <script setup>
-import { ImagePreview } from '@varlet/ui'
+import { ImagePreview, Snackbar } from '@varlet/ui'
 
 function preview() {
   ImagePreview({
     images: [
-      'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      'https://varlet.gitee.io/varlet-ui/cat2.jpg'
+      'https://varletjs.org/cat.jpg',
+      'https://varletjs.org/cat2.jpg'
     ],
     onChange(index) {
-      console.log(index)
+      Snackbar(String(index))
     }
   })
 }
@@ -56,8 +56,8 @@ import { ref } from 'vue'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -81,8 +81,8 @@ import { ref } from 'vue'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -110,8 +110,8 @@ import { ref } from 'vue'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -140,8 +140,8 @@ import { Snackbar } from '@varlet/ui'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -172,8 +172,8 @@ import { Snackbar } from '@varlet/ui'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -203,8 +203,8 @@ import { ref } from 'vue'
 const show = ref(false)
 const menuShow = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 const actions = [
   {
@@ -246,11 +246,12 @@ const actions = [
 
 | Prop         | Description   | Type  | Default  |
 | ------------ | ------------ | ------------------ | ------------ |
-| `show`       | Whether or display | _boolean_ | `false` |
+| `v-model:show` | Whether or display | _boolean_ | `false` |
 | `images`     | Need to preview the image URL | _string[]_ | `[]` |
 | `initial-index`   | Index from which the image preview starts | _string \| number_ | `0`     |
 | `zoom`       | Double-click to zoom in | _string \| number_ | `2` |
 | `closeable`  | Whether to show the close button | _boolean_ | `false` |
+| `close-on-key-escape` | Whether to support keyboard ESC to close the image-preview | _boolean_ | `true`  |
 | `loop`       | Whether to open loop playback | _boolean_ | `true` |
 | `indicator`  | Whether to show paging | _boolean_ | `true` |
 | `lock-scroll` | Lock scroll | _boolean_ | `true` |
@@ -267,6 +268,7 @@ const actions = [
 | `close`  | Triggered when Image-Preview is off | `-` |
 | `closed` | Triggered when the animation that closes the image-preview ends | `-` |
 | `long-press` | The callback function when long pressing an image, the callback parameter is the current index | `index: number` Image indexing | 
+| `key-escape` | Triggered when click keyboard ESC  | `-` |
 
 ### Methods
 
@@ -297,6 +299,7 @@ const actions = [
 | `initialIndex`   | Index from which the image preview starts | _string \| number_ | `0`     |
 | `zoom`       | Double-click to zoom in | _string \| number_ | `2` |
 | `closeable`  | Whether to show the close button | _boolean_ | `false` |
+| `closeOnKeyEscape` | Whether to support keyboard ESC to close the image-preview | _boolean_ | `true` |
 | `loop`       | Whether to open loop playback | _boolean_ | `true` |
 | `indicator`  | Whether to show paging | _boolean_ | `true` |
 | `lockScroll` | Lock scroll | _boolean_ | `true` |
@@ -307,6 +310,7 @@ const actions = [
 | `onClose`  | Callback when image-preview is closed |  _() => void_ |  `-` |
 | `onClosed` | Callback at the end of the animation that closes the image-preview |  _() => void_ | `-` |
 | `onLongPress` | The callback function when long pressing an image, the callback parameter is the current index | _(index: number) => void_  |  `-` |
+| `onKeyEscape` | Triggered when click keyboard ESC | _() => void_ | `-` |
 
 ### Style Variables
 Here are the CSS variables used by the component. Styles can be customized using [StyleProvider](#/en-US/style-provider).

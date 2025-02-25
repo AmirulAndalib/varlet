@@ -1,4 +1,4 @@
-import { type PropType } from 'vue'
+import { InputHTMLAttributes, type PropType } from 'vue'
 import { defineListenerProp } from '../utils/components'
 
 export interface VarFile {
@@ -26,7 +26,7 @@ export const props = {
     default: 'image/*',
   },
   capture: {
-    type: [String, Boolean] as PropType<boolean | 'user' | 'environment'>,
+    type: [String, Boolean] as PropType<InputHTMLAttributes['capture']>,
     default: undefined,
   },
   multiple: Boolean,
@@ -58,7 +58,7 @@ export const props = {
     type: Array as PropType<Array<UploaderValidateTrigger>>,
     default: () => ['onChange', 'onRemove'],
   },
-  rules: Array as PropType<Array<(v: VarFile) => any>>,
+  rules: [Array, Function, Object] as PropType<any>,
   hideList: Boolean,
   preventDefaultPreview: Boolean,
   onClickAction: defineListenerProp<(chooseFile: () => void, event: Event) => void>(),

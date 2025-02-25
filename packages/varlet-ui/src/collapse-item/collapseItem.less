@@ -1,5 +1,5 @@
 :root {
-  --collapse-background: #fff;
+  --collapse-background: var(--color-surface-container-highest);
   --collapse-text-color: #232222;
   --collapse-header-font-size: var(--font-size-lg);
   --collapse-header-padding: 10px 12px;
@@ -7,17 +7,19 @@
   --collapse-content-padding: 0 12px 10px;
   --collapse-item-margin-top: 16px;
   --collapse-disable-color: #bdbdbd;
-  --collapse-border-top: thin solid rgba(0, 0, 0, 0.12);
+  --collapse-border-top: thin solid var(--color-outline);
 }
 
 .var-collapse-item {
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
   position: relative;
   margin-top: 0;
   background: var(--collapse-background);
   color: var(--collapse-text-color);
-  transition: margin-top 0.25s, background-color 0.25s;
+  transition:
+    margin-top 0.25s,
+    background-color 0.25s;
 
   &__shadow {
     bottom: 0;
@@ -30,7 +32,7 @@
   }
 
   &:not(:first-child)::after {
-    border-top: var(--collapse-divider-top);
+    border-top: var(--collapse-border-top);
     content: '';
     left: 0;
     position: absolute;
@@ -62,6 +64,10 @@
 
     &--disable {
       opacity: 0;
+    }
+
+    &--cursor-pointer {
+      cursor: pointer;
     }
   }
 

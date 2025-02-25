@@ -9,7 +9,8 @@
         n('$--inline-flex'),
         n(`--${type}`),
         [underline !== 'none', n(`--underline-${underline}`)],
-        [disabled, n('--disabled')]
+        [disabled, n('--disabled')],
+        [isFocusing && !inMobile(), n('--focusing')],
       )
     "
     :style="{
@@ -17,17 +18,19 @@
       fontSize: toSizeUnit(textSize),
     }"
     @click="handleClick"
+    @focus="isFocusing = true"
+    @blur="isFocusing = false"
   >
     <slot />
   </component>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
-import { props } from './props'
+import { computed, defineComponent, ref } from 'vue'
+import { call, inMobile } from '@varlet/shared'
 import { createNamespace } from '../utils/components'
 import { toSizeUnit } from '../utils/elements'
-import { call } from '@varlet/shared'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('link')
 
@@ -35,6 +38,7 @@ export default defineComponent({
   name,
   props,
   setup(props) {
+    const isFocusing = ref(false)
     const tag = computed<'a' | 'router-link' | 'span'>(() => {
       const { disabled, href, to } = props
 
@@ -81,6 +85,8 @@ export default defineComponent({
     return {
       tag,
       linkProps,
+      isFocusing,
+      inMobile,
       n,
       classes,
       handleClick,

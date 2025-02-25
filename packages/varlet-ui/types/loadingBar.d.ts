@@ -3,14 +3,12 @@ export interface LoadingBarOptions {
   errorColor?: string
   height?: string | number
   top?: string | number
+  finishDelay?: number
 }
 
 export declare const loadingBarProps: Record<string, any>
 
 export interface ILoadingBar {
-  /** @deprecated Use setDefaultOptions to instead. */
-  mergeConfig(options: LoadingBarOptions): void
-
   start(): void
 
   finish(): void

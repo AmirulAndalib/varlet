@@ -49,8 +49,8 @@ const value = ref(false)
 
 <template>
   <var-checkbox
-    unchecked-color="#e99eb4"
-    checked-color="#f44336"
+    unchecked-color="var(--color-warning)" 
+    checked-color="var(--color-danger)"
     v-model="value"
   >
     <template #unchecked-icon>
@@ -105,7 +105,12 @@ const indeterminate = ref(true)
 </script>
 
 <template>
-  <var-checkbox v-model:indeterminate="indeterminate" v-model="value"></var-checkbox>
+  <var-space :size="[0, 10]">
+    <var-checkbox v-model="value" v-model:indeterminate="indeterminate">
+      Current value: {{ value }}
+    </var-checkbox>
+    <var-button type="primary" @click="indeterminate = !indeterminate">Toggle</var-button>
+  </var-space>
 </template>
 ```
 
@@ -126,21 +131,65 @@ const value = ref([])
     <var-checkbox :checked-value="0">Eat</var-checkbox>
     <var-checkbox :checked-value="1">Sleep</var-checkbox>
   </var-checkbox-group>
+  <var-space :size="[0, 10]">
+    <var-button
+      type="primary"
+      @click="$refs.group.checkAll()"
+    >
+      Check All
+    </var-button>
+    <var-button
+      type="primary"
+      @click="$refs.group.inverseAll()"
+    >
+      Inverse All
+    </var-button>
+  </var-space>
+  <div>Current value: {{ value }}</div>
+</template>
+```
 
-  <var-button
-    class="button"
-    type="primary"
-    @click="$refs.group.checkAll()"
-  >
-    Check All
-  </var-button>
-  <var-button
-    class="button"
-    type="primary"
-    @click="$refs.group.inverseAll()"
-  >
-    Inverse All
-  </var-button>
+### Options API
+
+Setting child elements via the `options` prop.
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref([])
+const options = ref([
+  { label: 'Eat', value: 0 },
+  { label: 'Sleep', value: 1 },
+  { label: 'Game', value: 2, disabled: true },
+])
+</script>
+
+<template>
+  <var-checkbox-group v-model="value" :options="options" />
+  <div>Current value: {{ value }}</div>
+</template>
+```
+
+### Custom Fields
+
+Customize the format of the data in `options` through the `label-key` and `value-key` attributes.
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref([])
+const options = ref([
+  { name: 'Eat', id: 0 },
+  { name: 'Sleep', id: 1 },
+  { name: 'Game', id: 2 },
+])
+</script>
+
+<template>
+  <var-checkbox-group v-model="value" :options="options" label-key="name" value-key="id" />
+  <div>Current value: {{ value }}</div>
 </template>
 ```
 
@@ -161,6 +210,25 @@ const value = ref([])
 </template>
 ```
 
+### Maximum Number Of Checked
+
+In a checkbox group, you can limit the maximum number of selections by setting `max`.
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref([])
+</script>
+
+<template>
+  <var-checkbox-group v-model="value" :max="1">
+    <var-checkbox :checked-value="0">Eat</var-checkbox>
+    <var-checkbox :checked-value="1">Sleep</var-checkbox>
+  </var-checkbox-group>
+</template>
+```
+
 ### Checkbox Validation
 
 ```html
@@ -173,7 +241,27 @@ const value = ref([])
 <template>
   <var-checkbox
     v-model="value"
-    :rules="[v => v || 'Please check your choices']"
+    :rules="v => v || 'Please check your choices'"
+  >
+    Current value: {{ value }}
+  </var-checkbox>
+</template>
+```
+
+### Checkbox Validation With Zod
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { z } from 'zod'
+
+const value = ref([])
+</script>
+
+<template>
+  <var-checkbox
+    v-model="value"
+    :rules="z.boolean().refine(v => v, 'Please check your choices')"
   >
     Current value: {{ value }}
   </var-checkbox>
@@ -192,7 +280,28 @@ const value = ref([])
 <template>
   <var-checkbox-group
     v-model="value"
-    :rules="[v => v.length === 2 || 'Please check all']"
+    :rules="v => v.length === 2 || 'Please check all'"
+  >
+    <var-checkbox :checked-value="0">Eat</var-checkbox>
+    <var-checkbox :checked-value="1">Sleep</var-checkbox>
+  </var-checkbox-group>
+</template>
+```
+
+### CheckboxGroup Validate with Zod
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { z } from 'zod'
+
+const value = ref([])
+</script>
+
+<template>
+  <var-checkbox-group
+    v-model="value"
+    :rules="z.array(z.number()).length(2, 'Please check all')"
   >
     <var-checkbox :checked-value="0">Eat</var-checkbox>
     <var-checkbox :checked-value="1">Sleep</var-checkbox>
@@ -212,7 +321,18 @@ const value = ref([])
 | `v-model` | The value of the binding | _any[]_ | `[]` |
 | `max` | Maximum number of checked | _string \| number_ | `-` |
 | `direction` | The layout direction, optional value is `horizontal` `vertical` | _string_ | `horizontal` |
-| `rules` | The validation rules, return `true` to indicate that the validation passed. The remaining values are converted to text as user prompts | _Array<(value: any[]) => any>_ | `horizontal` |
+| `options` ***3.2.11*** | Specifies options | _CheckboxGroupOption[]_ | `[]` |
+| `label-key` ***3.2.12*** | As the key that uniquely identifies label | _string_ | `label` |
+| `value-key` ***3.2.12*** | As the key that uniquely identifies value | _string_ | `value` |
+| `rules` | Validation rules, return `true` to indicate verification passes, other types of values ​​will be converted into text as user prompts. [Zod validation](#/en-US/zodValidation) is supported since `3.5.0` | _((v: any[]) => any) \| ZodType \| Array<((v: any[]) => any) \| ZodType>_ | `-` |
+
+#### CheckboxGroupOption 
+
+| Prop | Description | Type | Default |
+| ------- | --- |----------------|-----------|
+| `label`    |   The text of checkbox    | _string \| VNode \| (option: CheckboxGroupOption, checked: boolean) => VNodeChild_      | `-`   |
+| `value`  |    The value of checkbox    | _any_      | `-`   |
+| `disabled`    |    Whether to disable checkbox   | _boolean_      | `-`   |
 
 #### Checkbox Props
 
@@ -223,12 +343,12 @@ const value = ref([])
 | `unchecked-value` | Unchecked value | _any_ | `false` |
 | `checked-color` | Checked color | _string_ | `-` |
 | `unchecked-color` | Unchecked color | _string_ | `-` |
-| `icon-size` | Icon size | _string |\ number_ | `-` |
+| `icon-size` | Icon size | _string \| number_ | `-` |
 | `disabled` | Whether the disabled | _boolean_ | `false` |
 | `readonly` | Whether the readonly | _boolean_ | `false` |
 | `indeterminate` | Whether indeterminate status(style has the highest priority) | _boolean_ | `false` |
 | `ripple` | Whether to open ripple | _boolean_ | `true` |
-| `rules` | The validation rules, return `true` to indicate that the validation passed. The remaining values are converted to text as user prompts | _Array<(value: any) => any>_ | `-` |
+| `rules` | Validation rules, return `true` to indicate verification passes, other types of values ​​will be converted into text as user prompts. [Zod validation](#/en-US/zodValidation) is supported since `3.5.0` | _(v: string) => any \| ZodType \| Array<(v: string) => any \| ZodType>_ | `-` |
 
 ### Methods
 
@@ -239,8 +359,8 @@ const value = ref([])
 | `validate` | Trigger validate | `-` | `valid: Promise<boolean>` |
 | `resetValidation` | Clearing validate messages | `-` | `-` |
 | `reset` | Clear the value of the binding(set to `[]`) and validate messages | `-` | `-` |
-| `checkAll` | Check all | `-` | `value: any` |
-| `inverseAll` | Inverse all | `-` | `value: any` |
+| `checkAll` | Check all | `-` | `value: any[]` |
+| `inverseAll` | Inverse all | `-` | `value: any[]` |
 
 #### Checkbox Methods
 
@@ -249,7 +369,7 @@ const value = ref([])
 | `validate` | Trigger validate | `-` | `valid: Promise<boolean>` |
 | `resetValidation` | Clearing validate messages | `-` | `-` |
 | `reset` | Clear the value of the binding(set to `unchecked-value`) and validate messages | `-` | `-` |
-| `toggle` | Toggle the checked state, pass `checked-value` to check, `unchecked-value` to uncheck, do not pass or other cases to reverse | `value: any` | `-` |
+| `toggle` | Toggle the checked state, pass `checked-value` to check, `unchecked-value` to uncheck, do not pass or other cases to reverse | `value?: any` | `-` |
 
 ### Events
 
@@ -281,7 +401,7 @@ const value = ref([])
 | `checked-icon` | Checked icon | `-` |
 | `unchecked-icon` | Unchecked icon | `-` |
 | `indeterminate-icon` | Indeterminate icon | `-` |
-| `default` | Displayed text | `-` |
+| `default` | Displayed text | `checked: boolean` is checked |
 
 ### Style Variables
 Here are the CSS variables used by the component. Styles can be customized using [StyleProvider](#/en-US/style-provider).

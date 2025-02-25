@@ -161,17 +161,17 @@ async function handleSelect() {
       {
         name: 'Item 01',
         icon: 'account-circle',
-        color: '#00c48f',
+        color: 'var(--color-success)',
       },
       {
         name: 'Item 02',
         icon: 'notebook',
-        color: '#ff9800',
+        color: 'var(--color-warning)',
       },
       {
         name: 'Item 03',
         icon: 'wifi',
-        color: '#00afef',
+        color: 'var(--color-info)',
       },
     ] 
   })
@@ -354,17 +354,17 @@ const actions = ref([
   {
     name: 'Item 01',
     icon: 'account-circle',
-    color: '#00c48f',
+    color: 'var(--color-success)',
   },
   {
     name: 'Item 02',
     icon: 'notebook',
-    color: '#ff9800',
+    color: 'var(--color-warning)',
   },
   {
     name: 'Item 03',
     icon: 'wifi',
-    color: '#00afef',
+    color: 'var(--color-info)',
   },
 ])
 
@@ -398,6 +398,7 @@ function handleSelect(action) {
 | `lock-scroll` | 是否禁止滚动穿透，禁止时滚动弹出层不会引发 body 的滚动 | _boolean_ | `true` |
 | `close-on-click-action` | 是否点击选项时关闭动作面板 | _boolean_ | `true` |
 | `close-on-click-overlay` | 是否点击遮罩层关闭动作面板 | _boolean_ | `true` |
+| `close-on-key-escape` | 是否支持键盘 ESC 关闭动作面板 | _boolean_ | `true` |
 | `safe-area`   | 是否开启底部安全区适配      | _boolean_             | `false`  |
 | `teleport` | 动作面板挂载的位置 | _TeleportProps['to'] \| false_ | `body` |
 
@@ -411,6 +412,7 @@ function handleSelect(action) {
 | `close` | 关闭动作面板时触发 | `-` |
 | `closed` | 关闭动作面板动画结束时触发 | `-` |
 | `click-overlay` | 点击遮罩层时触发 | `-` |
+| `key-escape` | 点击键盘 ESC 时触发 | `-` |
 
 ### 方法
 
@@ -433,7 +435,9 @@ function handleSelect(action) {
 | `overlayClass` | 自定义遮罩层的 class | _string_ | `-` |
 | `overlayStyle` | 自定义遮罩层的 style | _object_ | `-` |
 | `lockScroll` | 是否禁止滚动穿透，禁止时滚动弹出层不会引发 body 的滚动 | _boolean_ | `true` |
+| `closeOnClickAction` | 是否点击选项时关闭动作面板 | _boolean_ | `true` |
 | `closeOnClickOverlay` | 是否点击遮罩层关闭弹出层 | _boolean_ | `true` |
+| `closeOnKeyEscape` | 是否支持键盘 ESC 关闭动作面板 | _boolean_ | `true`
 | `safe-area`              | 是否开启底部安全区适配	                                     | _boolean_             | `false`  |
 | `onOpen` | 动作面板开启回调 | _() => void_ | `-` |
 | `onOpened` | 动作面板开启动画结束回调 | _() => void_ | `-` |
@@ -441,6 +445,7 @@ function handleSelect(action) {
 | `onClosed` |动作面板关闭动画结束回调 | _() => void_ | `-` |
 | `onSelect` | 选项选择时回调 | _(action: Action) => void_ | `-` |
 | `onClickOverlay` | 遮罩层点击回调 | _() => void_ | `-` |
+| `onKeyEscape` | 点击键盘 ESC 时触发 | _() => void_ | `-` |
 
 ### ActionSheet Action
 

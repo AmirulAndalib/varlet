@@ -1,9 +1,9 @@
-import Sticky from '..'
-import VarSticky from '../Sticky'
-import { delay, trigger } from '../../utils/test'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
-import { expect } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test } from 'vitest'
+import Sticky from '..'
+import { delay, trigger } from '../../utils/test'
+import VarSticky from '../Sticky'
 
 const mockRect = (top) => {
   const origin = HTMLElement.prototype.getBoundingClientRect
@@ -22,7 +22,7 @@ const mockRect = (top) => {
   }
 }
 
-test('test sticky use', () => {
+test('sticky use', () => {
   const app = createApp({}).use(Sticky)
   expect(app.component(Sticky.name)).toBeTruthy()
 })
@@ -30,7 +30,7 @@ test('test sticky use', () => {
 describe('test sticky component props', () => {
   let rect = mockRect(200)
 
-  test('test sticky offset-top', async () => {
+  test('sticky offset-top', async () => {
     const wrapper = mount(VarSticky, {
       props: {
         offsetTop: 100,
@@ -47,7 +47,7 @@ describe('test sticky component props', () => {
     rect.restore()
   })
 
-  test('test sticky z-index', async () => {
+  test('sticky z-index', async () => {
     const wrapper = mount(VarSticky, {
       props: {
         zIndex: 200,
@@ -63,7 +63,7 @@ describe('test sticky component props', () => {
     wrapper.unmount()
   })
 
-  test('test sticky css-mode', async () => {
+  test('sticky css-mode', async () => {
     const wrapper = mount(VarSticky, {
       props: {
         cssMode: true,
@@ -77,7 +77,7 @@ describe('test sticky component props', () => {
     wrapper.unmount()
   })
 
-  test('test sticky disabled', async () => {
+  test('sticky disabled', async () => {
     let rect = mockRect(200)
 
     const wrapper = mount(VarSticky, {

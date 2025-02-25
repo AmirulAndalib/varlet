@@ -1,18 +1,16 @@
 import { type PropType, type TeleportProps } from 'vue'
-import { type Placement } from './usePopover'
 import { type PositioningStrategy } from '@popperjs/core'
 import { defineListenerProp } from '../utils/components'
-
-export type MenuTrigger = 'click' | 'hover'
+import { type Placement, type Reference, type Trigger } from './usePopover'
 
 export const props = {
   show: Boolean,
   disabled: Boolean,
   trigger: {
-    type: String as PropType<MenuTrigger>,
+    type: String as PropType<Trigger>,
     default: 'click',
   },
-  reference: String,
+  reference: [String, Object] as PropType<Reference>,
   placement: {
     type: String as PropType<Placement>,
     default: 'cover-top-start',
@@ -44,10 +42,18 @@ export const props = {
   },
   popoverClass: String,
   closeOnClickReference: Boolean,
+  closeOnKeyEscape: {
+    type: Boolean,
+    default: true,
+  },
   onOpen: defineListenerProp<() => void>(),
   onOpened: defineListenerProp<() => void>(),
   onClose: defineListenerProp<() => void>(),
   onClosed: defineListenerProp<() => void>(),
   onClickOutside: defineListenerProp<(event: Event) => void>(),
   'onUpdate:show': defineListenerProp<(show: boolean) => void>(),
+
+  // internal start
+  cascadeOptimization: Boolean,
+  // internal end
 }

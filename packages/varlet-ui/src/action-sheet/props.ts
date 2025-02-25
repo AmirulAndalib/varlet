@@ -1,7 +1,7 @@
-import { defineListenerProp, pickProps } from '../utils/components'
-import { popupProps } from '../popup'
-import { ActionItem } from './index'
 import { type PropType } from 'vue'
+import { popupProps } from '../popup'
+import { defineListenerProp, pickProps } from '../utils/components'
+import { ActionItem } from './index'
 
 export const props = {
   show: Boolean,
@@ -22,6 +22,7 @@ export const props = {
     'overlayStyle',
     'lockScroll',
     'closeOnClickOverlay',
+    'closeOnKeyEscape',
     'safeArea',
     'teleport',
     'onOpen',
@@ -31,5 +32,6 @@ export const props = {
     'onClickOverlay',
     // internal for function call closes the dialog
     'onRouteChange',
+    'onKeyEscape',
   ]),
 }

@@ -1,6 +1,6 @@
 import { type PropType } from 'vue'
-import { defineListenerProp, pickProps } from '../utils/components'
 import { popupProps } from '../popup'
+import { defineListenerProp, pickProps } from '../utils/components'
 import { DialogActions } from './index'
 
 export type DialogMessageAlign = 'left' | 'center' | 'right'
@@ -40,12 +40,14 @@ export const props = {
     'overlayStyle',
     'lockScroll',
     'closeOnClickOverlay',
+    'closeOnKeyEscape',
     'teleport',
     'onOpen',
     'onClose',
     'onOpened',
     'onClosed',
     'onClickOverlay',
+    'onKeyEscape',
     // internal for function call closes the dialog
     'onRouteChange',
   ]),

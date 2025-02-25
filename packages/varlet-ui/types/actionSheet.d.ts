@@ -1,5 +1,5 @@
-import { VarComponent, BasicAttributes, ListenerProp, SetPropsDefaults } from './varComponent'
-import { VNode, App, TeleportProps } from 'vue'
+import { App, TeleportProps, VNode } from 'vue'
+import { BasicAttributes, ListenerProp, SetPropsDefaults, VarComponent } from './varComponent'
 
 export declare const actionSheetProps: Record<keyof ActionSheetProps, any>
 
@@ -13,6 +13,7 @@ export interface ActionSheetProps extends BasicAttributes {
   lockScroll?: boolean
   closeOnClickAction?: boolean
   closeOnClickOverlay?: boolean
+  closeOnKeyEscape?: boolean
   safeArea?: boolean
   teleport?: TeleportProps['to'] | false
   onOpen?: ListenerProp<() => void>
@@ -21,6 +22,7 @@ export interface ActionSheetProps extends BasicAttributes {
   onClosed?: ListenerProp<() => void>
   onSelect?: ListenerProp<(action: ActionItem) => void>
   onClickOverlay?: ListenerProp<() => void>
+  onKeyEscape?: ListenerProp<() => void>
   'onUpdate:show'?: ListenerProp<(show: boolean) => void>
 }
 
@@ -43,12 +45,14 @@ export interface ActionSheetOptions {
   lockScroll?: boolean
   closeOnClickAction?: boolean
   closeOnClickOverlay?: boolean
+  closeOnKeyEscape?: boolean
   safeArea?: boolean
   onOpen?: () => void
   onOpened?: () => void
   onClose?: () => void
   onClosed?: () => void
   onClickOverlay?: () => void
+  onKeyEscape?: () => void
   onSelect?: (action: ActionItem) => void
 }
 

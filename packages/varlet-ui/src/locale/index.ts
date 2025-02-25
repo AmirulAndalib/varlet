@@ -1,11 +1,14 @@
-import zhCN from './zh-CN'
-import enUS from './en-US'
-import zhTW from './zh-TW'
-import zhHK from './zh-HK'
 import { ref, type Ref } from 'vue'
+import { hasOwn } from '@varlet/shared'
 import { type Month, type Week } from '../date-picker/props'
+import enUS from './en-US'
+import faIR from './fa-IR'
+import jaJP from './ja-JP'
+import zhCN from './zh-CN'
+import zhHK from './zh-HK'
+import zhTW from './zh-TW'
 
-export type Pack = {
+export type Message = {
   // Dialog
   dialogTitle: string
   dialogConfirmButtonText: string
@@ -33,64 +36,91 @@ export type Pack = {
   timePickerHint: string
   // internal
   lang?: string
+  [key: PropertyKey]: any
 }
 
-function useLocale<T = Pack>() {
-  const packs: Record<string, Partial<T>> = {}
-  const pack: Ref<Partial<T>> = ref({})
+type ValueOf<T> = T[keyof T]
 
-  const add = (lang: string, pack: Partial<T> & { lang?: string }) => {
-    pack.lang = lang
-    packs[lang] = pack
+function useLocale<T = Message>() {
+  const messages = ref<Record<string, Partial<T>>>({})
+  const currentMessage: Ref<Partial<T>> = ref({})
+
+  const add = (lang: string, message: Partial<T> & { lang?: string }) => {
+    message.lang = lang
+    messages.value[lang] = message
   }
 
   const use = (lang: string) => {
-    if (!packs[lang]) {
-      console.warn(`The ${lang} does not exist. You can mount a language package using the add method`)
+    if (!messages.value[lang]) {
+      console.warn(`The ${lang} does not exist. You can mount a language message using the add method`)
       return {}
     }
 
-    pack.value = packs[lang]
+    currentMessage.value = messages.value[lang]
   }
 
-  const merge = (lang: string, pack: Partial<T>) => {
-    if (!packs[lang]) {
-      console.warn(`The ${lang} does not exist. You can mount a language package using the add method`)
+  const merge = (lang: string, message: Partial<T>) => {
+    if (!messages.value[lang]) {
+      console.warn(`The ${lang} does not exist. You can mount a language message using the add method`)
       return
     }
 
-    packs[lang] = { ...packs[lang], ...pack }
+    messages.value[lang] = { ...messages.value[lang], ...message }
 
     use(lang)
   }
 
+  const t = (id: string): ValueOf<T> | undefined => {
+    if (hasOwn(currentMessage.value, id)) {
+      return currentMessage.value[id]
+    }
+  }
+
   return {
-    packs,
-    pack,
+    messages,
+    currentMessage,
     add,
     use,
     merge,
+    t,
   }
 }
 
-const { packs, pack, add, use, merge } = useLocale()
+const { messages, currentMessage, add, use, merge, t } = useLocale()
 
 add('zh-CN', zhCN)
 use('zh-CN')
 
-export { zhCN, enUS, packs, pack, add, use, merge, useLocale }
+export { zhCN, enUS, zhTW, zhHK, faIR, messages, currentMessage, add, use, merge, t, useLocale }
 
-export const _LocaleComponent = { zhCN, enUS, packs, pack, add, use, merge, useLocale }
+export const _LocaleComponent = {
+  zhCN,
+  enUS,
+  zhTW,
+  zhHK,
+  faIR,
+  jaJP,
+  messages,
+  currentMessage,
+  add,
+  use,
+  merge,
+  t,
+  useLocale,
+}
 
 export default {
   zhCN,
   enUS,
   zhTW,
   zhHK,
-  packs,
-  pack,
+  faIR,
+  jaJP,
+  messages,
+  currentMessage,
   add,
   use,
   merge,
+  t,
   useLocale,
 }

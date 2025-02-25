@@ -1,8 +1,8 @@
-import { useChildren, useParent } from '@varlet/use'
-import { error } from '../utils/logger'
-import { TABS_ITEMS_BIND_TAB_ITEM_KEY, type TabsItemsProvider } from '../tabs-items/provide'
 import { type ComputedRef } from 'vue'
+import { assert } from '@varlet/shared'
+import { useChildren, useParent } from '@varlet/use'
 import { type ListProvider } from '../list/provide'
+import { TABS_ITEMS_BIND_TAB_ITEM_KEY, type TabsItemsProvider } from '../tabs-items/provide'
 
 export interface TabItemProvider {
   index: ComputedRef<number>
@@ -15,12 +15,10 @@ export const TAB_ITEM_BIND_LIST_KEY = Symbol('TAB_ITEM_BIND_LIST_KEY')
 
 export function useTabsItems() {
   const { parentProvider, bindParent, index } = useParent<TabsItemsProvider, TabItemProvider>(
-    TABS_ITEMS_BIND_TAB_ITEM_KEY
+    TABS_ITEMS_BIND_TAB_ITEM_KEY,
   )
 
-  if (!bindParent) {
-    error('TabItem', '<var-tab-item/> must in <var-tabs-items/>')
-  }
+  assert(!!bindParent, 'TabItem', '<var-tab-item/> must in <var-tabs-items/>')
 
   return {
     index,

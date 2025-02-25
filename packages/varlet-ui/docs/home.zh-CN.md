@@ -2,7 +2,7 @@
 
 ### 介绍
 
-Varlet 是一个基于 `Vue3` 开发的 Material 风格移动端组件库，全面拥抱 `Vue3` 生态，由 `varletjs` 社区团队开发和维护。
+Varlet 是一个 `Vue3` 组件库，基于 Material Design 2 和 3，支持移动端、桌面端，由 `varletjs` 组织维护。
 
 ### 特性
 
@@ -14,10 +14,13 @@ Varlet 是一个基于 `Vue3` 开发的 Material 风格移动端组件库，全�
 - 🌍 &nbsp; 支持国际化
 - 💡 &nbsp; 支持 webstorm 组件属性高亮
 - 💪 &nbsp; 支持 SSR
+- 📦 &nbsp; 支持 [Nuxt Module](https://github.com/varletjs/varlet-nuxt)
 - 💡 &nbsp; 支持 Typescript
 - 💪 &nbsp; 确保 90% 以上单元测试覆盖率，提供稳定性保证
+- 🎨 &nbsp; 同时支持 Material Design 2 和 Material Design 3 两套设计系统
 - 🛠️ &nbsp; 支持暗黑模式
-- 🛠️ &nbsp; 提供官方的 VSCode 插件
+- 🔧 &nbsp; 提供官方的 VSCode 插件
+- ⌨️ &nbsp; 支持无障碍访问（持续改进中）
 
 ### 官方生态
 
@@ -28,6 +31,10 @@ Varlet 是一个基于 `Vue3` 开发的 Material 风格移动端组件库，全�
 | [@varlet/cli](https://github.com/varletjs/varlet/tree/dev/packages/varlet-cli)                       | `Vue3 组件库快速成型工具`         |
 | [@varlet/touch-emulator](https://github.com/varletjs/varlet/tree/dev/packages/varlet-touch-emulator) | `桌面端适配器，让移动端组件库可以在桌面端运行` |
 | [@varlet/ui-playground](https://github.com/varletjs/varlet/tree/dev/packages/varlet-ui-playground)  | `Varlet 组件库在线编辑工具`       |
+| [@varlet/import-resolver](https://github.com/varletjs/varlet/tree/dev/packages/varlet-import-resolver)  | [unplugin-vue-components](https://github.com/unplugin/unplugin-vue-components) `的一个解析器，用于实现 Varlet 按需引入`   |
+| [@varlet/preset-unocss](https://github.com/varletjs/varlet/tree/dev/packages/varlet-preset-unocss)  | `varlet 的` [UnoCss](https://unocss.dev/) `预设` |
+| [@varlet/preset-tailwindcss](https://github.com/varletjs/varlet/tree/dev/packages/varlet-preset-tailwindcss)  | `varlet 的` [tailwindcss](https://tailwindcss.com/) `预设` |
+| [varlet-theme-builder](https://github.com/varletjs/varlet-theme-builder) | `主题生成器，用于为 varlet material design 3 生成主题变量` | 
 | [varlet-vscode-extension](https://github.com/varletjs/varlet/tree/dev/packages/varlet-vscode-extension)  | `Varlet 组件库 VSCode 插件`   |
 | [vscode-theme-varlet](https://github.com/varletjs/vscode-theme-varlet)  | `Varlet VSCode 主题`   |
 | [varlet-app-example](https://github.com/varletjs/varlet-app-template)  | `Varlet 组件库移动端模板`   |
@@ -42,6 +49,7 @@ Varlet 是一个基于 `Vue3` 开发的 Material 风格移动端组件库，全�
 | [vue-h5-template](https://github.com/sunniejs/vue-h5-template) | `基于 Vue 的移动端模板脚手架，提供了 Varlet 组件库的移动端预设`   |
 | [create-vite-app](https://github.com/ErKeLost/create-vite-app) | `基于 Vue3 的桌面端模板脚手架，提供了 Varlet 组件库的桌面端预设`  |
 | [vscode-common-intellisense](https://github.com/Simon-He95/vscode-common-intellisense) | `为 Varlet 开发人员提供更好的智能感知的 VSCode 扩展` |
+| [vue3-varlet-mobile](https://github.com/easy-temps/vue3-varlet-mobile) | `基于 Vue 3 和 Varlet 组件库的移动模板` |
 
 ### PR & Issue
 使用过程中出现的问题可以到 [github](https://github.com/varletjs/varlet) 来给我们提 [issue](https://github.com/varletjs/varlet/issues)，
@@ -64,7 +72,3 @@ Varlet 是一个基于 `Vue3` 开发的 Material 风格移动端组件库，全�
 <a href="https://cdn.jsdelivr.net/gh/varletjs/varlet-static/sponsorkit/sponsors.svg" style="width: 100%; display: block; margin-top: 16px">
   <img src="https://cdn.jsdelivr.net/gh/varletjs/varlet-static/sponsorkit/sponsors.svg" style="width: 100%; display: block; border-radius: 4px;">
 </a>
-
-### 赞助本项目
-
-赞助本项目，支持我们更好的创作。推荐使用[爱发电](https://afdian.net/a/haoziqaq)进行订阅，您的头像将出现在本项目中。

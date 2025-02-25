@@ -32,12 +32,12 @@ import { ref } from 'vue'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg'
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg'
   },
   {
     url: 'https://www.runoob.com/try/demo_source/mov_bbb.mp4',
-    cover: 'https://varlet.gitee.io/varlet-ui/cover.jpg'
+    cover: 'https://varletjs.org/cover.jpg'
   }
 ])
 </script>
@@ -56,8 +56,8 @@ import { Dialog } from '@varlet/ui'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg'
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg'
   }
 ])
 
@@ -84,18 +84,18 @@ import { ref } from 'vue'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'loading'
   },
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'success'
   },
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'error'
   }
 ])
@@ -291,8 +291,8 @@ import { Dialog } from '@varlet/ui'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg'
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg'
   }
 ])
 
@@ -339,8 +339,8 @@ import { ref } from 'vue'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'error',
   },
 ])
@@ -348,7 +348,33 @@ const files = ref([
 
 <template>
   <var-uploader
-    :rules="[(v, u) => u.getError().length === 0 || '存在上传失败的文件']"
+    :rules="(v, u) => u.getError().length === 0 || '存在上传失败的文件'"
+    v-model="files"
+  />
+</template>
+```
+
+### 使用 Zod 进行校验
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { z } from 'zod'
+
+const files = ref([
+  {
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
+    state: 'error',
+  },
+])
+</script>
+
+<template>
+  <var-uploader
+    :rules="
+      z.array(z.any()).refine(v => v.filter(file => file.state === 'error').length === 0, '存在上传失败的文件')
+    "
     v-model="files"
   />
 </template>
@@ -364,18 +390,18 @@ import { ref } from 'vue'
 
 const files = ref([
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'loading',
   },
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'success',
   },
   {
-    url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-    cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg',
     state: 'error',
   },
 ])
@@ -408,6 +434,44 @@ const files = ref([
 </style>
 ```
 
+### 自定义删除按钮
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const files = ref([
+  {
+    url: 'https://varletjs.org/cat.jpg',
+    cover: 'https://varletjs.org/cat.jpg'
+  },
+  {
+    url: 'https://www.runoob.com/try/demo_source/mov_bbb.mp4',
+    cover: 'https://varletjs.org/cover.jpg'
+  }
+])
+</script>
+
+<template>
+  <var-uploader v-model="files">
+    <template #remove-button="{ remove }">
+      <div class="custom-remove-button">
+        <var-icon color="#fff" name="window-close" @click.stop="remove"></var-icon>
+      </div>
+    </template>
+  </var-uploader>
+</template>
+
+<style>
+.custom-remove-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+}
+</style>
+```
+
 ## API
 
 ### 属性
@@ -423,15 +487,14 @@ const files = ref([
 | `elevation`| 海拔高度，可选值为 `true` `false` 和 `0-24` 的等级, 不为简单模式时生效 | _string \| number \| boolean_|   `true`    |
 | `removable` | 是否可以删除 | _boolean_ | `true` |
 | `maxlength` | 最大文件个数 | _string \| number_ | `-` |
-| `maxsize` | 最大文件大小 | _string \| number_ | `-` |
+| `maxsize` | 最大文件大小，单位为 `byte` | _string \| number_ | `-` |
 | `previewed` | 是否允许预览 | _boolean_ | `true` |
 | `prevent-default-preview` | 阻止默认预览行为 | _boolean_ | `false` |
 | `ripple` | 是否开启水波纹 | _boolean_ | `true` |
 | `hide-list` | 是否隐藏文件列表 | _boolean_ | `false` |
 | `resolve-type` | 文件预处理类型，可选值为 `default` `file` `data-url`（`default`，图片文件包含 dataURL 编码和 File 对象，其他类型仅包含 File 对象。`file`，仅包含 File 对象。`data-url`，所有文件类型都包含 dataURL 编码和 File 对象） | _string_ | `default` |
-| `validate-trigger` | 触发验证的时机， 可选值为 `onChange` `onRemove` | _ValidateTriggers[]_ | `['onChange', 'onRemove']` |
-| `rules` | 验证规则，返回 `true` 表示验证通过，其余的值则转换为文本作为用户提示 | _Array<(v: VarFile, u: VarFileUtils) => any>_ | `-` |
-
+| `validate-trigger` | 触发验证的时机， 可选值为 `onChange` `onRemove` | _UploaderValidateTrigger[]_ | `['onChange', 'onRemove']` |
+| `rules` | 验证规则，返回 `true` 表示验证通过，其它类型的值将转换为文本作为用户提示。自 `3.5.0` 开始支持 [Zod 验证](#/zh-CN/zodValidation)  | _((v: VarFile[]) => any) \| ZodType \| Array<((v: VarFile[]) => any) \| ZodType>_ | `-` |
 
 ### VarFile
 
@@ -485,6 +548,7 @@ const files = ref([
 | --- | --- | --- |
 | `default` | 上传按钮内容 | `-` |
 | `extra-message` | 附加信息 | `-` |
+| `remove-button` ***3.8.0*** | 删除按钮 | `remove: () => void` |
 
 ### 样式变量
 
@@ -502,6 +566,7 @@ const files = ref([
 | `--uploader-file-name-color`              | `#888`                                                                                       |
 | `--uploader-file-name-font-size`          | `12px`                                                                                       |
 | `--uploader-file-name-padding`            | `10px`                                                                                       |
+| `--uploader-file-border-radius`            | `0`                                                                                       |
 | `--uploader-file-text-align`              | `center`                                                                                     |
 | `--uploader-file-close-background`        | `rgba(0, 0, 0, 0.3)`                                                                         |
 | `--uploader-file-close-size`              | `24px`                                                                                       |

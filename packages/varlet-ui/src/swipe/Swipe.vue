@@ -1,12 +1,12 @@
 <template>
-  <div :class="n()" ref="swipeEl" v-hover="handleHovering">
+  <div ref="swipeEl" v-hover="handleHovering" :class="n()">
     <div
       :class="classes(n('track'), [vertical, n('--vertical')])"
       :style="{
-        width: !vertical ? `${trackSize}px` : undefined,
-        height: vertical ? `${trackSize}px` : undefined,
-        transform: `translate${vertical ? 'Y' : 'X'}(${trackTranslate}px)`,
-        transitionDuration: lockDuration ? `0ms` : `${toNumber(duration)}ms`,
+        width: !vertical ? toSizeUnit(trackSize) : undefined,
+        height: vertical ? toSizeUnit(trackSize) : undefined,
+        transform: `translate${vertical ? 'Y' : 'X'}(${toSizeUnit(trackTranslate)})`,
+        transitionDuration: lockDuration ? '0ms' : `${toNumber(duration)}ms`,
       }"
       @touchstart="handleTouchstart"
       @touchmove="handleTouchmove"
@@ -92,14 +92,14 @@
         to,
       }"
     >
-      <div :class="classes(n('indicators'), [vertical, n('--indicators-vertical')])" v-if="indicator && length">
+      <div v-if="indicator && length" :class="classes(n('indicators'), [vertical, n('--indicators-vertical')])">
         <div
+          v-for="(l, idx) in length"
+          :key="l"
           :class="
             classes(n('indicator'), [index === idx, n('--indicator-active')], [vertical, n('--indicator-vertical')])
           "
           :style="{ background: indicatorColor }"
-          :key="l"
-          v-for="(l, idx) in length"
           @click="to(idx)"
         ></div>
       </div>
@@ -108,17 +108,18 @@
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, onActivated, ref, watch } from 'vue'
+import { call, clamp, doubleRaf, isNumber, preventDefault, toNumber } from '@varlet/shared'
+import { onSmartUnmounted, onWindowResize, useEventListener, useTouch } from '@varlet/use'
 import VarButton from '../button'
-import VarIcon from '../icon'
 import Hover from '../hover'
-import { defineComponent, ref, computed, watch, onActivated } from 'vue'
-import { useSwipeItems, type SwipeProvider } from './provide'
-import { props, type SwipeToOptions } from './props'
-import { clamp, isNumber, toNumber, doubleRaf, preventDefault, call } from '@varlet/shared'
-import { createNamespace } from '../utils/components'
-import { onSmartUnmounted, onWindowResize, useTouch } from '@varlet/use'
+import VarIcon from '../icon'
 import { usePopup } from '../popup/provide'
 import { type SwipeItemProvider } from '../swipe-item/provide'
+import { createNamespace } from '../utils/components'
+import { toSizeUnit } from '../utils/elements'
+import { props, type SwipeToOptions } from './props'
+import { useSwipeItems, useSwipeResizeListeners, type SwipeProvider } from './provide'
 
 const SWIPE_DELAY = 250
 const SWIPE_OFFSET = 20
@@ -140,6 +141,7 @@ export default defineComponent({
     const index = ref(0)
     const hovering = ref(false)
     const { swipeItems, bindSwipeItems, length } = useSwipeItems()
+    const { swipeResizeListeners, bindSwipeResizeListeners } = useSwipeResizeListeners()
     const { popup, bindPopup } = usePopup()
     const {
       deltaX,
@@ -161,12 +163,16 @@ export default defineComponent({
     let timer = -1
     const swipeProvider: SwipeProvider = {
       size,
+      currentIndex: index,
       vertical,
     }
 
     bindSwipeItems(swipeProvider)
 
+    useEventListener(() => window, 'keydown', handleKeydown)
+
     call(bindPopup, null)
+    call(bindSwipeResizeListeners, null)
 
     watch(
       () => length.value,
@@ -176,7 +182,7 @@ export default defineComponent({
 
         initialIndex()
         resize()
-      }
+      },
     )
 
     if (popup) {
@@ -190,7 +196,7 @@ export default defineComponent({
           } else {
             stopAutoplay()
           }
-        }
+        },
       )
     }
 
@@ -394,6 +400,29 @@ export default defineComponent({
       return n(`--navigation${props.vertical ? '-vertical' : ''}-${type}-animation`)
     }
 
+    function handleKeydown(event: KeyboardEvent) {
+      if (!swipeItems.length) {
+        return
+      }
+
+      const focusingSwipeItemIndex = swipeItems.findIndex(({ isFocusing }) => isFocusing.value)
+      if (focusingSwipeItemIndex === -1) {
+        return
+      }
+
+      const { key } = event
+
+      preventDefault(event)
+
+      if (key === 'ArrowLeft') {
+        prev()
+      }
+
+      if (key === 'ArrowRight') {
+        next()
+      }
+    }
+
     // expose
     function resize() {
       if (!swipeEl.value) {
@@ -414,6 +443,10 @@ export default defineComponent({
 
       setTimeout(() => {
         lockDuration.value = false
+      })
+
+      swipeResizeListeners.forEach(({ onResize }) => {
+        onResize()
       })
     }
 
@@ -501,6 +534,7 @@ export default defineComponent({
       lockDuration,
       hovering,
       n,
+      toSizeUnit,
       classes,
       handleTouchstart,
       handleTouchmove,

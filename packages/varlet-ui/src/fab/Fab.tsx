@@ -1,13 +1,12 @@
-import Button from '../button'
-import Icon from '../icon'
-import Drag from '../drag'
 import { defineComponent, ref, Transition, watch } from 'vue'
+import { call, isBoolean } from '@varlet/shared'
 import { useClickOutside, useVModel } from '@varlet/use'
-import { isBoolean, call } from '@varlet/shared'
+import Button from '../button'
+import Drag from '../drag'
+import Icon from '../icon'
 import { createNamespace, flatFragment } from '../utils/components'
 import { toSizeUnit } from '../utils/elements'
 import { props } from './props'
-
 import '../styles/common.less'
 import '../styles/elevation.less'
 import '../ripple/ripple.less'
@@ -32,21 +31,21 @@ export default defineComponent({
       () => props.trigger,
       () => {
         isActive.value = false
-      }
+      },
     )
 
     watch(
       () => props.disabled,
       () => {
         isActive.value = false
-      }
+      },
     )
 
     watch(
       () => [props.position, props.fixed, props.top, props.bottom, props.left, props.right],
       () => {
         dragRef.value?.reset()
-      }
+      },
     )
 
     useClickOutside(host, 'click', handleClickOutside)
@@ -102,7 +101,7 @@ export default defineComponent({
           color={props.color}
           disabled={props.disabled}
           elevation={props.elevation}
-          round
+          iconContainer={true}
         >
           <Icon
             var-fab-cover
@@ -137,7 +136,7 @@ export default defineComponent({
           direction={dragProps.direction}
           attraction={dragProps.attraction}
           boundary={dragProps.boundary}
-          onClick={(e) => handleClick(e, !isActive.value, children.length)}
+          onClick={(e: Event) => handleClick(e, !isActive.value, children.length)}
           {...attrs}
         >
           <div
@@ -159,7 +158,9 @@ export default defineComponent({
                 onClick={(e) => e.stopPropagation()}
               >
                 {children.map((child) => (
-                  <div class={n('action')}>{child}</div>
+                  <div class={n('action')} key={child.key ?? undefined}>
+                    {child}
+                  </div>
                 ))}
               </div>
             </Transition>

@@ -4,10 +4,6 @@
 
 提供了函数和组件两种调用方式。同时支持级联模式，可以处理多级联动。
 
-### 注意
-
-为了使 api 更加友好，该组件重构于 `2.17.0`，但引入了破坏性变更，老版本文档请 [查看这里](https://github.com/varletjs/varlet/blob/v2.16.7/packages/varlet-ui/src/picker/docs/zh-CN.md)。
-
 ## 函数调用
 
 ### 单列选择
@@ -163,6 +159,32 @@ async function picker() {
 
 <template>
   <var-button type="primary" block @click="picker">地区选择</var-button>
+</template>
+```
+
+### 列数量
+
+通过 `columnsCount` 设置最大显示列的数量，在级联模式下十分有用。
+
+```html
+<script setup>
+import { Picker, Snackbar } from '@varlet/ui'
+import columns from '@varlet/ui/json/area.json'
+
+async function picker() {
+  const { state, texts, indexes } = await Picker({
+    cascade: true,
+    columns,
+    columnsCount: 2,
+    onChange(values, indexes) {
+      Snackbar(`values: ${values.toString()}, indexes: ${indexes.toString()}`)
+    },
+  })
+}
+</script>
+
+<template>
+  <var-button type="primary" block @click="picker">配置显示列</var-button>
 </template>
 ```
 
@@ -348,6 +370,26 @@ function handleChange(values, indexes) {
 </template>
 ```
 
+### 列数量
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { Snackbar } from '@varlet/ui'
+import area from '@varlet/ui/json/area.json'
+
+const columns = ref(area)
+
+function handleChange(values, indexes) {
+  Snackbar(`values: ${values.toString()}, indexes: ${indexes.toString()}`)
+}
+</script>
+
+<template>
+  <var-picker cascade :columns="columns" :columns-count="2" @change="handleChange" />
+</template>
+```
+
 ### 值的映射
 
 ```html
@@ -451,10 +493,12 @@ function handleChange(values, indexes) {
 | `cascade` | 是否开启级联模式 | _boolean_ | `true` |
 | `option-height` | 选项的高度(px rem) | _string \| number_ | `44` |
 | `option-count` | 可见的选项个数 | _string \| number_ | `6` |
+| `columns-count`  ***3.3.11*** | 最大显示列数 | _string \| number_ | `-` |
 | `confirm-button-text` | 确认按钮文字 | _string_ | `确认` |
 | `cancel-button-text` | 取消按钮文字 | _string_ | `取消` |
 | `confirm-button-text-color` | 确认按钮文字颜色 | _string_ | `-` |
 | `cancel-button-text-color` | 取消按钮文字颜色 | _string_ | `-` |
+| `close-on-key-escape` | 是否支持键盘 ESC 关闭选择器 | _boolean_ | `true` |
 
 ### Picker Options
 
@@ -469,11 +513,13 @@ function handleChange(values, indexes) {
 | `cascade`                | 是否开启级联模式 | _boolean_ | `true` |
 | `optionHeight`           | 选项的高度 | _string \| number_ | `44` |
 | `optionCount`            | 可见的选项个数 | _string \| number_ | `6` |
+| `columnsCount`  ***3.3.11***   | 最大显示列数 | _string \| number_ | `-` |
 | `confirmButtonText`      | 确认按钮文字 | _string_ | `确认` |
 | `cancelButtonText`       | 取消按钮文字 | _string_ | `取消` |
 | `confirmButtonTextColor` | 确认按钮文字颜色 | _string_ | `-` |
 | `cancelButtonTextColor`  | 取消按钮文字颜色 | _string_ | `-` |
 | `closeOnClickOverlay`    | 是否点击遮罩层关闭弹出层 | _boolean_ | `true` |
+| `closeOnKeyEscape`       | 是否支持键盘 ESC 关闭选择器 | _boolean_ | `true` |
 | `safeArea`               | 是否开启底部安全区适配      | _boolean_             | `false`  |
 | `onClickOverlay`         | 遮罩层点击回调 | _() => void_ | `-` |
 | `onOpen`                 | 弹出层开启回调 | _() => void_ | `-` |
@@ -483,6 +529,7 @@ function handleChange(values, indexes) {
 | `onChange`               | 选择内容变化时回调 | _(values: (string \| number)[], indexes: number[], options: PickerColumnOption[]) => void_ | `() => void` |
 | `onConfirm`              | 点击确认按钮时触发 | _(values: (string \| number)[], indexes: number[], options: PickerColumnOption[]) => void_ | `() => void` |
 | `onCancel`               | 点击取消按钮时触发 | _(values: (string \| number)[], indexes: number[], options: PickerColumnOption[]) => void_ | `() => void` |
+| `onKeyEscape`            | 点击键盘 ESC 时触发 | _() => void_ | `-` |
 
 ### PickerColumnOption
 
@@ -508,6 +555,7 @@ function handleChange(values, indexes) {
 | `change` | 选择内容变化时触发 | `values: (string \| number)[]` 选择的值列表 <br> `indexes: number[]` 选择的下标列表 <br> `options: PickerColumnOption[]` 选择的选项对象列表 |
 | `cancel` | 点击取消按钮时触发 | `values: (string \| number)[]` 选择的值列表 <br> `indexes: number[]` 选择的下标列表 <br> `options: PickerColumnOption[]` 选择的选项对象列表 |
 | `confirm` | 点击确认按钮时触发 | `values: (string \| number)[]` 选择的值列表 <br> `indexes: number[]` 选择的下标列表 <br> `options: PickerColumnOption[]` 选择的选项对象列表 |
+| `key-escape` | 点击键盘 ESC 时触发 | `-` |
 
 ### 插槽
 
@@ -527,7 +575,7 @@ function handleChange(values, indexes) {
 | `--picker-toolbar-height` | `44px` |
 | `--picker-confirm-button-text-color` | `var(--color-primary)` |
 | `--picker-cancel-button-text-color` | `#888` |
-| `--picker-picked-border` | `1px solid rgba(0, 0, 0, 0.12)` |
+| `--picker-picked-border` | `1px solid var(--color-outline)` |
 | `--picker-title-font-size` | `var(--font-size-lg)` |
 | `--picker-title-text-color` | `#555` |
 | `--picker-option-font-size` | `var(--font-size-lg)` |

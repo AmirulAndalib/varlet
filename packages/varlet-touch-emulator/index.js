@@ -25,13 +25,6 @@ function Touch(target, identifier, mouseEvent) {
   this.pageY = pageY
 }
 
-function updateTouchList(mouseEvent) {
-  const touchList = createTouchList()
-
-  touchList.push(new Touch(eventTarget, 1, mouseEvent))
-  return touchList
-}
-
 function createTouchList() {
   const touchList = []
 
@@ -39,13 +32,27 @@ function createTouchList() {
     return this[index] || null
   }
 
+  touchList.identifiedTouch = function (id) {
+    return this[id + 1] || null
+  }
+
+  return touchList
+}
+
+function createTouchListWithEvent(mouseEvent) {
+  const touchList = createTouchList()
+  touchList.push(new Touch(eventTarget, 1, mouseEvent))
   return touchList
 }
 
 function getActiveTouches(mouseEvent) {
   const { type } = mouseEvent
-  if (isMouseup(type)) return createTouchList()
-  return updateTouchList(mouseEvent)
+
+  if (isMouseup(type)) {
+    return createTouchList()
+  }
+
+  return createTouchListWithEvent(mouseEvent)
 }
 
 function triggerTouch(touchType, mouseEvent) {
@@ -59,7 +66,7 @@ function triggerTouch(touchType, mouseEvent) {
 
   touchEvent.touches = getActiveTouches(mouseEvent)
   touchEvent.targetTouches = getActiveTouches(mouseEvent)
-  touchEvent.changedTouches = createTouchList()
+  touchEvent.changedTouches = createTouchListWithEvent(mouseEvent)
 
   eventTarget.dispatchEvent(touchEvent)
 }
@@ -69,13 +76,19 @@ function onMouse(mouseEvent, touchType) {
 
   initiated = isMousedown(type) ? true : isMouseup(type) ? false : initiated
 
-  if (isMousemove(type) && !initiated) return
+  if (isMousemove(type) && !initiated) {
+    return
+  }
 
-  if (isUpdateTarget(type)) eventTarget = target
+  if (isUpdateTarget(type)) {
+    eventTarget = target
+  }
 
   triggerTouch(touchType, mouseEvent)
 
-  if (isMouseup(type)) eventTarget = null
+  if (isMouseup(type)) {
+    eventTarget = null
+  }
 }
 
 function createTouchEmulator() {

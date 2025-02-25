@@ -16,7 +16,7 @@ The style binding is performed when the pointer hovers over the bound element, a
     :elevation="2"
     :width="100"
     :height="100"
-    v-hover="{ color: '#fff', background: 'var(--color-primary)' }"
+    v-hover="{ color: 'var(--color-on-primary)', background: ' var(--color-primary)' }"
   >
     HOVER
   </var-paper>
@@ -49,7 +49,7 @@ function handleHover(hovering) {
 
 <template>
    <div class="image-container" v-hover="handleHover">
-     <var-image src="https://varlet.gitee.io/varlet-ui/tree.jpeg" />
+     <var-image src="https://varletjs.org/tree.jpeg" />
      <div class="image-mask" :style="{ transform: `translateY(${translateY})` }">HOVER</div>
    </div>
 </template>
@@ -72,7 +72,7 @@ function handleHover(hovering) {
   width: 100%;
   height: 100%;
   transition: all 0.3s;
-  color: #fff;
+  color: var(--color-on-primary);
   background-color: var(--color-primary);
   font-size: 50px;
 }

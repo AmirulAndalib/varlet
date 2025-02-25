@@ -1,7 +1,7 @@
-import VarActionSheet from './ActionSheet.vue'
 import { nextTick, reactive, type TeleportProps } from 'vue'
-import { inBrowser, call } from '@varlet/shared'
+import { call, inBrowser } from '@varlet/shared'
 import { mountInstance, withInstall, withPropsDefaultsSetter } from '../utils/components'
+import VarActionSheet from './ActionSheet.vue'
 import { props as actionSheetProps } from './props'
 
 export type ActionSheetActions = ActionItem | 'close'
@@ -26,6 +26,7 @@ export interface ActionSheetOptions {
   lockScroll?: boolean
   closeOnClickAction?: boolean
   closeOnClickOverlay?: boolean
+  closeOnKeyEscape?: boolean
   safeArea?: boolean
   onOpen?: () => void
   onOpened?: () => void
@@ -33,6 +34,7 @@ export interface ActionSheetOptions {
   onClosed?: () => void
   onClickOverlay?: () => void
   onSelect?: (action: ActionItem) => void
+  onKeyEscape?: () => void
   // internal
   teleport?: TeleportProps['to']
 }

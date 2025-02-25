@@ -4,7 +4,7 @@
       <slot />
     </div>
     <slot v-if="!isLast" name="separator">
-      <div :class="n('separator')">
+      <div :class="n('separator')" aria-hidden="true">
         {{ separator ?? parentSeparator }}
       </div>
     </slot>
@@ -12,11 +12,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { computed, defineComponent } from 'vue'
+import { call } from '@varlet/shared'
+import { createNamespace } from '../utils/components'
 import { props } from './props'
 import { useBreadcrumb } from './provide'
-import { createNamespace } from '../utils/components'
-import { call } from '@varlet/shared'
 
 const { name, n, classes } = createNamespace('breadcrumb')
 

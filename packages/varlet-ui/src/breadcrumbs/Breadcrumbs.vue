@@ -1,14 +1,14 @@
 <template>
-  <div :class="n()">
+  <div :class="n()" role="navigation" aria-label="Breadcrumbs">
     <slot />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { computed, defineComponent } from 'vue'
+import { createNamespace } from '../utils/components'
 import { props } from './props'
 import { useBreadcrumbsList, type BreadcrumbsProvider } from './provide'
-import { createNamespace } from '../utils/components'
 
 const { name, n } = createNamespace('breadcrumbs')
 

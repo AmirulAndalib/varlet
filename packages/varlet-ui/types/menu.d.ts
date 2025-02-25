@@ -1,7 +1,7 @@
-import { VarComponent, BasicAttributes, ListenerProp, SetPropsDefaults } from './varComponent'
-import { Placement as PopperPlacement } from '@popperjs/core/lib/enums'
 import { TeleportProps, VNode } from 'vue'
 import { PositioningStrategy } from '@popperjs/core'
+import { Placement as PopperPlacement } from '@popperjs/core/lib/enums'
+import { BasicAttributes, ListenerProp, SetPropsDefaults, VarComponent } from './varComponent'
 
 export declare const menuProps: Record<keyof MenuProps, any>
 
@@ -18,15 +18,17 @@ export type MenuPlacement =
   | 'cover-left'
   | 'cover-right'
 
-export type MenuTrigger = 'click' | 'hover'
+export type MenuTrigger = 'click' | 'hover' | 'manual'
 
 export type MenuStrategy = PositioningStrategy
+
+export type MenuReference = string | HTMLElement
 
 export interface MenuProps extends BasicAttributes {
   show?: boolean
   disabled?: boolean
   trigger?: MenuTrigger
-  reference?: string
+  reference?: MenuReference
   placement?: MenuPlacement
   strategy?: MenuStrategy
   offsetX?: string | number
@@ -37,10 +39,12 @@ export interface MenuProps extends BasicAttributes {
   defaultStyle?: boolean
   popoverClass?: string
   closeOnClickReference?: boolean
+  closeOnKeyEscape?: boolean
   onOpen?: ListenerProp<() => void>
   onOpened?: ListenerProp<() => void>
   onClose?: ListenerProp<() => void>
   onClosed?: ListenerProp<() => void>
+  onClickOutside?: ListenerProp<(event: Event) => void>
   'onUpdate:show'?: ListenerProp<(show: boolean) => void>
 }
 
@@ -59,6 +63,8 @@ export class Menu extends VarComponent {
   close(): void
 
   resize(): void
+
+  setReference(reference: MenuReference): void
 }
 
 export class _MenuComponent extends Menu {}

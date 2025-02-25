@@ -9,6 +9,7 @@ export default {
   disabled: 'Disabled',
   readonly: 'Readonly',
   validate: 'Validate',
+  validateWithZod: 'Validate with Zod',
   validateMessage: 'There is a file that failed to upload',
   style: 'Customize upload styles',
   upload: 'Upload',
@@ -22,4 +23,5 @@ export default {
   useProgress: 'Use Progress',
   beforeFilter: 'File List Filter',
   clickAction: 'Upload Button Click Event',
+  removeButtonSlot: 'Custom Remove Button',
 }

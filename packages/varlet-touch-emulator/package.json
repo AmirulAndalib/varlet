@@ -1,11 +1,21 @@
 {
   "name": "@varlet/touch-emulator",
-  "version": "2.21.0",
+  "version": "3.9.0",
   "description": "touch-emulator",
   "keywords": [
     "emulator",
     "varlet"
   ],
+  "homepage": "https://github.com/varletjs/varlet#readme",
+  "bugs": {
+    "url": "https://github.com/varletjs/varlet/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varletjs/varlet.git"
+  },
+  "license": "MIT",
+  "author": "BeADre <beadre_wang@163.com>",
   "type": "module",
   "main": "index.js",
   "module": "index.js",
@@ -13,16 +23,6 @@
     "iife.js",
     "index.js"
   ],
-  "author": "BeADre <beadre_wang@163.com>",
-  "homepage": "https://github.com/varletjs/varlet#readme",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/varletjs/varlet.git"
-  },
-  "bugs": {
-    "url": "https://github.com/varletjs/varlet/issues"
-  },
   "scripts": {
     "build": "tsup index.js --format iife --out-dir=. --globalName=VarletTouchEmulator && node build.js"
   },

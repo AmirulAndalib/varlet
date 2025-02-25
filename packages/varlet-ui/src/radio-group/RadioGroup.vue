@@ -1,6 +1,18 @@
 <template>
   <div :class="n('wrap')">
-    <div :class="classes(n(), n(`--${direction}`))">
+    <div :aria-label="ariaLabel" role="radiogroup" :class="classes(n(), n(`--${direction}`))">
+      <template v-if="options.length">
+        <var-radio
+          v-for="option in options"
+          :key="option[valueKey]"
+          :checked-value="option[valueKey]"
+          :disabled="option.disabled"
+        >
+          <template #default="{ checked }">
+            <maybe-v-node :is="isFunction(option[labelKey]) ? option[labelKey](option, checked) : option[labelKey]" />
+          </template>
+        </var-radio>
+      </template>
       <slot />
     </div>
 
@@ -9,19 +21,21 @@
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, nextTick, ref, watch } from 'vue'
+import { call, isFunction, preventDefault } from '@varlet/shared'
+import { useEventListener } from '@varlet/use'
 import VarFormDetails from '../form-details'
-import { computed, defineComponent, nextTick, watch } from 'vue'
-import { props, type ValidateTriggers } from './props'
-import { useValidation, createNamespace } from '../utils/components'
-import { useRadios, type RadioGroupProvider } from './provide'
 import { useForm } from '../form/provide'
-import { call } from '@varlet/shared'
+import VarRadio from '../radio'
+import { createNamespace, MaybeVNode, useValidation } from '../utils/components'
+import { props, type RadioGroupValidateTrigger } from './props'
+import { useRadios, type RadioGroupProvider } from './provide'
 
 const { name, n, classes } = createNamespace('radio-group')
 
 export default defineComponent({
   name,
-  components: { VarFormDetails },
+  components: { VarFormDetails, VarRadio, MaybeVNode },
   props,
   setup(props) {
     const { length, radios, bindRadios } = useRadios()
@@ -34,24 +48,77 @@ export default defineComponent({
       resetValidation,
     } = useValidation()
     const radioGroupErrorMessage = computed(() => errorMessage.value)
+    const hasChecked = ref(false)
 
     const radioGroupProvider: RadioGroupProvider = {
       onToggle,
       validate,
       reset,
       resetValidation,
+      hasChecked: computed(() => hasChecked.value),
       errorMessage: radioGroupErrorMessage,
     }
 
     watch(() => props.modelValue, syncRadios)
-
     watch(() => length.value, syncRadios)
 
     call(bindForm, radioGroupProvider)
-
     bindRadios(radioGroupProvider)
 
-    function validateWithTrigger(trigger: ValidateTriggers) {
+    useEventListener(() => window, 'keydown', handleKeydown)
+
+    function handleKeydown(event: KeyboardEvent) {
+      const focusingRadioIndex = radios.findIndex(({ isFocusing }) => isFocusing.value)
+      if (focusingRadioIndex === -1) {
+        return
+      }
+
+      const hasMoveableRadio = radios.some(({ moveable }, index) => (index === focusingRadioIndex ? false : moveable()))
+      if (!hasMoveableRadio) {
+        return
+      }
+
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        preventDefault(event)
+      }
+
+      if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+        moveRadio(focusingRadioIndex, 'prev')
+        return
+      }
+
+      if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+        moveRadio(focusingRadioIndex, 'next')
+      }
+    }
+
+    function moveRadio(fromIndex: number, method: 'prev' | 'next') {
+      const looping = true
+
+      while (looping) {
+        if (method === 'prev') {
+          fromIndex--
+        } else {
+          fromIndex++
+        }
+
+        if (fromIndex < 0) {
+          fromIndex = radios.length - 1
+        }
+
+        if (fromIndex > radios.length - 1) {
+          fromIndex = 0
+        }
+
+        const radio = radios[fromIndex]
+        if (radio.moveable()) {
+          radio.move()
+          break
+        }
+      }
+    }
+
+    function validateWithTrigger(trigger: RadioGroupValidateTrigger) {
       nextTick(() => {
         const { validateTrigger, rules, modelValue } = props
         vt(validateTrigger, trigger, rules, modelValue)
@@ -59,7 +126,11 @@ export default defineComponent({
     }
 
     function syncRadios() {
-      return radios.forEach(({ sync }) => sync(props.modelValue))
+      radios.forEach(({ sync }) => {
+        if (sync(props.modelValue)) {
+          hasChecked.value = true
+        }
+      })
     }
 
     function onToggle(changedValue: any) {
@@ -86,6 +157,7 @@ export default defineComponent({
       reset,
       validate,
       resetValidation,
+      isFunction,
     }
   },
 })
@@ -94,5 +166,9 @@ export default defineComponent({
 <style lang="less">
 @import '../styles/common';
 @import '../form-details/formDetails';
+@import '../ripple/ripple';
+@import '../hover-overlay/hoverOverlay';
+@import '../icon/icon';
+@import '../radio/radio';
 @import './radioGroup';
 </style>

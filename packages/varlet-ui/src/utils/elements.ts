@@ -1,18 +1,18 @@
 import {
+  assert,
+  getRect,
+  getScrollLeft,
+  getScrollTop,
+  getStyle,
+  inBrowser,
   isNumber,
+  isNumeric,
   isObject,
   isString,
+  isWindow,
   kebabCase,
   toNumber,
-  isWindow,
-  inBrowser,
-  getRect,
-  getStyle,
-  getScrollTop,
-  getScrollLeft,
-  isNumeric,
 } from '@varlet/shared'
-import { error } from './logger'
 import { type StyleVars } from '../style-provider'
 
 export function getLeft(element: HTMLElement): number {
@@ -73,16 +73,14 @@ export function getTarget(target: string | HTMLElement, componentName: string) {
   if (isString(target)) {
     const el = document.querySelector(target)
 
-    if (!el) {
-      error(componentName, 'target element cannot found')
-    }
+    assert(!!el, componentName, 'target element cannot found')
 
     return el as HTMLElement
   }
 
-  if (isObject(target)) return target
+  assert(isObject(target), componentName, 'type of prop "target" should be an element object')
 
-  error(componentName, 'type of prop "target" should be a selector or an element object')
+  return target
 }
 
 export function getViewportSize() {
@@ -209,7 +207,7 @@ interface ScrollToOptions {
 
 export function scrollTo(
   element: HTMLElement | Window,
-  { top = 0, left = 0, duration = 300, animation }: ScrollToOptions
+  { top = 0, left = 0, duration = 300, animation }: ScrollToOptions,
 ): Promise<void> {
   const startTime = Date.now()
 
@@ -247,4 +245,85 @@ export function formatStyleVars(styleVars: StyleVars | null) {
 
 export function padStartFlex(style: string | undefined) {
   return style === 'start' || style === 'end' ? `flex-${style}` : style
+}
+
+export function isDisplayNoneElement(element: HTMLElement) {
+  let parent: HTMLElement | null = element
+
+  while (parent && parent !== document.documentElement) {
+    if (getStyle(parent).display === 'none') {
+      return true
+    }
+
+    parent = parent.parentNode as HTMLElement | null
+  }
+
+  return false
+}
+
+const focusableSelector = ['button', 'input', 'select', 'textarea', '[tabindex]', '[href]']
+  .map((s) => `${s}:not([disabled])`)
+  .join(', ')
+
+export function focusChildElementByKey(
+  referenceElement: HTMLElement,
+  parentElement: HTMLElement,
+  key: 'ArrowDown' | 'ArrowUp',
+  beforeFocus?: (
+    activeElement: HTMLElement,
+    nextActiveElement: HTMLElement,
+    isActiveInReferenceElements: boolean,
+  ) => boolean,
+) {
+  const focusableElements = Array.from(parentElement.querySelectorAll<HTMLElement>(focusableSelector)).filter(
+    (element) => !isDisplayNoneElement(element),
+  )
+
+  if (!focusableElements.length) {
+    return
+  }
+
+  const isActiveInReferenceElements =
+    [referenceElement, ...Array.from(referenceElement.querySelectorAll<HTMLElement>(focusableSelector))].findIndex(
+      (el) => el === document.activeElement,
+    ) !== -1
+
+  const activeElementIndex = Array.from(focusableElements).findIndex((el) => el === document.activeElement)
+
+  if (key === 'ArrowDown') {
+    if (
+      (isActiveInReferenceElements && activeElementIndex === -1) ||
+      activeElementIndex === focusableElements.length - 1
+    ) {
+      focus(focusableElements[0])
+      return
+    }
+
+    if (activeElementIndex !== -1 && activeElementIndex < focusableElements.length - 1) {
+      focus(focusableElements[activeElementIndex + 1])
+      return
+    }
+  }
+
+  if (key === 'ArrowUp') {
+    if ((isActiveInReferenceElements && activeElementIndex === -1) || activeElementIndex === 0) {
+      focus(focusableElements[focusableElements.length - 1])
+      return
+    }
+
+    if (activeElementIndex > 0) {
+      focus(focusableElements[activeElementIndex - 1])
+    }
+  }
+
+  function focus(nextActiveElement: HTMLElement) {
+    if (
+      beforeFocus &&
+      !beforeFocus(document.activeElement as HTMLElement, nextActiveElement, isActiveInReferenceElements)
+    ) {
+      return
+    }
+
+    nextActiveElement.focus()
+  }
 }

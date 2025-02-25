@@ -1,10 +1,11 @@
 import { defineComponent, Teleport, Transition } from 'vue'
-import { props } from './props'
+import { call, preventDefault } from '@varlet/shared'
+import { useEventListener } from '@varlet/use'
 import { useLock } from '../context/lock'
+import { useStack } from '../context/stack'
 import { useZIndex } from '../context/zIndex'
 import { createNamespace, useTeleport } from '../utils/components'
-import { call } from '@varlet/shared'
-
+import { props } from './props'
 import '../styles/common.less'
 import './overlay.less'
 
@@ -15,13 +16,31 @@ export default defineComponent({
   inheritAttrs: false,
   props,
   setup(props, { slots, attrs }) {
-    const { zIndex } = useZIndex(() => props.show, 1)
+    const { zIndex } = useZIndex(() => props.show, 3)
+    const { onStackTop } = useStack(() => props.show, zIndex)
     const { disabled } = useTeleport()
 
     useLock(
       () => props.show,
-      () => props.lockScroll
+      () => props.lockScroll,
     )
+
+    useEventListener(() => window, 'keydown', handleKeydown)
+
+    function handleKeydown(event: KeyboardEvent) {
+      if (!onStackTop() || event.key !== 'Escape' || !props.show) {
+        return
+      }
+
+      call(props.onKeyEscape)
+
+      if (!props.closeOnKeyEscape) {
+        return
+      }
+
+      preventDefault(event)
+      call(props['onUpdate:show'], false)
+    }
 
     function handleClickOverlay() {
       call(props.onClick)
@@ -33,12 +52,25 @@ export default defineComponent({
         <div
           class={n()}
           style={{
-            zIndex: zIndex.value - 1,
+            zIndex: zIndex.value - 2,
           }}
           {...attrs}
-          onClick={handleClickOverlay}
         >
-          {call(slots.default)}
+          <div
+            class={n('overlay')}
+            style={{
+              zIndex: zIndex.value - 1,
+            }}
+            onClick={handleClickOverlay}
+          />
+          <div
+            class={n('content')}
+            style={{
+              zIndex: zIndex.value,
+            }}
+          >
+            {call(slots.default)}
+          </div>
         </div>
       )
     }

@@ -1,5 +1,5 @@
 <template>
-  <div :class="n()" ref="barEl">
+  <div ref="barEl" :class="n()">
     <slot />
     <ul :class="n('anchor-list')" :style="{ zIndex: toNumber(zIndex) + 2, display: hideList ? 'none' : 'block' }">
       <li
@@ -18,24 +18,24 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch, onBeforeUnmount, onDeactivated, onActivated } from 'vue'
+import { computed, defineComponent, onActivated, onBeforeUnmount, onDeactivated, ref, watch } from 'vue'
 import {
-  isPlainObject,
-  toNumber,
+  call,
   doubleRaf,
-  requestAnimationFrame,
   getRect,
   getScrollLeft,
   getScrollTop,
-  call,
+  isPlainObject,
+  requestAnimationFrame,
+  toNumber,
 } from '@varlet/shared'
-import { easeInOutCubic } from '../utils/shared'
-import { getParentScroller, scrollTo as varScrollTo, toPxNum } from '../utils/elements'
-import { useIndexAnchors, type IndexBarProvider } from './provide'
-import { props, type IndexBarScrollToOptions, type ClickOptions } from './props'
-import { createNamespace } from '../utils/components'
 import { onSmartMounted } from '@varlet/use'
 import { type IndexAnchorProvider } from '../index-anchor/provide'
+import { createNamespace } from '../utils/components'
+import { getParentScroller, toPxNum, scrollTo as varScrollTo } from '../utils/elements'
+import { easeInOutCubic } from '../utils/shared'
+import { props, type ClickOptions, type IndexBarScrollToOptions } from './props'
+import { useIndexAnchors, type IndexBarProvider } from './provide'
 
 const { name, n, classes } = createNamespace('index-bar')
 
@@ -48,7 +48,7 @@ export default defineComponent({
     const anchorNameList = ref<(number | string)[]>([])
     const active = ref<number | string | undefined>()
     const sticky = computed(() => props.sticky)
-    const cssMode = computed(() => props.stickyCssMode || props.cssMode)
+    const cssMode = computed(() => props.stickyCssMode)
     const stickyOffsetTop = computed(() => toPxNum(props.stickyOffsetTop))
     const zIndex = computed(() => props.zIndex)
     const { length, indexAnchors, bindIndexAnchors } = useIndexAnchors()
@@ -67,17 +67,13 @@ export default defineComponent({
       () => length.value,
       async () => {
         await doubleRaf()
-        indexAnchors.forEach(({ name, setOwnTop }) => {
-          if (name.value) anchorNameList.value.push(name.value)
-          setOwnTop()
-        })
-      }
+        anchorNameList.value = indexAnchors
+          .filter(({ name }) => name.value != null)
+          .map(({ name }) => name.value) as Array<string | number>
+      },
     )
 
-    onSmartMounted(async () => {
-      await setScroller()
-      addScrollerListener()
-    })
+    onSmartMounted(setupScroller)
 
     onBeforeUnmount(removeScrollerListener)
 
@@ -87,7 +83,9 @@ export default defineComponent({
     })
 
     onActivated(() => {
-      if (!isDeactivated || active.value === undefined) return
+      if (!isDeactivated || active.value === undefined) {
+        return
+      }
 
       anchorClick({
         anchorName: active.value,
@@ -100,7 +98,9 @@ export default defineComponent({
 
     function emitEvent(anchor: IndexAnchorProvider | number | string, options?: IndexBarScrollToOptions) {
       const anchorName = isPlainObject(anchor) ? anchor.name.value : anchor
-      if (anchorName === active.value || anchorName === undefined) return
+      if (anchorName === active.value || anchorName === undefined) {
+        return
+      }
 
       active.value = anchorName
       if (options?.event !== false) {
@@ -122,10 +122,12 @@ export default defineComponent({
       const offsetTop = getOffsetTop()
 
       indexAnchors.forEach((anchor: IndexAnchorProvider, index: number) => {
-        const anchorTop = anchor.ownTop.value
+        const anchorTop = anchor.getOffsetTop()
         const top = scrollTop - anchorTop + stickyOffsetTop.value - offsetTop
         const distance =
-          index === indexAnchors.length - 1 ? scrollHeight : indexAnchors[index + 1].ownTop.value - anchor.ownTop.value
+          index === indexAnchors.length - 1
+            ? scrollHeight
+            : indexAnchors[index + 1].getOffsetTop() - anchor.getOffsetTop()
 
         anchor.setDisabled(true)
 
@@ -151,7 +153,8 @@ export default defineComponent({
       }
 
       const offsetTop = getOffsetTop()
-      const top = indexAnchor.ownTop.value - stickyOffsetTop.value + offsetTop
+      const indexAnchorTop = indexAnchor.getOffsetTop()
+      const top = indexAnchorTop - stickyOffsetTop.value + offsetTop
       const left = getScrollLeft(scroller!)
 
       clickedName.value = anchorName
@@ -168,17 +171,18 @@ export default defineComponent({
       clickedName.value = ''
     }
 
-    async function setScroller() {
-      await doubleRaf()
+    function setupScroller() {
       scroller = getParentScroller(barEl.value as HTMLElement)
-    }
-
-    function addScrollerListener() {
-      scroller!.addEventListener('scroll', handleScroll)
+      scroller.addEventListener('scroll', handleScroll)
     }
 
     function removeScrollerListener() {
-      scroller!.removeEventListener('scroll', handleScroll)
+      if (!scroller) {
+        // may be null in nuxt
+        return
+      }
+
+      scroller.removeEventListener('scroll', handleScroll)
     }
 
     // expose

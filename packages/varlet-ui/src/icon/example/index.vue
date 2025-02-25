@@ -1,22 +1,17 @@
 <script setup>
-import { Themes, Snackbar } from '@varlet/ui'
-import Clipboard from 'clipboard'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
 import icons from '@varlet/icons'
-import { reactive, onMounted, ref, computed } from 'vue'
-import { AppType, watchLang, watchDarkMode } from '@varlet/cli/client'
-import { use, pack } from './locale'
+import { Snackbar } from '@varlet/ui'
+import Clipboard from 'clipboard'
+import { t, use } from './locale'
 
 const iconNames = reactive(icons)
 const iconName = ref('information')
-const background = ref('#fff')
 const searchText = ref('')
 const searchIcons = computed(() =>
-  searchText.value ? iconNames.filter((name) => name.includes(searchText.value)) : iconNames
+  searchText.value ? iconNames.filter((name) => name.includes(searchText.value)) : iconNames,
 )
-
-function toggle() {
-  iconName.value = iconName.value === 'information' ? 'checkbox-marked-circle' : 'information'
-}
 
 onMounted(() => {
   const clipboard = new Clipboard('.icon-example__icon', {
@@ -24,38 +19,39 @@ onMounted(() => {
   })
 
   clipboard.on('success', (e) => {
-    Snackbar.success(`${pack.value.copySuccess} ${e.text}!`)
+    Snackbar.success(`${t('copySuccess')} ${e.text}!`)
   })
 })
 
 watchLang(use)
+onThemeChange()
 
-watchDarkMode(Themes.dark, (theme) => {
-  background.value = theme === 'darkTheme' ? '#303030' : '#fff'
-})
+function toggle() {
+  iconName.value = iconName.value === 'information' ? 'checkbox-marked-circle' : 'information'
+}
 </script>
 
 <template>
-  <app-type>{{ pack.iconSize }}</app-type>
+  <app-type>{{ t('iconSize') }}</app-type>
   <var-icon class="icon-example__animation-icon" name="checkbox-marked-circle" />
   <var-icon class="icon-example__animation-icon" name="checkbox-marked-circle" :size="26" />
 
-  <app-type>{{ pack.iconColor }}</app-type>
+  <app-type>{{ t('iconColor') }}</app-type>
   <var-icon class="icon-example__animation-icon" name="checkbox-marked-circle" color="var(--color-primary)" />
   <var-icon class="icon-example__animation-icon" name="checkbox-marked-circle" color="var(--color-success)" />
 
-  <app-type>{{ pack.useImage }}</app-type>
-  <var-icon class="icon-example__animation-icon" name="https://varlet.gitee.io/varlet-ui/cat.jpg" :size="32" />
+  <app-type>{{ t('useImage') }}</app-type>
+  <var-icon class="icon-example__animation-icon" name="https://varletjs.org/cat.jpg" :size="32" />
 
-  <app-type>{{ pack.clickEvent }}</app-type>
+  <app-type>{{ t('clickEvent') }}</app-type>
   <var-icon
     class="icon-example__animation-icon"
     name="checkbox-marked-circle"
     color="var(--color-primary)"
-    @click="() => Snackbar.success(pack.clickSuccess)"
+    @click="Snackbar.success(t('clickSuccess'))"
   />
 
-  <app-type>{{ pack.iconAnimation }}</app-type>
+  <app-type>{{ t('iconAnimation') }}</app-type>
   <var-icon
     class="icon-example__animation-icon"
     color="var(--color-primary)"
@@ -74,14 +70,14 @@ watchDarkMode(Themes.dark, (theme) => {
     @click="toggle"
   />
 
-  <app-type>{{ pack.iconList }}</app-type>
+  <app-type>{{ t('iconList') }}</app-type>
 
   <var-input
+    v-model.trim="searchText"
     class="icon-example__search"
     size="small"
     variant="outlined"
-    :placeholder="pack.searchIcon"
-    v-model.trim="searchText"
+    :placeholder="t('searchIcon')"
     clearable
   >
     <template #append-icon>
@@ -91,12 +87,12 @@ watchDarkMode(Themes.dark, (theme) => {
 
   <div class="icon-example__icons">
     <div
-      class="icon-example__icon var-elevation--2"
-      :style="{ background }"
-      :data-clipboard-text="name"
-      :key="name"
       v-for="name in searchIcons"
+      :key="name"
       v-ripple
+      class="icon-example__icon var-elevation--2"
+      :style="{ background: 'var(--paper-background)' }"
+      :data-clipboard-text="name"
     >
       <var-icon :name="name" />
       <div class="icon-example__icon-name">{{ name }}</div>
@@ -131,10 +127,10 @@ watchDarkMode(Themes.dark, (theme) => {
     width: 29%;
     padding: 6% 5%;
     margin: 0 2% 4%;
+    border-radius: 10px;
     cursor: pointer;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: transparent;
     user-select: none;
-    border-bottom: 2px solid var(--color-primary);
     transition: background-color 0.25s;
   }
 

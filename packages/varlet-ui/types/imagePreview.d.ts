@@ -1,6 +1,6 @@
-import { VarComponent, BasicAttributes, ListenerProp, SetPropsDefaults } from './varComponent'
-import { SwipeToOptions } from './swipe'
 import { App, TeleportProps, VNode } from 'vue'
+import { SwipeToOptions } from './swipe'
+import { BasicAttributes, ListenerProp, SetPropsDefaults, VarComponent } from './varComponent'
 
 export declare const imagePreviewProps: Record<keyof ImagePreviewProps, any>
 
@@ -12,6 +12,7 @@ export interface ImagePreviewProps extends BasicAttributes {
   lockScroll?: boolean
   indicator?: boolean
   closeable?: boolean
+  closeOnKeyEscape?: boolean
   teleport?: TeleportProps['to'] | false
   imagePreventDefault?: boolean
   onOpen?: ListenerProp<() => void>
@@ -20,10 +21,8 @@ export interface ImagePreviewProps extends BasicAttributes {
   onClosed?: ListenerProp<() => void>
   onChange?: ListenerProp<(index: number) => void>
   onLongPress?: ListenerProp<(index: number) => void>
+  onKeyEscape?: ListenerProp<() => void>
   'onUpdate:show'?: ListenerProp<(show: boolean) => void>
-
-  /** @deprecated Use initialIndex to instead. */
-  current?: string
 }
 
 export interface ImagePreviewOptions {
@@ -33,6 +32,7 @@ export interface ImagePreviewOptions {
   lockScroll?: boolean
   indicator?: boolean
   closeable?: boolean
+  closeOnKeyEscape?: boolean
   imagePreventDefault?: boolean
   onOpen?: () => void
   onOpened?: () => void
@@ -40,9 +40,7 @@ export interface ImagePreviewOptions {
   onClosed?: () => void
   onChange?: (index: number) => void
   onLongPress?: (index: number) => void
-
-  /** @deprecated Use initialIndex to instead. */
-  current?: string
+  onKeyEscape?: () => void
 }
 
 export class ImagePreviewComponent extends VarComponent {

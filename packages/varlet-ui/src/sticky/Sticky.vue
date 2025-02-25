@@ -1,7 +1,7 @@
 <template>
   <div
-    :class="classes(n(), [enableCSSMode, n('--css-mode')])"
     ref="stickyEl"
+    :class="classes(n(), [enableCSSMode, n('--css-mode')])"
     :style="{
       zIndex: toNumber(zIndex),
       top: enableCSSMode ? `${offsetTop}px` : undefined,
@@ -10,8 +10,8 @@
     }"
   >
     <div
-      :class="n('wrapper')"
       ref="wrapperEl"
+      :class="n('wrapper')"
       :style="{
         zIndex: toNumber(zIndex),
         position: enableFixedMode ? 'fixed' : undefined,
@@ -27,12 +27,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue'
-import { props } from './props'
-import { getParentScroller, toPxNum } from '../utils/elements'
-import { toNumber, raf, doubleRaf, getRect, call } from '@varlet/shared'
+import { computed, defineComponent, ref, watch } from 'vue'
+import { call, doubleRaf, getRect, raf, toNumber } from '@varlet/shared'
+import { onSmartMounted, onSmartUnmounted, onWindowResize, useEventListener } from '@varlet/use'
 import { createNamespace } from '../utils/components'
-import { useEventListener, onSmartMounted, onWindowResize, onSmartUnmounted } from '@varlet/use'
+import { getParentScroller, toPxNum } from '../utils/elements'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('sticky')
 
@@ -62,7 +62,11 @@ export default defineComponent({
 
     watch(() => props.disabled, resize)
 
-    onSmartMounted(addScrollListener)
+    onSmartMounted(async () => {
+      await doubleRaf()
+      setupScroller()
+      handleScroll()
+    })
 
     onSmartUnmounted(removeScrollListener)
 
@@ -79,7 +83,7 @@ export default defineComponent({
 
       let scrollerTop = 0
 
-      if (scroller !== window) {
+      if (scroller && scroller !== window) {
         const { top } = getRect(scroller as HTMLElement)
         scrollerTop = top
       }
@@ -114,11 +118,15 @@ export default defineComponent({
       }
     }
 
-    function handleScroll() {
-      if (!scroller) {
-        return
-      }
+    function setupScroller() {
+      scroller = getParentScroller(stickyEl.value as HTMLElement)
 
+      if (scroller !== window) {
+        scroller.addEventListener('scroll', handleScroll)
+      }
+    }
+
+    function handleScroll() {
       // returns undefined when disabled = true
       const fixedParams = computeFixedParams()
 
@@ -127,22 +135,20 @@ export default defineComponent({
       }
     }
 
+    function removeScrollListener() {
+      if (!scroller || scroller === window) {
+        // may be null in nuxt
+        return
+      }
+
+      scroller.removeEventListener('scroll', handleScroll)
+    }
+
     // expose
     async function resize() {
       isFixed.value = false
       await raf()
       computeFixedParams()
-    }
-
-    async function addScrollListener() {
-      await doubleRaf()
-      scroller = getParentScroller(stickyEl.value as HTMLElement)
-      scroller !== window && scroller.addEventListener('scroll', handleScroll)
-      handleScroll()
-    }
-
-    function removeScrollListener() {
-      scroller !== window && scroller.removeEventListener('scroll', handleScroll)
     }
 
     return {

@@ -1,27 +1,26 @@
 <template>
-  <div
-    ref="host"
-    :class="classes(n(), n('$--box'))"
-    @click="handleHostClick"
-    @mouseenter="handleHostMouseenter"
-    @mouseleave="handleHostMouseleave"
-  >
+  <div ref="host" :class="classes(n(), n('$--box'))">
     <slot />
 
     <Teleport :to="teleport === false ? undefined : teleport" :disabled="teleportDisabled || teleport === false">
       <transition :name="n()" @after-enter="onOpened" @after-leave="handleClosed">
         <div
+          v-show="show"
           ref="popover"
           :class="classes(n('tooltip'), n('$--box'))"
           :style="{ zIndex }"
-          v-show="show"
           @click.stop
           @mouseenter="handlePopoverMouseenter"
           @mouseleave="handlePopoverMouseleave"
         >
           <div
-            :style="{ background: color, width: sameWidth ? toSizeUnit(Math.ceil(hostSize.width)) : undefined }"
+            :style="{
+              background: color,
+              color: textColor,
+              width: sameWidth ? toSizeUnit(Math.ceil(referenceSize.width)) : undefined,
+            }"
             :class="classes(n('content-container'), n(`--${type}`))"
+            role="tooltip"
           >
             <slot name="content">{{ content }}</slot>
           </div>
@@ -32,10 +31,10 @@
 </template>
 
 <script lang="ts">
-import { createNamespace, useTeleport } from '../utils/components'
 import { defineComponent } from 'vue'
-import { toSizeUnit } from '../utils/elements'
 import { usePopover } from '../menu/usePopover'
+import { createNamespace, useTeleport } from '../utils/components'
+import { toSizeUnit } from '../utils/elements'
 import { props } from './props'
 
 const { name, n, classes } = createNamespace('tooltip')
@@ -48,12 +47,9 @@ export default defineComponent({
     const {
       popover,
       host,
-      hostSize,
+      referenceSize,
       show,
       zIndex,
-      handleHostClick,
-      handleHostMouseenter,
-      handleHostMouseleave,
       handlePopoverMouseenter,
       handlePopoverMouseleave,
       handlePopoverClose,
@@ -64,28 +60,28 @@ export default defineComponent({
       close,
       // expose
       resize,
+      // expose
+      setReference,
     } = usePopover(props)
 
     return {
       popover,
       host,
-      hostSize,
+      referenceSize,
       show,
       zIndex,
       teleportDisabled,
       toSizeUnit,
       n,
       classes,
-      handleHostClick,
       handlePopoverClose,
-      handleHostMouseenter,
-      handleHostMouseleave,
       handlePopoverMouseenter,
       handlePopoverMouseleave,
       handleClosed,
       resize,
       open,
       close,
+      setReference,
     }
   },
 })

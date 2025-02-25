@@ -222,20 +222,22 @@ it is recommended to wrap a `block` element.
 
 | Prop            | Description                                                                                                                  | Type              | Default           |
 |-----------------|------------------------------------------------------------------------------------------------------------------------------|----------------------|-------------------|
-| `v-model:show`  | Whether to show the menu                                                                                                     | _string_             | `default`         |
+| `v-model:show`  | Whether to show the menu                                                                                                     | _boolean_             | `false`         |
 | `placement`     | Menu popup placement                                                                                                         | _Placement_          | `cover-top-start` |
 | `strategy`       | Menu position strategy, optional value is `absolute` `fixed` | _string_              | `absolute`           |
 | `offset-x`      | The x-axis offset, relative to the menu-aligned position                                                                     | _number \| string_           | `0` |
 | `offset-y`      | The y-axis offset, relative to the menu-aligned position                                                                     | _number \| string_           | `0` |
 | `teleport`      | The location of the menu mount                                                                                               | _TeleportProps['to'] \| false_ | `body`            |
 | `disabled`      | Whether to disable the menu                                                                                                  | _boolean_            | `false`           |
-| `trigger`       | Menu trigger method, optional value is `click` `hover`, `click` is triggered when clicked, `hover` is triggered when hovered | _string_  | `click`           |
+| `trigger`       | Menu trigger method, optional value is `click` `hover` `manual`  | _string_  | `click`           |
 | `reference`       | The associated trigger element selector is used to specify specific child elements as trigger elements | _string_              | `-`           |
+| `reference` | The trigger element associated with the menu, the `string` type is the descendant element selector of the menu component, the `HTMLElement` type is any specified element node | _string \| HTMLElement_ | `-` |
 | `elevation` | Elevation level, options `true` `false` and level of `0-24` | _string \| number \| boolean_|   `true`    |
 | `same-width`    | Whether to same width as trigger element                                                                                     | _boolean_ | `false`           |
 | `default-style` | Whether to enable default styles                                                                                             | _boolean_ | `true`            |
 | `popover-class` | Class of the popover                                                    | _string_             | `-`            |
 | `close-on-click-reference` | Whether to close the menu when clicking the reference element | _boolean_ | `false` |
+| `close-on-key-escape` | Whether to support keyboard ESC to close the menu | _boolean_ | `true`  |
 
 ### Placement
 
@@ -263,11 +265,13 @@ it is recommended to wrap a `block` element.
 | `cover-right` | Right center position, overlay trigger |
 
 ### Methods
+
 | Method   | Description                     | Arguments | Return |
 | --- |---------------------------------| --- | --- |
 | `open` | Open Menu                       | `-` | `-` |
 | `close` | Close Menu                      | `-` | `-` |
 | `resize` | This method can be called to redraw when the default slot element of Menu changes its position and size | `-` | `-` |
+| `setReference` ***3.7.2*** | Set the trigger element associated with the menu | `reference: consistent with the reference of the component attribute` | `-` |
 
 ### Events
 
@@ -292,5 +296,5 @@ Here are the CSS variables used by the component. Styles can be customized using
 
 | Variable | Default |
 | --- | --- |
-| `--menu-background-color` | `#fff` |
+| `--menu-background-color` | `var(--color-surface-container-high)` |
 | `--menu-border-radius` | `2px` |

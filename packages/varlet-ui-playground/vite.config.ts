@@ -1,6 +1,6 @@
 import fs from 'fs'
-import { defineConfig, Plugin } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
+import { defineConfig, Plugin } from 'vite'
 
 function toPath(path: string) {
   return fileURLToPath(new URL(path, import.meta.url))
@@ -13,10 +13,10 @@ function copyVarletDependencies(): Plugin {
     buildStart() {
       fs.copyFileSync(toPath('../varlet-ui/es/varlet.esm.js'), toPath('./public/varlet.esm.js'))
       fs.copyFileSync(toPath('../varlet-touch-emulator/iife.js'), toPath('./public/varlet-touch-emulator.js'))
-      fs.copyFileSync(toPath('../varlet-ui/es/style.css'), toPath('./public/varlet.css'))
+      fs.copyFileSync(toPath('../varlet-ui/es/varlet.css'), toPath('./public/varlet.css'))
       fs.writeFileSync(
         toPath('./public/varlet-area.js'),
-        `export default ${fs.readFileSync(toPath('../varlet-ui/json/area.json'))}`
+        `export default ${fs.readFileSync(toPath('../varlet-ui/json/area.json'))}`,
       )
     },
   }

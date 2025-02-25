@@ -1,7 +1,7 @@
 import { type PropType } from 'vue'
-import { defineListenerProp, pickProps } from '../utils/components'
-import { swipeProps } from '../swipe'
 import { popupProps } from '../popup'
+import { swipeProps } from '../swipe'
+import { defineListenerProp, pickProps } from '../utils/components'
 
 export const props = {
   show: Boolean,
@@ -10,8 +10,6 @@ export const props = {
     type: Array as PropType<string[]>,
     default: () => [],
   },
-  /** @deprecated Use initialIndex to instead. */
-  current: String,
   initialIndex: {
     type: [String, Number],
     default: 0,
@@ -27,10 +25,12 @@ export const props = {
   ...pickProps(popupProps, [
     'lockScroll',
     'teleport',
+    'closeOnKeyEscape',
     'onOpen',
     'onClose',
     'onOpened',
     'onClosed',
+    'onKeyEscape',
     // internal for function call closes the dialog
     'onRouteChange',
   ]),

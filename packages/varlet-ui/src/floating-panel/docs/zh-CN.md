@@ -71,6 +71,7 @@ const anchor = ref(100)
 | 插槽名 | 说明 | 参数 |
 | --- | --- | --- |
 | `default` | 自定义面板内容 |  `-` |
+| `header` ***3.2.12*** | 自定义面板标头 |  `-` |
 
 ### 样式变量
 
@@ -81,7 +82,7 @@ const anchor = ref(100)
 | `--floating-panel-z-index` | `999` |
 | `--floating-panel-border-top` | `none` |
 | `--floating-panel-border-radius` | `0` |
-| `--floating-panel-background` | `#fff` |
+| `--floating-panel-background` | `var(--color-surface-container-high)` |
 | `--floating-panel-header-height` | `40px` |
 | `--floating-panel-toolbar-width` | `20px` |
 | `--floating-panel-toolbar-height` | `3px` |

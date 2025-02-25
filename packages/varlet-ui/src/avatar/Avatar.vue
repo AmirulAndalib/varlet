@@ -8,7 +8,7 @@
         [isInternalSize(size), n(`--${size}`)],
         [round, n('--round')],
         [bordered, n('--bordered')],
-        [hoverable, n('--hoverable')]
+        [hoverable, n('--hoverable')],
       )
     "
     :style="{
@@ -23,6 +23,7 @@
       <img
         v-if="lazy"
         v-lazy="src"
+        role="img"
         :class="n('image')"
         :src="src"
         :alt="alt"
@@ -34,6 +35,7 @@
 
       <img
         v-else
+        role="img"
         :class="n('image')"
         :src="src"
         :alt="alt"
@@ -43,20 +45,20 @@
       />
     </template>
 
-    <div ref="textElement" :class="n('text')" :style="{ transform: `scale(${scale})` }" v-else>
+    <div v-else ref="textElement" :class="n('text')" :style="{ transform: `scale(${scale})` }">
       <slot />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Lazy, { type LazyHTMLElement } from '../lazy'
-import { defineComponent, ref, onUpdated, type Ref } from 'vue'
-import { props } from './props'
-import { toSizeUnit } from '../utils/elements'
-import { createNamespace } from '../utils/components'
+import { defineComponent, onUpdated, ref, type Ref } from 'vue'
 import { call } from '@varlet/shared'
 import { onSmartMounted } from '@varlet/use'
+import Lazy, { type LazyHTMLElement } from '../lazy'
+import { createNamespace } from '../utils/components'
+import { toSizeUnit } from '../utils/elements'
+import { props } from './props'
 
 const isInternalSize = (size: any) => ['mini', 'small', 'normal', 'large'].includes(size)
 

@@ -1,5 +1,5 @@
-import { VarComponent, BasicAttributes, Type as ProgressType, SetPropsDefaults } from './varComponent'
 import { VNode } from 'vue'
+import { BasicAttributes, Type as ProgressType, SetPropsDefaults, VarComponent } from './varComponent'
 
 export type ProgressMode = 'linear' | 'circle'
 
@@ -20,9 +20,6 @@ export interface ProgressProps extends BasicAttributes {
   value?: number | string
   size?: number | string
   rotate?: number
-
-  /** @deprecated  Use indeterminate to instead. */
-  ripple?: boolean
 }
 
 export class Progress extends VarComponent {

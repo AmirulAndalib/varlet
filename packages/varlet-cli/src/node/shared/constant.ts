@@ -15,8 +15,7 @@ export const TYPES_DIR = resolve(CWD, 'types')
 export const ROOT_DOCS_DIR = resolve(CWD, 'docs')
 export const ROOT_PAGES_DIR = resolve(CWD, 'pages')
 
-export const ESLINT_EXTENSIONS = ['.vue', '.tsx', '.ts', '.jsx', '.js', '.mjs', '.cjs']
-export const VITE_RESOLVE_EXTENSIONS = ['.vue', '.tsx', '.ts', '.jsx', '.js', '.mjs', '.cjs', '.less', '.css']
+export const VITE_RESOLVE_EXTENSIONS = ['.vue', '.tsx', '.ts', '.jsx', '.js', '.mjs', '.cjs', '.less', '.scss', '.css']
 export const SCRIPTS_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.cjs']
 export const PUBLIC_DIR_INDEXES = ['index.vue', 'index.tsx', 'index.ts', 'index.jsx', 'index.js']
 export const STYLE_DIR_NAME = 'style'
@@ -57,9 +56,7 @@ export const HL_ZH_MD = 'zh-CN.md'
 export const HL_ZH_WEB_TYPES_JSON = resolve(HL_DIR, 'web-types.zh-CN.json')
 
 // icons
-export const ICONS_CSS_DIR_NAME = 'css'
 export const ICONS_PNG_DIR_NAME = 'png'
-export const ICONS_FONTS_DIR_NAME = 'fonts'
 
 // extension
 export const EXTENSION_ENTRY = resolve(CWD, 'src/extension.ts')

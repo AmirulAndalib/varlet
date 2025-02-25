@@ -1,17 +1,15 @@
-import routes from '@mobile-routes'
-import config from '@config'
-import App from './App.vue'
-import Varlet from '@varlet/ui'
 import { createApp } from 'vue'
+import config from '@config'
+import routes from '@mobile-routes'
+import Varlet from '@varlet/ui'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { get } from 'lodash-es'
 import { inIframe, isPhone } from '../utils'
-
+import App from './App.vue'
 import '@varlet/touch-emulator'
 import '@varlet/ui/es/style'
 
-const redirect = get(config, 'mobile.redirect')
-const defaultLanguage = get(config, 'defaultLanguage')
+const redirect = config?.mobile?.redirect
+const defaultLanguage = config?.defaultLanguage
 
 redirect &&
   routes.push({
@@ -21,7 +19,7 @@ redirect &&
 
 routes.push({
   path: '/home',
-  component: () => import('./AppHome.vue')
+  component: () => import('./AppHome.vue'),
 })
 
 const router = createRouter({
@@ -57,7 +55,4 @@ router.beforeEach((to: any) => {
   }
 })
 
-createApp(App)
-  .use(router)
-  .use(Varlet)
-  .mount('#app')
+createApp(App).use(router).use(Varlet).mount('#app')

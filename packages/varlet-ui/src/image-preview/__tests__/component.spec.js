@@ -1,9 +1,9 @@
-import ImagePreview from '../index'
-import VarImagePreview from '../ImagePreview.vue'
 import { createApp } from 'vue'
 import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
 import { delay, mockImageNaturalSize, mockOffset, trigger, triggerDrag } from '../../utils/test'
-import { expect, vi, describe } from 'vitest'
+import VarImagePreview from '../ImagePreview.vue'
+import ImagePreview from '../index'
 
 mockImageNaturalSize(1440, 1080)
 mockOffset({ offsetWidth: 375, offsetHeight: 815 })
@@ -27,13 +27,13 @@ const expectTap = async (element, wrapper) => {
   expect(wrapper.find('.var-popup').isVisible()).toBe(false)
 }
 
-test('test image preview component plugin', () => {
+test('image preview component plugin', () => {
   const app = createApp({}).use(ImagePreview.Component)
   expect(app.component(ImagePreview.Component.name)).toBeTruthy()
 })
 
 describe('test image preview component props', () => {
-  test('test image preview show', async () => {
+  test('image preview show', async () => {
     const onUpdateShow = vi.fn((value) => wrapper.setProps({ show: value }))
     const wrapper = mount(VarImagePreview, {
       props: {
@@ -52,11 +52,11 @@ describe('test image preview component props', () => {
     wrapper.unmount()
   })
 
-  test('test image preview images', async () => {
+  test('image preview images', async () => {
     const wrapper = mount(VarImagePreview, {
       props: {
         teleport: null,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg'],
         show: true,
       },
     })
@@ -64,18 +64,18 @@ describe('test image preview component props', () => {
     expect(wrapper.findAll('.var-image-preview__zoom-container').length).toBe(1)
 
     await wrapper.setProps({
-      images: ['https://varlet.gitee.io/varlet-ui/cat.jpg', 'https://varlet.gitee.io/varlet-ui/cat2.jpg'],
+      images: ['https://varletjs.org/varlet/cat.jpg', 'https://varletjs.org/varlet/cat2.jpg'],
     })
     expect(wrapper.findAll('.var-image-preview__zoom-container').length).toBe(2)
 
     wrapper.unmount()
   })
 
-  test('test image preview imagePreventDefault', async () => {
+  test('image preview imagePreventDefault', async () => {
     const wrapper = mount(VarImagePreview, {
       props: {
         teleport: null,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg'],
         imagePreventDefault: true,
         show: true,
       },
@@ -88,11 +88,11 @@ describe('test image preview component props', () => {
     wrapper.unmount()
   })
 
-  test('test image preview initialIndex', async () => {
+  test('image preview initialIndex', async () => {
     const wrapper = mount(VarImagePreview, {
       props: {
         teleport: null,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg', 'https://varlet.gitee.io/varlet-ui/cat2.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg', 'https://varletjs.org/varlet/cat2.jpg'],
         initialIndex: 1,
         show: true,
       },
@@ -105,11 +105,11 @@ describe('test image preview component props', () => {
     wrapper.unmount()
   })
 
-  test('test image preview closeable', async () => {
+  test('image preview closeable', async () => {
     const wrapper = mount(VarImagePreview, {
       props: {
         teleport: null,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg', 'https://varlet.gitee.io/varlet-ui/cat2.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg', 'https://varletjs.org/varlet/cat2.jpg'],
         show: true,
       },
     })
@@ -124,13 +124,13 @@ describe('test image preview component props', () => {
     wrapper.unmount()
   })
 
-  test('test image preview zoom', async () => {
+  test('image preview zoom', async () => {
     const onUpdateShow = vi.fn((value) => wrapper.setProps({ show: value }))
     const wrapper = mount(VarImagePreview, {
       props: {
         teleport: null,
         show: true,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg'],
         'onUpdate:show': onUpdateShow,
       },
     })
@@ -155,12 +155,12 @@ describe('test image preview component props', () => {
     wrapper.unmount()
   })
 
-  test('test image preview zoom move', async () => {
+  test('image preview zoom move', async () => {
     const wrapper = mount(VarImagePreview, {
       props: {
         teleport: null,
         show: true,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg'],
       },
     })
 
@@ -189,13 +189,13 @@ describe('test image preview component props', () => {
 })
 
 describe('test image preview component events', () => {
-  test('test image preview tap', async () => {
+  test('image preview tap', async () => {
     const onUpdateShow = vi.fn((value) => wrapper.setProps({ show: value }))
     const wrapper = mount(VarImagePreview, {
       props: {
         teleport: null,
         show: true,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg'],
         'onUpdate:show': onUpdateShow,
       },
     })
@@ -206,12 +206,12 @@ describe('test image preview component events', () => {
     wrapper.unmount()
   })
 
-  test('test image preview onLongPress', async () => {
+  test('image preview onLongPress', async () => {
     const onLongPress = vi.fn()
     const wrapper = mount(VarImagePreview, {
       props: {
         teleport: null,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg'],
         onLongPress,
         show: true,
       },
@@ -229,7 +229,7 @@ describe('test image preview component events', () => {
 })
 
 describe('test image preview component methods', () => {
-  test('test image preview next & prev & to method', async () => {
+  test('image preview next & prev & to method', async () => {
     const Wrapper = {
       components: {
         [VarImagePreview.name]: VarImagePreview,
@@ -242,7 +242,7 @@ describe('test image preview component methods', () => {
     const wrapper = mount(Wrapper, {
       props: {
         teleport: null,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg', 'https://varlet.gitee.io/varlet-ui/cat2.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg', 'https://varletjs.org/varlet/cat2.jpg'],
         show: true,
       },
     })
@@ -271,7 +271,7 @@ describe('test image preview component methods', () => {
     wrapper.unmount()
   })
 
-  test('test image preview zoom method', async () => {
+  test('image preview zoom method', async () => {
     const Wrapper = {
       components: {
         [VarImagePreview.name]: VarImagePreview,
@@ -284,7 +284,7 @@ describe('test image preview component methods', () => {
     const wrapper = mount(Wrapper, {
       props: {
         teleport: null,
-        images: ['https://varlet.gitee.io/varlet-ui/cat.jpg', 'https://varlet.gitee.io/varlet-ui/cat2.jpg'],
+        images: ['https://varletjs.org/varlet/cat.jpg', 'https://varletjs.org/varlet/cat2.jpg'],
         show: true,
       },
     })

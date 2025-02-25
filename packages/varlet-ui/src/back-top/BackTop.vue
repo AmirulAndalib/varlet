@@ -1,8 +1,8 @@
 <template>
   <teleport to="body" :disabled="disabled">
     <div
-      :class="classes(n(), [show, n('--active')])"
       ref="backTopEl"
+      :class="classes(n(), [show, n('--active')])"
       :style="{
         right: toSizeUnit(right),
         bottom: toSizeUnit(bottom),
@@ -11,23 +11,24 @@
       @click.stop="handleClick"
     >
       <slot>
-        <var-button :elevation="elevation" type="primary" round var-back-top-cover>
+        <var-button :elevation="elevation" type="primary" var-back-top-cover>
           <var-icon name="chevron-up" />
         </var-button>
       </slot>
     </div>
   </teleport>
 </template>
+
 <script lang="ts">
+import { defineComponent, onActivated, onMounted, ref, type TeleportProps } from 'vue'
+import { call, getScrollLeft, getScrollTop, throttle } from '@varlet/shared'
+import { onSmartUnmounted } from '@varlet/use'
 import VarButton from '../button'
 import VarIcon from '../icon'
-import { defineComponent, ref, onMounted, onActivated, type TeleportProps } from 'vue'
-import { props } from './props'
-import { throttle, getScrollTop, getScrollLeft, call } from '@varlet/shared'
-import { easeInOutCubic } from '../utils/shared'
-import { scrollTo, getParentScroller, toPxNum, toSizeUnit, getTarget } from '../utils/elements'
 import { createNamespace } from '../utils/components'
-import { onSmartUnmounted } from '@varlet/use'
+import { getParentScroller, getTarget, scrollTo, toPxNum, toSizeUnit } from '../utils/elements'
+import { easeInOutCubic } from '../utils/shared'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('back-top')
 
@@ -47,17 +48,22 @@ export default defineComponent({
     let scroller: HTMLElement | Window
 
     const handleScroll = throttle(() => {
-      show.value = getScrollTop(scroller) >= toPxNum(props.visibilityHeight)
+      setBackTopVisibility()
     }, 200)
 
     onMounted(() => {
       setScroller()
       addScrollerEventListener()
+      setBackTopVisibility()
       disabled.value = false
     })
 
     onActivated(addScrollerEventListener)
     onSmartUnmounted(removeScrollerEventListener)
+
+    function setBackTopVisibility() {
+      show.value = getScrollTop(scroller) >= toPxNum(props.visibilityHeight)
+    }
 
     function handleClick(event: Event) {
       call(props.onClick, event)
@@ -80,6 +86,11 @@ export default defineComponent({
     }
 
     function removeScrollerEventListener() {
+      if (!scroller) {
+        // may be null in nuxt
+        return
+      }
+
       scroller.removeEventListener('scroll', handleScroll)
     }
 

@@ -30,13 +30,13 @@ const value = ref(25)
 </script>
 
 <template>
-  <var-slider v-model="value" step="10" />
+  <var-slider v-model="value" :step="10" />
 </template>
 ```
 
 ### Dual Thumbs
 
-Open the double slider mode through the `range` attribute. Make sure the `value` is an **array**.
+Open the double slider mode through the `range` attribute. Make sure the `value` is an array.
 
 ```html
 <script setup>
@@ -64,7 +64,7 @@ const value = ref(0)
 </script>
 
 <template>
-  <var-slider v-model="value" max="210" min="-50" label-visible="always" />
+  <var-slider v-model="value" :max="210" :min="-50" label-visible="always" />
 </template>
 ```
 
@@ -108,7 +108,7 @@ const value = ref([7, 64])
 </script>
 
 <template>
-  <var-slider v-model="value" track-height="4" thumb-size="8" range />
+  <var-slider v-model="value" :track-height="4" :thumb-size="8" range />
 </template>
 ```
 
@@ -192,8 +192,7 @@ const value2 = ref(50)
 ### Validate Value
 
 Verify the value through the `rules` attribute.
-
-<span style="font-size: 12px">`rules` is an array that accepts `functions`, `boolean`, and `string`. Functions pass an input value as an argument and must return either `true` / `false` or a `string` containing an error message. The input field will enter an error state if a function returns (or any value in the array contains) `false` or is a `string`.</span>
+`rules` is an array that accepts `functions`, `boolean`, and `string`. Functions pass an input value as an argument and must return either `true` / `false` or a `string` containing an error message. The input field will enter an error state if a function returns (or any value in the array contains) `false` or is a `string`.
 
 ```html
 <script setup>
@@ -203,7 +202,22 @@ const value = ref(20)
 </script>
 
 <template>
-  <var-slider v-model="value" :rules="[(v) => v > 35 || 'error message']" />
+  <var-slider v-model="value" :rules="[v => v > 35 || 'error message']" />
+</template>
+```
+
+### Validate With Zod
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { z } from 'zod'
+
+const value = ref(20)
+</script>
+
+<template>
+  <var-slider v-model="value" :rules="z.number().min(36, 'error message')" />
 </template>
 ```
 
@@ -253,8 +267,7 @@ const value2 = ref([7, 64])
 | `disabled`| Whether to disable slider                                                | _boolean_  | `false` |
 | `readonly`| Whether to readonly slider                                               | _boolean_  | `false` |
 | `direction` | Direction of slider, Can be set to `vertical horizontal`                           | _string_ | `horizontal` |
-| `rules`| Validation rules                                                         | _array_  | `-` |
-
+| `rules` | Validation rules, return `true` to indicate verification passes, other types of values ​​will be converted into text as user prompts. [Zod validation](#/en-US/zodValidation) is supported since `3.5.0` | _((v: number \| [number, number]) => any) \| ZodType \| Array<((v: number \| [number, number]) => any) \| ZodType>_ | `-` |
 ### Events
 
 | Event | Description | arguments |
@@ -285,6 +298,6 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--slider-thumb-ripple-background` | `var(--color-primary)` |
 | `--slider-thumb-label-background` | `var(--color-primary)` |
 | `--slider-thumb-label-font-size` | `var(--font-size-sm)` |
-| `--slider-thumb-label-text-color` | `#fff` |
+| `--slider-thumb-label-text-color` | `var(--color-on-primary)` |
 | `--slider-thumb-size` | `12px` |
 | `--slider-disabled-opacity` | `var(--opacity-disabled)` |
